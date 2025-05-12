@@ -25,12 +25,12 @@ export default function Dashboard({ user }: DashboardProps) {
 
             <div className="py-4">
                 <div className="mx-auto">
-                    <h1 className="mb-6 text-2xl font-bold">Chào mừng, {user.name}</h1>
+                    <h1 className="mb-6 text-2xl font-bold">Chào mừng, {user.full_name}</h1>
 
-                    {user.role === 'DM' && <DMDashboard />}
-                    {user.role === 'SM' && <SMDashboard />}
-                    {user.role === 'SL' && <SLDashboard />}
-                    {user.role === 'SA' && <SADashboard />}
+                    {user.position === 'DM' && <DMDashboard />}
+                    {user.position === 'SM' && <SMDashboard />}
+                    {user.position === 'SL' && <SLDashboard />}
+                    {user.position === 'SA' && <SADashboard />}
                 </div>
             </div>
         </AppLayout>

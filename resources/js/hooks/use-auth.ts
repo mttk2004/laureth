@@ -16,18 +16,18 @@ export function useAuth() {
         isLoggedIn: !!user,
 
         // Kiểm tra vai trò
-        isAdmin: user ? isAdminRole(user.role) : false,
-        isStaff: user ? isStaffRole(user.role) : false,
+        isAdmin: user ? isAdminRole(user.position) : false,
+        isStaff: user ? isStaffRole(user.position) : false,
 
         // Kiểm tra vai trò cụ thể
         hasRole: (role: UserRole | UserRole[]) => {
             if (!user) return false;
 
             if (Array.isArray(role)) {
-                return role.includes(user.role);
+                return role.includes(user.position);
             }
 
-            return user.role === role;
+            return user.position === role;
         },
 
         // Kiểm tra quyền hạn (sẽ cài đặt chi tiết sau)
@@ -42,7 +42,7 @@ export function useAuth() {
                 SA: ['sell', 'check_inventory', 'view_personal_data']
             };
 
-            return rolePermissions[user.role]?.includes(permission) || false;
+            return rolePermissions[user.position]?.includes(permission) || false;
         }
     };
 }

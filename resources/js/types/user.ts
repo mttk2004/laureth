@@ -2,9 +2,9 @@ export type UserRole = 'DM' | 'SM' | 'SL' | 'SA';
 
 export interface User {
     id: number;
-    name: string;
+    full_name: string;
     email: string;
-    role: UserRole;
+    position: UserRole; // Đổi từ role thành position theo đúng cấu trúc DB
     store_id?: number; // ID cửa hàng mà người dùng thuộc về (SM, SL, SA)
     created_at: string;
     updated_at: string;

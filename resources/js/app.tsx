@@ -16,6 +16,19 @@ createInertiaApp({
         // Console.log để debug
         console.log('Inertia props:', props);
 
+        // Debug thông tin user
+        const auth = (props.initialPage.props as any).auth;
+        if (auth?.user) {
+            console.log('Auth user:', {
+                id: auth.user.id,
+                full_name: auth.user.full_name,
+                email: auth.user.email,
+                position: auth.user.position
+            });
+        } else {
+            console.log('No authenticated user');
+        }
+
         root.render(<App {...props} />);
     },
     progress: {
