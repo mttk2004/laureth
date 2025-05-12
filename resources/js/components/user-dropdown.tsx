@@ -41,7 +41,7 @@ export default function UserDropdown({ user, className }: UserDropdownProps) {
                         <div className="border-b p-3">
                             <p className="font-medium">{user.full_name}</p>
                             <p className="text-xs text-muted-foreground">{user.email}</p>
-                            <div className="mt-1 rounded-md bg-primary/10 px-2 py-1 text-xs text-primary">
+                            <div className="mt-1 rounded-xs bg-primary/10 px-2 py-1 text-xs text-primary font-medium">
                                 {roleLabels[user.position]}
                             </div>
                         </div>
