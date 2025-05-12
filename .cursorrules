@@ -1,0 +1,36 @@
+# Quy tắc cho Cursor AI khi làm việc với ứng dụng LAURETH
+
+# Thông tin cơ bản
+- Đây là ứng dụng quản lý cửa hàng phụ kiện thời trang LAURETH xây dựng trên Laravel 12 và React 19
+- Ứng dụng quản lý bán hàng, kho, nhân sự và báo cáo cho chuỗi cửa hàng thời trang
+- Hệ thống có 4 vai trò: DM (quản lý chuỗi), SM (quản lý cửa hàng), SL (trưởng ca), SA (nhân viên bán hàng)
+- Giao diện chia thành 2 layout: Admin Layout (DM, SM) và Staff Layout (SL, SA)
+
+# Kiến trúc
+- Dùng mô hình MVC của Laravel
+- Database gồm 15 bảng chính quản lý users, stores, products, orders, warehouses, shifts, payrolls, v.v.
+- Sử dụng Eloquent ORM với quan hệ nhiều-nhiều, một-nhiều
+- Business logic nằm trong services và repositories
+- Validation sử dụng Laravel Request validation
+- Authentication sử dụng Laravel Sanctum với policy và gate
+
+# Quy ước code
+- Models đặt trong app/Models
+- Controllers đặt trong app/Http/Controllers theo chức năng
+- Services đặt trong app/Services, phân chia theo tính năng
+- Code nên được giữ clean và dễ đọc, dễ bảo trì
+
+# Lưu ý khi phát triển
+- Luôn xác thực quyền trước khi thực hiện actions
+- Kiểm tra dữ liệu theo store_id với vai trò SM
+- Tính lương theo giờ/hoa hồng cho SL, SA và lương cơ bản/doanh số cho SM
+- Kiểm tra tồn kho khi bán hàng hoặc chuyển kho
+- Chuyển kho cần xác nhận từ cả 2 cửa hàng
+- Ca làm việc chia thành 2 ca: A (8h-16h) và B (14h30-22h30)
+
+# Mẹo hữu ích
+- Xem database.md để hiểu cấu trúc DB
+- Xem roles-and-layouts.md để hiểu phân quyền
+- Dùng cấu trúc Controller -> Service -> Repository để tổ chức code
+- Tách biệt logic admin (quản lý) và staff (nhân viên)
+- Mô hình kinh doanh tập trung vào bán hàng tại cửa hàng, quản lý kho và tính lương theo hiệu suất
