@@ -110,7 +110,7 @@ export default function DataTable<T>({
                       href={link.url || ''}
                       className={`relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md ${
                         link.active
-                          ? 'z-10 bg-[#F5B3BE] text-white'
+                          ? 'z-10 bg-[#ff477e] text-white'
                           : 'bg-background text-muted-foreground hover:bg-muted'
                       } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                       preserveScroll

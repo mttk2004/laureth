@@ -11,7 +11,7 @@
 - Các bảng hiển thị dữ liệu sử dụng pagination
 - Toast notifications cho thông báo thành công/lỗi
 - Modal dialog cho các form nhỏ và xác nhận
-- Màu chủ đạo: #F5B3BE (hồng nhạt), #303030 (đen), #FFFFFF (trắng)
+- Màu chủ đạo: #ff477e (hồng nhạt), #303030 (đen), #FFFFFF (trắng)
 - Tập trung vào UX đơn giản, trực quan, dễ sử dụng cho nhân viên
 - Các nút tác vụ nên nhất quán về vị trí, màu sắc và kích thước
 
@@ -24,6 +24,9 @@
 - Authentication sử dụng Laravel Sanctum với policy và gate
 - Các components được tạo trong resources/js/components
 - Các page được tạo trong resources/js/pages
+- Các hook được tạo trong resources/js/hooks
+- Các utils được tạo trong resources/js/lib
+- Các type được tạo sẵn trong resources/js/types
 
 # Quy ước code
 - Code nên được giữ clean và dễ đọc, dễ bảo trì
