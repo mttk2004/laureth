@@ -4,38 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Http\Requests\StoreProductRequest;
 
 class ProductController extends Controller
 {
+  private $productService;
+
+  public function __construct(ProductService $productService)
+  {
+    $this->productService = $productService;
+  }
+
+  /**
+   * Hiển thị danh sách sản phẩm
+   *
+   * @param Request $request
+   * @return \Inertia\Response
+   */
   public function index(Request $request)
   {
-    // Lấy query từ request
-    $query = Product::query()->with(['category']);
-
-    // Lọc theo danh mục
-    if ($request->filled('category_id') && $request->category_id !== 'all') {
-      $query->where('category_id', $request->category_id);
-    }
-
-    // Lọc theo trạng thái
-    if ($request->filled('status') && $request->status !== 'all') {
-      $query->where('status', $request->status);
-    }
-
-    // Lọc theo khoảng giá
-    if ($request->filled('price_min')) {
-      $query->where('price', '>=', $request->price_min);
-    }
-
-    if ($request->filled('price_max')) {
-      $query->where('price', '<=', $request->price_max);
-    }
-
     // Lấy danh sách sản phẩm đã lọc và phân trang
-    $products = $query->paginate(10)->withQueryString();
+    $products = $this->productService->getProducts($request->all(), 10);
 
     // Lấy tất cả danh mục để hiển thị trong filter
     $categories = Category::all();
@@ -49,5 +42,36 @@ class ProductController extends Controller
       'categories' => $categories,
       'filters' => $request->only(['category_id', 'status', 'price_min', 'price_max'])
     ]);
+  }
+
+  /**
+   * Hiển thị form tạo sản phẩm mới
+   *
+   * @return \Inertia\Response
+   */
+  public function create()
+  {
+    // Lấy danh sách danh mục để hiển thị trong dropdown
+    $categories = Category::all();
+
+    return Inertia::render('Products/Create', [
+      'categories' => $categories,
+      'user' => Auth::user()
+    ]);
+  }
+
+  /**
+   * Lưu sản phẩm mới
+   *
+   * @param StoreProductRequest $request
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function store(StoreProductRequest $request)
+  {
+    // Xử lý lưu sản phẩm qua service
+    $this->productService->createProduct($request->validated());
+
+    return redirect()->route('products.index')
+      ->with('success', 'Sản phẩm đã được tạo thành công.');
   }
 }
