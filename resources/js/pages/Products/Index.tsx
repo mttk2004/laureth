@@ -26,6 +26,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   products: {
@@ -60,10 +61,11 @@ interface FilterOptions {
 
 export default function ProductsIndex({ products, user, categories = [], filters = {} }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
+  const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { addToast } = useToast();
 
   // Khởi tạo giá trị filterOptions từ filters được truyền từ server hoặc giá trị mặc định
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
@@ -94,7 +96,7 @@ export default function ProductsIndex({ products, user, categories = [], filters
     ]);
   }, [filters]);
 
-  const openDeleteDialog = (productId: number) => {
+  const openDeleteDialog = (productId: string) => {
     setDeleteProductId(productId);
     setDeleteDialogOpen(true);
   };
@@ -118,8 +120,13 @@ export default function ProductsIndex({ products, user, categories = [], filters
     if (deleteProductId) {
       router.delete(`/products/${deleteProductId}`, {
         onSuccess: () => {
+          addToast('Sản phẩm đã được xóa thành công', 'success');
           closeDeleteDialog();
         },
+        onError: () => {
+          addToast('Không thể xóa sản phẩm', 'error');
+          closeDeleteDialog();
+        }
       });
     }
   };
@@ -240,7 +247,7 @@ export default function ProductsIndex({ products, user, categories = [], filters
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => openDeleteDialog(product.id)}
+        onClick={() => openDeleteDialog(product.id.toString())}
       >
         <TrashIcon className="h-4 w-4 text-red-500" />
         <span className="sr-only">Xóa</span>
@@ -452,7 +459,11 @@ export default function ProductsIndex({ products, user, categories = [], filters
                   <Button variant="outline" onClick={closeViewDialog}>
                     Đóng
                   </Button>
-                  <Button onClick={() => router.get(`/products/${selectedProduct.id}/edit`)}>
+                  <Button onClick={() => {
+                    if (selectedProduct) {
+                      router.visit(`/products/${selectedProduct.id}/edit`);
+                    }
+                  }}>
                     <PencilIcon className="h-4 w-4 mr-2" />
                     Chỉnh sửa
                   </Button>

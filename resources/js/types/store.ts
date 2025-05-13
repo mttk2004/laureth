@@ -1,8 +1,8 @@
 export interface Store {
-  id: number;
+  id: string;
   name: string;
   address: string;
-  manager_id: number | null;
+  manager_id: string | null;
   monthly_target: number;
   created_at: string;
   updated_at: string;

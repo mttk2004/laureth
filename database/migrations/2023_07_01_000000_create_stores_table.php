@@ -12,10 +12,10 @@ return new class extends Migration
   public function up(): void
   {
     Schema::create('stores', function (Blueprint $table) {
-      $table->unsignedBigInteger('id')->primary();
+      $table->string('id')->primary();
       $table->string('name', 100);
       $table->text('address');
-      $table->unsignedBigInteger('manager_id')->nullable();
+      $table->string('manager_id')->nullable();
       $table->decimal('monthly_target', 12, 2)->default(0);
       $table->timestamps();
       $table->softDeletes();

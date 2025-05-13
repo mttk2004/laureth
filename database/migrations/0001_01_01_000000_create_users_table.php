@@ -12,16 +12,16 @@ return new class extends Migration
   public function up(): void
   {
     Schema::create('users', function (Blueprint $table) {
-      $table->unsignedBigInteger('id')->primary();
+      $table->string('id')->primary();
       $table->string('full_name', 100);
       $table->string('email', 100)->unique();
       $table->string('password');
-      $table->string('phone', 20)->unique();
+      $table->string('phone', 10)->unique();
       $table->enum('position', ['DM', 'SM', 'SL', 'SA']);
-      $table->decimal('hourly_wage', 10, 2)->nullable();
-      $table->decimal('base_salary', 10, 2)->nullable();
-      $table->decimal('commission_rate', 5, 2)->default(0);
-      $table->unsignedBigInteger('store_id')->nullable();
+      $table->decimal('hourly_wage', 10, 2)->unsigned()->nullable();
+      $table->decimal('base_salary', 10, 2)->unsigned()->nullable();
+      $table->decimal('commission_rate', 5, 2)->unsigned()->default(0.0);
+      $table->string('store_id')->nullable();
       $table->timestamp('last_login')->nullable();
       $table->rememberToken();
       $table->timestamps();
@@ -36,11 +36,13 @@ return new class extends Migration
 
     Schema::create('sessions', function (Blueprint $table) {
       $table->string('id')->primary();
-      $table->foreignId('user_id')->nullable()->index();
+      $table->string('user_id')->nullable()->index();
       $table->string('ip_address', 45)->nullable();
       $table->text('user_agent')->nullable();
       $table->longText('payload');
       $table->integer('last_activity')->index();
+
+      $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
     });
   }
 

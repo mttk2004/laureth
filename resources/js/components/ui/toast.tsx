@@ -80,7 +80,7 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-0 right-0 z-50 flex max-h-screen w-full flex-col-reverse gap-2 p-4 sm:max-w-[420px]">
+    <div className="fixed top-4 right-0 z-50 flex max-h-screen w-full flex-col gap-2 p-4 sm:max-w-[420px]">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}

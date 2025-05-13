@@ -12,15 +12,15 @@ return new class extends Migration
   public function up(): void
   {
     Schema::create('orders', function (Blueprint $table) {
-      $table->unsignedBigInteger('id')->primary();
+      $table->string('id')->primary();
       $table->timestamp('order_date');
-      $table->decimal('total_amount', 12, 2);
-      $table->decimal('discount_amount', 10, 2)->default(0);
-      $table->decimal('final_amount', 12, 2);
+      $table->decimal('total_amount', 12, 2)->unsigned();
+      $table->decimal('discount_amount', 10, 2)->unsigned()->default(0);
+      $table->decimal('final_amount', 12, 2)->unsigned();
       $table->enum('payment_method', ['cash', 'card', 'transfer'])->default('cash');
       $table->enum('status', ['completed', 'canceled', 'pending'])->default('pending');
-      $table->unsignedBigInteger('user_id');
-      $table->unsignedBigInteger('store_id');
+      $table->string('user_id');
+      $table->string('store_id');
       $table->timestamps();
       $table->softDeletes();
 

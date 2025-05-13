@@ -15,7 +15,7 @@ return new class extends Migration
       $table->id();
       $table->string('name', 100);
       $table->boolean('is_main')->default(false);
-      $table->unsignedBigInteger('store_id')->nullable();
+      $table->string('store_id')->nullable();
       $table->timestamps();
       $table->softDeletes();
 

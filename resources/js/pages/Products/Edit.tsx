@@ -224,7 +224,7 @@ export default function ProductEdit({ product, categories, user }: Props) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.get('/products')}
+                onClick={() => router.visit('/products')}
                 disabled={isSubmitting}
               >
                 Hủy

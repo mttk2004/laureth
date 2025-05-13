@@ -15,8 +15,8 @@ return new class extends Migration
       $table->id();
       $table->enum('shift_type', ['A', 'B']);
       $table->date('date');
-      $table->unsignedBigInteger('user_id');
-      $table->unsignedBigInteger('store_id');
+      $table->string('user_id');
+      $table->string('store_id');
       $table->enum('status', ['planned', 'completed', 'absent'])->default('planned');
       $table->timestamps();
 

@@ -18,8 +18,8 @@ class SupplierFactory extends Factory
   {
     return [
       'name' => $this->faker->company(),
-      'phone' => $this->faker->phoneNumber(),
-      'email' => $this->faker->companyEmail(),
+      'phone' => $this->faker->unique()->regexify('0[35789][0-9]{8}'),
+      'email' => $this->faker->unique()->companyEmail(),
     ];
   }
 }

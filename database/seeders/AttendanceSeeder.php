@@ -32,7 +32,7 @@ class AttendanceSeeder extends Seeder
       }
 
       // Tính số giờ làm việc
-      $totalHours = $checkOut->diffInMinutes($checkIn) / 60;
+      $totalHours = - ($checkOut->diffInMinutes($checkIn) / 60);
 
       AttendanceRecord::create([
         'user_id' => $shift->user_id,

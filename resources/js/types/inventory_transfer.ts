@@ -9,9 +9,9 @@ export interface InventoryTransfer {
   id: number;
   source_warehouse_id: number;
   destination_warehouse_id: number;
-  requested_by: number;
-  approved_by: number | null;
-  product_id: number;
+  requested_by: string;
+  approved_by: string | null;
+  product_id: string;
   quantity: number;
   status: InventoryTransferStatus;
   created_at: string;

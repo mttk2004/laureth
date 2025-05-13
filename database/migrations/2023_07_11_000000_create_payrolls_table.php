@@ -13,13 +13,13 @@ return new class extends Migration
   {
     Schema::create('payrolls', function (Blueprint $table) {
       $table->id();
-      $table->unsignedBigInteger('user_id');
-      $table->integer('month');
-      $table->integer('year');
-      $table->decimal('base_amount', 10, 2);
-      $table->decimal('total_hours', 6, 2)->default(0);
-      $table->decimal('commission_amount', 10, 2)->default(0);
-      $table->decimal('final_amount', 12, 2);
+      $table->string('user_id');
+      $table->unsignedSmallInteger('month');
+      $table->unsignedSmallInteger('year');
+      $table->decimal('base_amount', 10, 2)->unsigned();
+      $table->decimal('total_hours', 6, 2)->unsigned()->default(0);
+      $table->decimal('commission_amount', 10, 2)->unsigned()->default(0);
+      $table->decimal('final_amount', 12, 2)->unsigned();
       $table->enum('status', ['pending', 'paid'])->default('pending');
       $table->timestamps();
 

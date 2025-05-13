@@ -18,7 +18,7 @@ class User extends Authenticatable
 
   public $incrementing = false;  // Vô hiệu hóa tự động tăng ID
 
-  protected $keyType = 'integer'; // Kiểu khóa chính là integer
+  protected $keyType = 'string'; // Kiểu khóa chính là string
 
   // Định nghĩa các giá trị cho position
   const POSITION_DM = 'DM'; // District Manager

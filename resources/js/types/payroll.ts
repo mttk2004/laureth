@@ -5,7 +5,7 @@ export enum PayrollStatus {
 
 export interface Payroll {
   id: number;
-  user_id: number;
+  user_id: string;
   month: number;
   year: number;
   base_amount: number;
@@ -16,6 +16,3 @@ export interface Payroll {
   created_at: string;
   updated_at: string;
 }
-
-
-

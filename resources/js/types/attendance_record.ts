@@ -1,6 +1,6 @@
 export interface AttendanceRecord {
   id: number;
-  user_id: number;
+  user_id: string;
   shift_id: number;
   check_in: string | null;
   check_out: string | null;

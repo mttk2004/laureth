@@ -15,7 +15,7 @@ class Store extends Model
 
   public $incrementing = false;  // Vô hiệu hóa tự động tăng ID
 
-  protected $keyType = 'integer'; // Kiểu khóa chính là integer cho phù hợp với kiểu unsignedBigInteger
+  protected $keyType = 'string'; // Kiểu khóa chính là string
 
   protected static function boot(): void
   {

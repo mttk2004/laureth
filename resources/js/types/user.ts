@@ -1,7 +1,7 @@
 export type UserRole = 'DM' | 'SM' | 'SL' | 'SA';
 
 export interface User {
-  id: number;
+  id: string;
   full_name: string;
   email: string;
   password: string;
@@ -10,7 +10,7 @@ export interface User {
   hourly_wage?: number;
   base_salary?: number;
   commission_rate?: number;
-  store_id?: number;
+  store_id?: string;
   last_login?: string;
   created_at: string;
   updated_at: string;

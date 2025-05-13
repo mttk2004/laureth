@@ -15,10 +15,10 @@ return new class extends Migration
       $table->id();
       $table->unsignedBigInteger('source_warehouse_id');
       $table->unsignedBigInteger('destination_warehouse_id');
-      $table->unsignedBigInteger('requested_by');
-      $table->unsignedBigInteger('approved_by')->nullable();
-      $table->unsignedBigInteger('product_id');
-      $table->integer('quantity');
+      $table->string('requested_by');
+      $table->string('approved_by')->nullable();
+      $table->string('product_id');
+      $table->unsignedSmallInteger('quantity');
       $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
       $table->timestamps();
       $table->softDeletes();

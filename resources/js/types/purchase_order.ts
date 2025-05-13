@@ -8,7 +8,7 @@ export interface PurchaseOrder {
   id: number;
   supplier_id: number;
   warehouse_id: number;
-  user_id: number;
+  user_id: string;
   order_date: string;
   total_amount: number;
   status: PurchaseOrderStatus;
@@ -19,8 +19,8 @@ export interface PurchaseOrder {
 
 export interface PurchaseOrderItem {
   id: number;
-  purchase_order_id: number;
-  product_id: number;
+  purchase_order_id: string;
+  product_id: string;
   quantity: number;
   purchase_price: number;
   selling_price: number;

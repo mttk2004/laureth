@@ -14,14 +14,14 @@ class Product extends Model
 
   public $incrementing = false;  // Vô hiệu hóa tự động tăng ID
 
-  protected $keyType = 'integer'; // Kiểu khóa chính là integer
+  protected $keyType = 'string'; // Chuyển kiểu khóa chính thành string thay vì integer
 
   protected static function boot(): void
   {
     parent::boot();
 
     static::creating(function ($model) {
-      $model->{$model->getKeyName()} = App::make('snowflake')->id();
+      $model->{$model->getKeyName()} = (string)App::make('snowflake')->id(); // Chuyển đổi rõ ràng sang string
     });
   }
 

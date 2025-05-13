@@ -79,11 +79,14 @@ class ProductController extends Controller
   /**
    * Hiển thị form chỉnh sửa sản phẩm
    *
-   * @param Product $product
+   * @param mixed $productId
    * @return \Inertia\Response
    */
-  public function edit(Product $product)
+  public function edit($productId)
   {
+    // Tìm sản phẩm theo ID truyền vào
+    $product = Product::findOrFail($productId);
+
     // Lấy danh sách danh mục để hiển thị trong dropdown
     $categories = Category::all();
 
@@ -98,15 +101,36 @@ class ProductController extends Controller
    * Cập nhật sản phẩm
    *
    * @param UpdateProductRequest $request
-   * @param Product $product
+   * @param mixed $productId
    * @return \Illuminate\Http\RedirectResponse
    */
-  public function update(UpdateProductRequest $request, Product $product)
+  public function update(UpdateProductRequest $request, $productId)
   {
+    // Tìm sản phẩm theo ID truyền vào
+    $product = Product::findOrFail($productId);
+
     // Xử lý cập nhật sản phẩm qua service
     $this->productService->updateProduct($product, $request->validated());
 
     return redirect()->route('products.index')
       ->with('success', 'Sản phẩm đã được cập nhật thành công.');
+  }
+
+  /**
+   * Xóa sản phẩm
+   *
+   * @param mixed $productId
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function destroy($productId)
+  {
+    // Tìm sản phẩm theo ID
+    $product = Product::findOrFail($productId);
+
+    // Xử lý xóa sản phẩm qua service
+    $this->productService->deleteProduct($product);
+
+    return redirect()->route('products.index')
+      ->with('success', 'Sản phẩm đã được xóa thành công.');
   }
 }

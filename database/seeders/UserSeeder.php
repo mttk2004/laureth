@@ -15,7 +15,6 @@ class UserSeeder extends Seeder
   {
     // Tạo một người dùng admin (DM - District Manager)
     User::create([
-      'id' => app('snowflake')->id(),
       'full_name' => 'Admin User',
       'email' => 'admin@example.com',
       'password' => Hash::make('password'),
@@ -45,8 +44,8 @@ class UserSeeder extends Seeder
       ]);
     }
 
-    // Tạo 10 Sales Associate (SA)
-    for ($i = 0; $i < 10; $i++) {
+    // Tạo 20 Sales Associate (SA)
+    for ($i = 0; $i < 20; $i++) {
       User::factory()->create([
         'position' => 'SA',
         'base_salary' => null,

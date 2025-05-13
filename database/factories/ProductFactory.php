@@ -18,7 +18,7 @@ class ProductFactory extends Factory
   public function definition(): array
   {
     $adjectives = ['Luxury', 'Modern', 'Elegant', 'Classic', 'Vintage', 'Royal', 'Premium', 'Fancy', 'Exquisite'];
-    $materials = ['Gold', 'Silver', 'Platinum', 'Diamond', 'Pearl', 'Crystal', 'Steel', 'Leather', 'Titanium'];
+    $materials = ['Gold', 'Silver', 'Platinum', 'Diamond', 'Pearl', 'Crystal', 'Steel', 'Leather', 'Titanium', 'Bronze'];
 
     return [
       'name' => $this->faker->randomElement($adjectives) . ' ' . $this->faker->randomElement($materials) . ' ' . $this->faker->word(),

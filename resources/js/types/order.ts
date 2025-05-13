@@ -11,15 +11,15 @@ export enum OrderStatus {
 }
 
 export interface Order {
-  id: number;
+  id: string;
   order_date: string;
   total_amount: number;
   discount_amount: number;
   final_amount: number;
   payment_method: PaymentMethod;
   status: OrderStatus;
-  user_id: number;
-  store_id: number;
+  user_id: string;
+  store_id: string;
   created_at: string;
   updated_at: string;
   deleted_at?: string;
@@ -27,8 +27,8 @@ export interface Order {
 
 export interface OrderItem {
   id: number;
-  order_id: number;
-  product_id: number;
+  order_id: string;
+  product_id: string;
   quantity: number;
   unit_price: number;
   total_price: number;

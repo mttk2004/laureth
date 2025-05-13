@@ -15,7 +15,7 @@ class PurchaseOrder extends Model
 
   public $incrementing = false;  // Vô hiệu hóa tự động tăng ID
 
-  protected $keyType = 'integer'; // Kiểu khóa chính là integer
+  protected $keyType = 'string'; // Kiểu khóa chính là string
 
   protected static function boot(): void
   {
