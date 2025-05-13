@@ -1,7 +1,6 @@
 import { PropsWithChildren } from 'react';
 
 import SidebarNavigation from '@/components/sidebar-navigation';
-import { cn } from '@/lib/utils';
 import { User, isAdminRole } from '@/types/user';
 import AppHeader from '@/components/app-header';
 

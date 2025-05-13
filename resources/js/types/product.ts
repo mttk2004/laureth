@@ -9,6 +9,7 @@ export interface Product {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  category?: Category;
 }
 
 export interface Category {

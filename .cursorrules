@@ -22,6 +22,8 @@
 - Business logic nằm trong services
 - Validation sử dụng Laravel Request validation
 - Authentication sử dụng Laravel Sanctum với policy và gate
+- Các components được tạo trong resources/js/components
+- Các page được tạo trong resources/js/pages
 
 # Quy ước code
 - Code nên được giữ clean và dễ đọc, dễ bảo trì
@@ -43,7 +45,8 @@
 
 # Mẹo hữu ích
 - Xem readme.md để hiểu mô tả doanh nghiệp của dự án
-- Xem database.md và định nghĩa đầy đủ các model trong resources/js/types
+- Xem database.md để hiểu về định nghĩa các bảng
+- Xem định nghĩa đầy đủ các model trong resources/js/types để hiểu rõ về type của các bảng. Không được tạo hoặc sửa định nghĩa model trong resources/js/types mà phải sử dụng định nghĩa đã có.
 - Xem roles-and-layouts.md để hiểu phân quyền
 - Dùng cấu trúc Controller -> Service để tổ chức code
 - Tách biệt logic admin (quản lý) và staff (nhân viên)
