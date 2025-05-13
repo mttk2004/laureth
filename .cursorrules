@@ -50,6 +50,7 @@
 - Xem readme.md để hiểu mô tả doanh nghiệp của dự án
 - Xem database.md để hiểu về định nghĩa các bảng
 - Xem định nghĩa đầy đủ các model trong resources/js/types để hiểu rõ về type của các bảng. Không được tạo hoặc sửa định nghĩa model trong resources/js/types mà phải sử dụng định nghĩa đã có.
+- Xem định nghĩa đầy đủ các model trong app/Models để hiểu rõ về các Model và các quan hệ giữa chúng, không tạo mới model trong app/Models mà phải sử dụng định nghĩa đã có, chỉ được chỉnh sửa Model khi cần thiết.
 - Xem roles-and-layouts.md để hiểu phân quyền
 - Dùng cấu trúc Controller -> Service để tổ chức code
 - Tách biệt logic admin (quản lý) và staff (nhân viên)

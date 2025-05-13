@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { EyeIcon, TrashIcon } from 'lucide-react';
-import { Product } from '@/types/product';
+import { EyeIcon, TrashIcon, FilterIcon } from 'lucide-react';
+import { Product, Category } from '@/types/product';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,10 +11,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { User } from '@/types/user';
 import DataTable from '@/components/ui/data-table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 
 interface Props {
   products: {
@@ -31,11 +42,55 @@ interface Props {
     last_page: number;
   };
   user: User;
+  categories: Category[];
+  filters?: {
+    category_id?: string;
+    status?: string;
+    price_min?: number;
+    price_max?: number;
+  };
 }
 
-export default function ProductsIndex({ products, user }: Props) {
+interface FilterOptions {
+  category_id: string;
+  status: string;
+  price_min: number;
+  price_max: number;
+}
+
+export default function ProductsIndex({ products, user, categories = [], filters = {} }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+
+  // Khởi tạo giá trị filterOptions từ filters được truyền từ server hoặc giá trị mặc định
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    category_id: filters.category_id || 'all',
+    status: filters.status || 'all',
+    price_min: filters.price_min || 0,
+    price_max: filters.price_max || 10000000,
+  });
+
+  // Khởi tạo giá trị priceRange từ filters hoặc giá trị mặc định
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    filters.price_min || 0,
+    filters.price_max || 10000000,
+  ]);
+
+  // Cập nhật filterOptions khi filters thay đổi
+  useEffect(() => {
+    setFilterOptions({
+      category_id: filters.category_id || 'all',
+      status: filters.status || 'all',
+      price_min: filters.price_min || 0,
+      price_max: filters.price_max || 10000000,
+    });
+
+    setPriceRange([
+      filters.price_min || 0,
+      filters.price_max || 10000000,
+    ]);
+  }, [filters]);
 
   const openDeleteDialog = (productId: number) => {
     setDeleteProductId(productId);
@@ -55,6 +110,52 @@ export default function ProductsIndex({ products, user }: Props) {
         },
       });
     }
+  };
+
+  const handleFilterChange = (key: keyof FilterOptions, value: string | number) => {
+    setFilterOptions((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handlePriceRangeChange = (values: number[]) => {
+    setPriceRange([values[0], values[1]]);
+    setFilterOptions((prev) => ({
+      ...prev,
+      price_min: values[0],
+      price_max: values[1],
+    }));
+  };
+
+  const applyFilters = () => {
+    router.get('/products', {
+      category_id: filterOptions.category_id !== 'all' ? filterOptions.category_id : undefined,
+      status: filterOptions.status !== 'all' ? filterOptions.status : undefined,
+      price_min: filterOptions.price_min > 0 ? filterOptions.price_min : undefined,
+      price_max: filterOptions.price_max < 10000000 ? filterOptions.price_max : undefined,
+    }, {
+      preserveState: true,
+      replace: true,
+      preserveScroll: true,
+    });
+    setFilterDialogOpen(false);
+  };
+
+  const resetFilters = () => {
+    setFilterOptions({
+      category_id: 'all',
+      status: 'all',
+      price_min: 0,
+      price_max: 10000000,
+    });
+    setPriceRange([0, 10000000]);
+    router.get('/products', {}, {
+      preserveState: true,
+      replace: true,
+      preserveScroll: true,
+    });
+    setFilterDialogOpen(false);
   };
 
   const columns = [
@@ -126,14 +227,121 @@ export default function ProductsIndex({ products, user }: Props) {
     </div>
   );
 
+  // Format giá tiền cho hiển thị
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+  };
+
   return (
     <AppLayout user={user}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Sản phẩm</h1>
-          <Link href="/products/create">
-            <Button>Thêm sản phẩm mới</Button>
-          </Link>
+          <div className="flex space-x-2">
+            <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <FilterIcon className="h-4 w-4 mr-2" />
+                  Lọc sản phẩm
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Lọc sản phẩm</DialogTitle>
+                  <DialogDescription>
+                    Chọn các tiêu chí để lọc danh sách sản phẩm.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="category">Danh mục</Label>
+                    <Select
+                      value={filterOptions.category_id}
+                      onValueChange={(value) => handleFilterChange('category_id', value)}
+                    >
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Chọn danh mục" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tất cả</SelectItem>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id.toString()}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="status">Trạng thái</Label>
+                    <Select
+                      value={filterOptions.status}
+                      onValueChange={(value) => handleFilterChange('status', value)}
+                    >
+                      <SelectTrigger id="status">
+                        <SelectValue placeholder="Chọn trạng thái" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tất cả</SelectItem>
+                        <SelectItem value="active">Đang bán</SelectItem>
+                        <SelectItem value="inactive">Không bán</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Khoảng giá</Label>
+                    <div className="pt-5 pb-2">
+                      <Slider
+                        defaultValue={priceRange}
+                        max={10000000}
+                        step={100000}
+                        value={priceRange}
+                        onValueChange={handlePriceRangeChange}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <Input
+                        type="number"
+                        value={priceRange[0]}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          setPriceRange([value, priceRange[1]]);
+                          handleFilterChange('price_min', value);
+                        }}
+                        className="w-[45%]"
+                      />
+                      <span>đến</span>
+                      <Input
+                        type="number"
+                        value={priceRange[1]}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          setPriceRange([priceRange[0], value]);
+                          handleFilterChange('price_max', value);
+                        }}
+                        className="w-[45%]"
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{formatCurrency(priceRange[0])}</span>
+                      <span>{formatCurrency(priceRange[1])}</span>
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={resetFilters}>
+                    Đặt lại
+                  </Button>
+                  <Button onClick={applyFilters}>
+                    Áp dụng bộ lọc
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Link href="/products/create">
+              <Button>Thêm sản phẩm mới</Button>
+            </Link>
+          </div>
         </div>
 
         <DataTable
