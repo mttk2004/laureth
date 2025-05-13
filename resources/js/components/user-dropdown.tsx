@@ -23,7 +23,7 @@ export default function UserDropdown({ user, className }: UserDropdownProps) {
         <div className={cn("relative", className)}>
             <button
                 onClick={toggleDropdown}
-                className="flex items-center gap-2 rounded-full bg-secondary/50 px-3 py-2 text-sm hover:bg-secondary/70"
+                className="flex items-center gap-2 rounded-full bg-secondary/50 px-3 py-2 text-sm hover:bg-secondary/70 cursor-pointer"
             >
                 <span className="font-medium">{user.full_name}</span>
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">

@@ -170,7 +170,7 @@ export default function ProductsIndex({ products, user, categories = [], filters
           data={products.data}
           columns={columns}
           actions={(product) => (
-            <div className="flex space-x-2">
+            <div className="flex">
               <Button variant="ghost" size="sm" onClick={() => handleViewProduct(product)}>
                 <EyeIcon className="h-4 w-4" />
                 <span className="sr-only">Xem</span>

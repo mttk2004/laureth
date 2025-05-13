@@ -22,7 +22,7 @@ export default function ProductSortSelect({ value, onChange }: ProductSortSelect
         value={value}
         onValueChange={(val) => onChange(val as SortOption)}
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-40 cursor-pointer">
           <SelectValue placeholder="Sắp xếp theo" />
         </SelectTrigger>
         <SelectContent>

@@ -31,7 +31,7 @@ export default function ThemeSwitcher({ className }: ThemeSwitcherProps) {
     return (
         <button
             onClick={toggleTheme}
-            className={cn("flex h-9 w-9 items-center justify-center rounded-full bg-secondary/50 hover:bg-secondary/70", className)}
+            className={cn("flex h-9 w-9 items-center justify-center rounded-full bg-secondary/50 hover:bg-secondary/70 cursor-pointer", className)}
             title={theme === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
         >
             {theme === 'light' ? (
