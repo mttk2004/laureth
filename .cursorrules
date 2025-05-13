@@ -43,7 +43,7 @@
 
 # Mẹo hữu ích
 - Xem readme.md để hiểu mô tả doanh nghiệp của dự án
-- Xem database.md và định nghĩa các bảng trong database/migrations để hiểu cấu trúc DB
+- Xem database.md và định nghĩa đầy đủ các model trong resources/js/types
 - Xem roles-and-layouts.md để hiểu phân quyền
 - Dùng cấu trúc Controller -> Service để tổ chức code
 - Tách biệt logic admin (quản lý) và staff (nhân viên)
