@@ -20,6 +20,12 @@ class User extends Authenticatable
 
   protected $keyType = 'integer'; // Kiểu khóa chính là integer
 
+  // Định nghĩa các giá trị cho position
+  const POSITION_DM = 'DM'; // District Manager
+  const POSITION_SM = 'SM'; // Store Manager
+  const POSITION_SL = 'SL'; // Shift Leader
+  const POSITION_SA = 'SA'; // Sales Associate
+
   protected static function boot(): void
   {
     parent::boot();
@@ -70,6 +76,7 @@ class User extends Authenticatable
       'base_salary' => 'decimal:2',
       'commission_rate' => 'decimal:2',
       'last_login' => 'datetime',
+      'position' => 'string',
     ];
   }
 
@@ -79,5 +86,37 @@ class User extends Authenticatable
   public function store(): BelongsTo
   {
     return $this->belongsTo(Store::class);
+  }
+
+  /**
+   * Check if user is DM
+   */
+  public function isDm(): bool
+  {
+    return $this->position === self::POSITION_DM;
+  }
+
+  /**
+   * Check if user is SM
+   */
+  public function isSm(): bool
+  {
+    return $this->position === self::POSITION_SM;
+  }
+
+  /**
+   * Check if user is SL
+   */
+  public function isSl(): bool
+  {
+    return $this->position === self::POSITION_SL;
+  }
+
+  /**
+   * Check if user is SA
+   */
+  public function isSa(): bool
+  {
+    return $this->position === self::POSITION_SA;
   }
 }

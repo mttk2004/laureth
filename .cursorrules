@@ -1,24 +1,37 @@
 # Quy tắc cho Cursor AI khi làm việc với ứng dụng LAURETH
 
 # Thông tin cơ bản
-- Đây là ứng dụng quản lý cửa hàng phụ kiện thời trang LAURETH xây dựng trên Laravel 12 và React 19
+- Đây là ứng dụng Inertia.js quản lý cửa hàng phụ kiện thời trang LAURETH xây dựng trên Laravel 12 và React 19
 - Ứng dụng quản lý bán hàng, kho, nhân sự và báo cáo cho chuỗi cửa hàng thời trang
 - Hệ thống có 4 vai trò: DM (quản lý chuỗi), SM (quản lý cửa hàng), SL (trưởng ca), SA (nhân viên bán hàng)
 - Giao diện chia thành 2 layout: Admin Layout (DM, SM) và Staff Layout (SL, SA)
 
+# Giao diện
+- Sử dụng tailwindcss kết hợp với radixUI cho components
+- Các bảng hiển thị dữ liệu sử dụng pagination
+- Toast notifications cho thông báo thành công/lỗi
+- Modal dialog cho các form nhỏ và xác nhận
+- Màu chủ đạo: #F5B3BE (hồng nhạt), #303030 (đen), #FFFFFF (trắng)
+- Tập trung vào UX đơn giản, trực quan, dễ sử dụng cho nhân viên
+- Các nút tác vụ nên nhất quán về vị trí, màu sắc và kích thước
+
 # Kiến trúc
 - Dùng mô hình MVC của Laravel
-- Database gồm 15 bảng chính quản lý users, stores, products, orders, warehouses, shifts, payrolls, v.v.
+- Database gồm 15 bảng chính quản lý users, stores, products, orders, warehouses, shifts, payrolls, v.v. Hãy đọc database.md và các định nghĩa của các bảng trong thư mục database/migrations để hiểu hơn.
 - Sử dụng Eloquent ORM với quan hệ nhiều-nhiều, một-nhiều
-- Business logic nằm trong services và repositories
+- Business logic nằm trong services
 - Validation sử dụng Laravel Request validation
 - Authentication sử dụng Laravel Sanctum với policy và gate
 
 # Quy ước code
-- Models đặt trong app/Models
-- Controllers đặt trong app/Http/Controllers theo chức năng
-- Services đặt trong app/Services, phân chia theo tính năng
 - Code nên được giữ clean và dễ đọc, dễ bảo trì
+- Kiểm tra file đã tồn tại chưa trước khi tạo mới để giữ codebase nhất quán
+- Sử dụng namespace đúng chuẩn PSR-4
+- Viết docblock cho method và class
+- Tách biệt logic nghiệp vụ khỏi controllers bằng services
+- Sử dụng các constant thay vì magic numbers/strings
+- Tuân thủ nguyên tắc SOLID nhưng không cần quá nghiêm ngặt
+- Luôn giữ code nhất quán, đơn giản, dễ đọc dễ hiểu
 
 # Lưu ý khi phát triển
 - Luôn xác thực quyền trước khi thực hiện actions
@@ -29,8 +42,9 @@
 - Ca làm việc chia thành 2 ca: A (8h-16h) và B (14h30-22h30)
 
 # Mẹo hữu ích
-- Xem database.md để hiểu cấu trúc DB
+- Xem readme.md để hiểu mô tả doanh nghiệp của dự án
+- Xem database.md và định nghĩa các bảng trong database/migrations để hiểu cấu trúc DB
 - Xem roles-and-layouts.md để hiểu phân quyền
-- Dùng cấu trúc Controller -> Service -> Repository để tổ chức code
+- Dùng cấu trúc Controller -> Service để tổ chức code
 - Tách biệt logic admin (quản lý) và staff (nhân viên)
 - Mô hình kinh doanh tập trung vào bán hàng tại cửa hàng, quản lý kho và tính lương theo hiệu suất
