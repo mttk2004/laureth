@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 
 class ProductController extends Controller
 {
@@ -73,5 +74,39 @@ class ProductController extends Controller
 
     return redirect()->route('products.index')
       ->with('success', 'Sản phẩm đã được tạo thành công.');
+  }
+
+  /**
+   * Hiển thị form chỉnh sửa sản phẩm
+   *
+   * @param Product $product
+   * @return \Inertia\Response
+   */
+  public function edit(Product $product)
+  {
+    // Lấy danh sách danh mục để hiển thị trong dropdown
+    $categories = Category::all();
+
+    return Inertia::render('Products/Edit', [
+      'product' => $product->load('category'),
+      'categories' => $categories,
+      'user' => Auth::user()
+    ]);
+  }
+
+  /**
+   * Cập nhật sản phẩm
+   *
+   * @param UpdateProductRequest $request
+   * @param Product $product
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function update(UpdateProductRequest $request, Product $product)
+  {
+    // Xử lý cập nhật sản phẩm qua service
+    $this->productService->updateProduct($product, $request->validated());
+
+    return redirect()->route('products.index')
+      ->with('success', 'Sản phẩm đã được cập nhật thành công.');
   }
 }

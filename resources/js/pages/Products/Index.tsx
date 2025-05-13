@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { EyeIcon, TrashIcon, FilterIcon } from 'lucide-react';
+import { EyeIcon, TrashIcon, FilterIcon, PencilIcon } from 'lucide-react';
 import { Product, Category } from '@/types/product';
 import { Button } from '@/components/ui/button';
 import {
@@ -62,6 +62,8 @@ export default function ProductsIndex({ products, user, categories = [], filters
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Khởi tạo giá trị filterOptions từ filters được truyền từ server hoặc giá trị mặc định
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
@@ -100,6 +102,16 @@ export default function ProductsIndex({ products, user, categories = [], filters
   const closeDeleteDialog = () => {
     setDeleteDialogOpen(false);
     setDeleteProductId(null);
+  };
+
+  const openViewDialog = (product: Product) => {
+    setSelectedProduct(product);
+    setViewDialogOpen(true);
+  };
+
+  const closeViewDialog = () => {
+    setViewDialogOpen(false);
+    setSelectedProduct(null);
   };
 
   const handleDelete = () => {
@@ -175,7 +187,7 @@ export default function ProductsIndex({ products, user, categories = [], filters
             <div className="flex-shrink-0 h-10 w-10 mr-4">
               <img
                 className="h-10 w-10 rounded-full object-cover"
-                src={getImageUrl(product.image)}
+                src={getImageUrl(product.image) || ''}
                 alt={product.name}
               />
             </div>
@@ -217,12 +229,14 @@ export default function ProductsIndex({ products, user, categories = [], filters
 
   const renderActions = (product: Product) => (
     <div className="flex space-x-2">
-      <Link href={`/products/${product.id}`}>
-        <Button variant="ghost" size="sm">
-          <EyeIcon className="h-4 w-4" />
-          <span className="sr-only">Xem</span>
-        </Button>
-      </Link>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => openViewDialog(product)}
+      >
+        <EyeIcon className="h-4 w-4" />
+        <span className="sr-only">Xem</span>
+      </Button>
       <Button
         variant="ghost"
         size="sm"
@@ -380,6 +394,71 @@ export default function ProductsIndex({ products, user, categories = [], filters
                 Xóa
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog xem chi tiết sản phẩm */}
+        <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            {selectedProduct && (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Chi tiết sản phẩm</DialogTitle>
+                  <DialogDescription>
+                    Thông tin chi tiết về sản phẩm {selectedProduct.name}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="grid gap-4 py-4">
+                  <div className="flex flex-col items-center mb-4">
+                    {selectedProduct.image && (
+                      <img
+                        src={getImageUrl(selectedProduct.image) || ''}
+                        alt={selectedProduct.name}
+                        className="w-40 h-40 object-cover rounded-md mb-4"
+                      />
+                    )}
+                    <h3 className="text-lg font-semibold">{selectedProduct.name}</h3>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="font-medium">Danh mục:</div>
+                    <div>{selectedProduct.category?.name}</div>
+
+                    <div className="font-medium">Giá:</div>
+                    <div>{formatCurrency(selectedProduct.price)}</div>
+
+                    <div className="font-medium">Trạng thái:</div>
+                    <div>
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        selectedProduct.status === 'active'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                      }`}>
+                        {selectedProduct.status === 'active' ? 'Đang bán' : 'Không bán'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {selectedProduct.description && (
+                    <div className="mt-2">
+                      <div className="font-medium">Mô tả:</div>
+                      <p className="text-sm mt-1">{selectedProduct.description}</p>
+                    </div>
+                  )}
+                </div>
+
+                <DialogFooter className="flex space-x-2">
+                  <Button variant="outline" onClick={closeViewDialog}>
+                    Đóng
+                  </Button>
+                  <Button onClick={() => router.get(`/products/${selectedProduct.id}/edit`)}>
+                    <PencilIcon className="h-4 w-4 mr-2" />
+                    Chỉnh sửa
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
           </DialogContent>
         </Dialog>
       </div>
