@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   categories: Category[];
@@ -33,6 +34,7 @@ export default function ProductCreate({ categories, user }: Props) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { addToast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -74,6 +76,8 @@ export default function ProductCreate({ categories, user }: Props) {
 
     router.post('/products', data, {
       onSuccess: () => {
+        // Hiển thị thông báo thành công
+        addToast('Sản phẩm đã được tạo thành công', 'success');
         // Reset form và chuyển hướng đã được xử lý tự động
       },
       onError: (errors) => {

@@ -158,6 +158,13 @@ export default function ProductsIndex({ products, user, categories = [], filters
     setFilterDialogOpen(false);
   };
 
+  // Hàm lấy URL đúng cho ảnh từ storage
+  const getImageUrl = (path: string | null) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    return `/storage/${path}`;
+  };
+
   const columns = [
     {
       key: 'name',
@@ -168,7 +175,7 @@ export default function ProductsIndex({ products, user, categories = [], filters
             <div className="flex-shrink-0 h-10 w-10 mr-4">
               <img
                 className="h-10 w-10 rounded-full object-cover"
-                src={product.image}
+                src={getImageUrl(product.image)}
                 alt={product.name}
               />
             </div>

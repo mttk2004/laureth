@@ -4,6 +4,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
+import { ToastProvider } from './hooks/use-toast';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -17,6 +18,7 @@ createInertiaApp({
         console.log('Inertia props:', props);
 
         // Debug thông tin user
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const auth = (props.initialPage.props as any).auth;
         if (auth?.user) {
             console.log('Auth user:', {
@@ -29,7 +31,12 @@ createInertiaApp({
             console.log('No authenticated user');
         }
 
-        root.render(<App {...props} />);
+        // Wrap App with ToastProvider
+        root.render(
+            <ToastProvider>
+                <App {...props} />
+            </ToastProvider>
+        );
     },
     progress: {
         color: '#4B5563',

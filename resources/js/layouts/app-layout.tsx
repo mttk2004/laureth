@@ -3,6 +3,7 @@ import { PropsWithChildren } from 'react';
 import SidebarNavigation from '@/components/sidebar-navigation';
 import { User, isAdminRole } from '@/types/user';
 import AppHeader from '@/components/app-header';
+import { ToastContainer } from '@/components/ui/toast';
 
 interface AppLayoutProps {
     user?: User;
@@ -15,6 +16,7 @@ export default function AppLayout({ children, user }: PropsWithChildren<AppLayou
             <div className="min-h-screen bg-background">
                 <div className="flex min-h-screen flex-col p-6">
                     {children}
+                    <ToastContainer />
                 </div>
             </div>
         );
@@ -57,6 +59,7 @@ function AdminLayout({ children, user }: PropsWithChildren<{ user: User }>) {
                         </div>
                     </main>
                 </div>
+                <ToastContainer />
             </div>
         </div>
     );
@@ -83,6 +86,7 @@ function StaffLayout({ children, user }: PropsWithChildren<{ user: User }>) {
                         </div>
                     </main>
                 </div>
+                <ToastContainer />
             </div>
         </div>
     );
