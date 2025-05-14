@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import UserRoleBadge from '@/components/users/UserRoleBadge';
 import { formatPhoneNumber, formatLastLogin } from '@/lib/userUtils';
 import { formatCurrency } from '@/lib/productUtils';
 
@@ -30,7 +29,7 @@ export default function UserDetailDialog({
 
   // Chuyển đổi tỷ lệ hoa hồng từ thập phân sang phần trăm
   const formattedCommissionRate = user.commission_rate
-    ? `${(user.commission_rate * 100).toFixed(1)}%`
+    ? `${user.commission_rate * 100}%`
     : 'Không áp dụng';
 
   return (
@@ -82,25 +81,25 @@ export default function UserDetailDialog({
             {user.position === 'SM' && (
               <div className="grid grid-cols-2 gap-2">
                 <div className="font-medium">Lương cơ bản:</div>
-                <div>{user.base_salary?.toLocaleString('vi-VN')} VND</div>
+                <div>{user.base_salary ? formatCurrency(user.base_salary) : 'Không áp dụng'}</div>
               </div>
             )}
 
             {['SL', 'SA'].includes(user.position) && (
               <div className="grid grid-cols-2 gap-2">
                 <div className="font-medium">Lương theo giờ:</div>
-                <div>{user.hourly_wage?.toLocaleString('vi-VN')} VND</div>
+                <div>{user.hourly_wage ? formatCurrency(user.hourly_wage) : 'Không áp dụng'}</div>
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-2">
               <div className="font-medium">Đăng nhập cuối:</div>
-              <div>{user.last_login ? new Date(user.last_login).toLocaleString('vi-VN') : 'Chưa đăng nhập'}</div>
+              <div>{user.last_login ? formatLastLogin(user.last_login) : 'Chưa đăng nhập'}</div>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div className="font-medium">Ngày tạo:</div>
-              <div>{new Date(user.created_at).toLocaleString('vi-VN')}</div>
+              <div>{formatLastLogin(user.created_at)}</div>
             </div>
           </div>
         </div>

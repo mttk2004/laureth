@@ -71,7 +71,7 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
       <DialogTrigger asChild>
         <Button variant={hasActiveFilters ? "default" : "outline"}>
           <FilterIcon className="h-4 w-4 mr-2" />
-          Lọc {hasActiveFilters && <span className="ml-1 text-xs rounded-full bg-white text-primary w-4 h-4 flex justify-center items-center font-bold">!</span>}
+          Lọc nhân viên {hasActiveFilters && <span className="ml-1 text-xs rounded-full bg-white text-primary w-4 h-4 flex justify-center items-center font-bold">!</span>}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

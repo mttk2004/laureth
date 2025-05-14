@@ -179,9 +179,9 @@ export default function UserCreate({ stores, user }: Props) {
                     type="number"
                     value={formData.commission_rate}
                     onChange={handleInputChange}
-                    min="0"
-                    max="100"
-                    step="0.1"
+                    min="10"
+                    max="1000"
+                    step="1"
                     className={errors.commission_rate ? 'border-red-500' : ''}
                     placeholder="Nhập % hoa hồng (vd: 5 cho 5%)"
                   />
@@ -199,8 +199,8 @@ export default function UserCreate({ stores, user }: Props) {
                       type="number"
                       value={formData.base_salary}
                       onChange={handleInputChange}
-                      min="0"
-                      step="100000"
+                      min="10000000"
+                      step="1"
                       className={errors.base_salary ? 'border-red-500' : ''}
                       required={showBaseSalary}
                     />
@@ -219,8 +219,8 @@ export default function UserCreate({ stores, user }: Props) {
                       type="number"
                       value={formData.hourly_wage}
                       onChange={handleInputChange}
-                      min="0"
-                      step="1000"
+                      min="25000"
+                      step="1"
                       className={errors.hourly_wage ? 'border-red-500' : ''}
                       required={showHourlyWage}
                     />
