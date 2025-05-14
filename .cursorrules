@@ -11,7 +11,7 @@
 - Các bảng hiển thị dữ liệu sử dụng pagination
 - Toast notifications cho thông báo thành công/lỗi
 - Modal dialog cho các form nhỏ và xác nhận
-- Màu chủ đạo: #ff477e (hồng nhạt), #303030 (đen), #FFFFFF (trắng)
+- Màu chủ đạo: #06f (xanh)
 - Tập trung vào UX đơn giản, trực quan, dễ sử dụng cho nhân viên
 - Các nút tác vụ nên nhất quán về vị trí, màu sắc và kích thước
 
@@ -35,6 +35,7 @@
 - Sử dụng namespace đúng chuẩn PSR-4
 - Viết docblock cho method và class
 - Tách biệt logic nghiệp vụ khỏi controllers bằng services
+- Tách biệt data validation khỏi controller bằng Request
 - Sử dụng các constant thay vì magic numbers/strings
 - Tuân thủ nguyên tắc SOLID nhưng không cần quá nghiêm ngặt
 - Luôn giữ code nhất quán, đơn giản, dễ đọc dễ hiểu
@@ -46,14 +47,15 @@
 - Kiểm tra tồn kho khi bán hàng hoặc chuyển kho
 - Chuyển kho cần xác nhận từ cả 2 cửa hàng
 - Ca làm việc chia thành 2 ca: A (8h-16h) và B (14h30-22h30)
+- Xem định nghĩa đầy đủ các model trong resources/js/types để hiểu rõ về type của các bảng. Không được tạo hoặc sửa định nghĩa model trong resources/js/types mà phải sử dụng định nghĩa đã có.
+- Xem định nghĩa đầy đủ các model trong app/Models để hiểu rõ về các Model và các quan hệ giữa chúng, không tạo mới model trong app/Models mà phải sử dụng định nghĩa đã có, chỉ được chỉnh sửa Model khi cần thiết.
+- Dùng cấu trúc Controller -> Service để tổ chức code, dùng Request để validate dữ liệu
+- Tạo request cho các action create, update trong controller (tạo vào thư mục app/Http/Requests) nếu chúng chưa có, nếu có rồi thì không cần tạo mới
+- Khi tạo trang Index, nếu cần dùng bảng thì luôn tái sử dụng data-table.tsx trong resources/js/components/ui, nếu cần chức năng lọc và sắp xếp thì luôn tái sử dụng BaseFilterDialog.tsx, BaseFilterForm.tsx và BaseSortSelect.tsx trong resources/js/components/common
 
 # Mẹo hữu ích
 - Xem readme.md để hiểu mô tả doanh nghiệp của dự án
 - Xem database.md để hiểu về định nghĩa các bảng
-- Xem định nghĩa đầy đủ các model trong resources/js/types để hiểu rõ về type của các bảng. Không được tạo hoặc sửa định nghĩa model trong resources/js/types mà phải sử dụng định nghĩa đã có.
-- Xem định nghĩa đầy đủ các model trong app/Models để hiểu rõ về các Model và các quan hệ giữa chúng, không tạo mới model trong app/Models mà phải sử dụng định nghĩa đã có, chỉ được chỉnh sửa Model khi cần thiết.
 - Xem roles-and-layouts.md để hiểu phân quyền
-- Dùng cấu trúc Controller -> Service để tổ chức code, dùng Request để validate dữ liệu
-- Luôn tạo request cho các action create, update trong controller (tạo vào thư mục app/Http/Requests) nếu chúng chưa có, nếu có rồi thì không cần tạo mới
 - Tách biệt logic admin (quản lý) và staff (nhân viên)
 - Mô hình kinh doanh tập trung vào bán hàng tại cửa hàng, quản lý kho và tính lương theo hiệu suất
