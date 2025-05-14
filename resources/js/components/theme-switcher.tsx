@@ -19,12 +19,12 @@ export default function ThemeSwitcher({ className }: ThemeSwitcherProps) {
     // Xác định icon hiển thị
     const getIcon = () => {
         if (theme === 'light') {
-            return <Sun className="h-5 w-5" />;
-        } else if (theme === 'dark') {
             return <Moon className="h-5 w-5" />;
+        } else if (theme === 'dark') {
+            return <MonitorSmartphone className="h-5 w-5" />;
         } else {
             // Sử dụng icon màn hình khi ở chế độ system
-            return <MonitorSmartphone className="h-5 w-5" />;
+            return <Sun className="h-5 w-5" />;
         }
     };
 
@@ -45,7 +45,7 @@ export default function ThemeSwitcher({ className }: ThemeSwitcherProps) {
                     <button
                         onClick={toggleTheme}
                         className={cn(
-                            "flex h-9 w-9 items-center justify-center rounded-md border border-border/40 bg-card shadow-sm hover:border-border/70 transition-all",
+                            "flex h-9 w-9 items-center justify-center rounded-md border border-border/40 bg-card hover:border-border/70 transition-all cursor-pointer",
                             className
                         )}
                         aria-label={getTooltipText()}

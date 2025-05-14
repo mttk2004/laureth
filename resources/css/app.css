@@ -49,6 +49,11 @@
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
 
+    --color-active: var(--active);
+    --color-inactive: var(--inactive);
+    --color-active-foreground: var(--active-foreground);
+    --color-inactive-foreground: var(--inactive-foreground);
+
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -124,6 +129,12 @@
     --chart-3: light-dark(oklch(0.7 0.15 190), oklch(0.7 0.15 190));
     --chart-4: light-dark(oklch(0.65 0.2 290), oklch(0.75 0.22 290));
     --chart-5: light-dark(oklch(0.75 0.2 70), oklch(0.75 0.2 70));
+
+    /* Màu cho sản phẩm */
+    --active: light-dark(oklch(96.2% 0.044 156.743), oklch(52.7% 0.154 150.069));
+    --active-foreground: light-dark(oklch(52.7% 0.154 150.069), oklch(96.2% 0.044 156.743));
+    --inactive: light-dark(oklch(93.6% 0.032 17.717), oklch(39.6% 0.141 25.723));
+    --inactive-foreground: light-dark(oklch(50.5% 0.213 27.518), oklch(93.6% 0.032 17.717));
 
     /* Bo góc */
     --radius: 0.5rem;
