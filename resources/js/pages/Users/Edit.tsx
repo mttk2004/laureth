@@ -189,6 +189,7 @@ export default function UserEdit({ editUser, stores, user }: Props) {
                     step="1"
                     className={errors.commission_rate ? 'border-red-500' : ''}
                     placeholder="Nhập % hoa hồng (vd: 5 cho 5%)"
+                    disabled={formData.position === 'SM'}
                   />
                   {errors.commission_rate && (
                     <p className="text-red-500 text-sm mt-1">{errors.commission_rate}</p>
