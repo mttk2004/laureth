@@ -1,13 +1,6 @@
 import React from 'react';
 import { SortOption, getSortLabel } from '@/lib/productUtils';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { ArrowUpDown } from 'lucide-react';
+import BaseSortSelect from '@/components/common/BaseSortSelect';
 
 interface ProductSortSelectProps {
   value: SortOption;
@@ -15,25 +8,23 @@ interface ProductSortSelectProps {
 }
 
 export default function ProductSortSelect({ value, onChange }: ProductSortSelectProps) {
+  const options = [
+    { value: SortOption.NEWEST, label: getSortLabel(SortOption.NEWEST) },
+    { value: SortOption.OLDEST, label: getSortLabel(SortOption.OLDEST) },
+    { value: SortOption.NAME_ASC, label: getSortLabel(SortOption.NAME_ASC) },
+    { value: SortOption.NAME_DESC, label: getSortLabel(SortOption.NAME_DESC) },
+    { value: SortOption.PRICE_ASC, label: getSortLabel(SortOption.PRICE_ASC) },
+    { value: SortOption.PRICE_DESC, label: getSortLabel(SortOption.PRICE_DESC) },
+  ];
+
   return (
-    <div className="flex items-center space-x-2">
-      <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-      <Select
-        value={value}
-        onValueChange={(val) => onChange(val as SortOption)}
-      >
-        <SelectTrigger className="w-40 cursor-pointer">
-          <SelectValue placeholder="Sắp xếp theo" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={SortOption.NEWEST}>{getSortLabel(SortOption.NEWEST)}</SelectItem>
-          <SelectItem value={SortOption.OLDEST}>{getSortLabel(SortOption.OLDEST)}</SelectItem>
-          <SelectItem value={SortOption.NAME_ASC}>{getSortLabel(SortOption.NAME_ASC)}</SelectItem>
-          <SelectItem value={SortOption.NAME_DESC}>{getSortLabel(SortOption.NAME_DESC)}</SelectItem>
-          <SelectItem value={SortOption.PRICE_ASC}>{getSortLabel(SortOption.PRICE_ASC)}</SelectItem>
-          <SelectItem value={SortOption.PRICE_DESC}>{getSortLabel(SortOption.PRICE_DESC)}</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <BaseSortSelect
+      value={value}
+      options={options}
+      onChange={(val) => onChange(val as SortOption)}
+      placeholder="Sắp xếp theo"
+      width="w-40"
+      icon="arrowUpDown"
+    />
   );
 }

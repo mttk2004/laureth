@@ -1,20 +1,8 @@
 import React, { useState } from 'react';
-import { FilterIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { formatCurrency } from '@/lib/productUtils';
 import { Category, ProductStatus } from '@/types/product';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -22,6 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import BaseFilterDialog from '@/components/common/BaseFilterDialog';
+import BaseFilterForm, { BaseFilterRow } from '@/components/common/BaseFilterForm';
 
 interface FilterOptions {
   category_id: string;
@@ -37,7 +27,6 @@ interface ProductFiltersProps {
 }
 
 export default function ProductFilters({ categories, initialFilters, onApplyFilters }: ProductFiltersProps) {
-  const [open, setOpen] = useState(false);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     category_id: initialFilters.category_id || 'all',
     status: initialFilters.status || 'all',
@@ -73,7 +62,6 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
       price_min: filterOptions.price_min > 0 ? filterOptions.price_min : undefined,
       price_max: filterOptions.price_max < 10000000 ? filterOptions.price_max : undefined,
     });
-    setOpen(false);
   };
 
   const resetFilters = () => {
@@ -85,62 +73,63 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
     });
     setPriceRange([0, 10000000]);
     onApplyFilters({});
-    setOpen(false);
   };
 
+  const hasActiveFilters = Boolean(
+    initialFilters.category_id ||
+    initialFilters.status ||
+    initialFilters.price_min ||
+    initialFilters.price_max
+  );
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <FilterIcon className="h-4 w-4 mr-2" />
-          Lọc sản phẩm
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Lọc sản phẩm</DialogTitle>
-          <DialogDescription>
-            Chọn các tiêu chí để lọc danh sách sản phẩm.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="category">Danh mục</Label>
-            <Select
-              value={filterOptions.category_id}
-              onValueChange={(value) => handleFilterChange('category_id', value)}
-            >
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Chọn danh mục" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="status">Trạng thái</Label>
-            <Select
-              value={filterOptions.status}
-              onValueChange={(value) => handleFilterChange('status', value)}
-            >
-              <SelectTrigger id="status">
-                <SelectValue placeholder="Chọn trạng thái" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                <SelectItem value={ProductStatus.ACTIVE}>Đang bán</SelectItem>
-                <SelectItem value={ProductStatus.INACTIVE}>Không bán</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <Label>Khoảng giá</Label>
+    <BaseFilterDialog
+      title="Lọc sản phẩm"
+      description="Chọn các tiêu chí để lọc danh sách sản phẩm."
+      onApply={applyFilters}
+      onReset={resetFilters}
+      hasActiveFilters={hasActiveFilters}
+      triggerText="Lọc sản phẩm"
+      dialogWidth="sm:max-w-md"
+    >
+      <BaseFilterForm>
+        <BaseFilterRow label="Danh mục" labelPosition="top">
+          <Select
+            value={filterOptions.category_id}
+            onValueChange={(value) => handleFilterChange('category_id', value)}
+          >
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Chọn danh mục" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id.toString()}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </BaseFilterRow>
+
+        <BaseFilterRow label="Trạng thái" labelPosition="top">
+          <Select
+            value={filterOptions.status}
+            onValueChange={(value) => handleFilterChange('status', value)}
+          >
+            <SelectTrigger id="status">
+              <SelectValue placeholder="Chọn trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value={ProductStatus.ACTIVE}>Đang bán</SelectItem>
+              <SelectItem value={ProductStatus.INACTIVE}>Không bán</SelectItem>
+            </SelectContent>
+          </Select>
+        </BaseFilterRow>
+
+        <BaseFilterRow label="Khoảng giá" labelPosition="top">
+          <div className="space-y-4">
             <div className="pt-5 pb-2">
               <Slider
                 defaultValue={priceRange}
@@ -178,16 +167,8 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
               <span>{formatCurrency(priceRange[1])}</span>
             </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={resetFilters}>
-            Đặt lại
-          </Button>
-          <Button onClick={applyFilters}>
-            Áp dụng bộ lọc
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </BaseFilterRow>
+      </BaseFilterForm>
+    </BaseFilterDialog>
   );
 }

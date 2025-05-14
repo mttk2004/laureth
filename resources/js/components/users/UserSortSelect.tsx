@@ -1,13 +1,6 @@
 import React from 'react';
-import { ArrowDownAZIcon } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { SortOption, sortOptionLabels } from '@/lib/userUtils';
+import BaseSortSelect from '@/components/common/BaseSortSelect';
 
 interface UserSortSelectProps {
   value: SortOption;
@@ -15,26 +8,18 @@ interface UserSortSelectProps {
 }
 
 export default function UserSortSelect({ value, onChange }: UserSortSelectProps) {
+  const options = Object.values(SortOption).map(option => ({
+    value: option,
+    label: sortOptionLabels[option]
+  }));
+
   return (
-    <div className="flex items-center gap-2">
-      <Select
-        value={value}
-        onValueChange={(newValue) => onChange(newValue as SortOption)}
-      >
-        <SelectTrigger className="w-[180px]">
-          <div className="flex items-center gap-2">
-            <ArrowDownAZIcon className="h-4 w-4" />
-            <SelectValue placeholder="Sắp xếp" />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          {Object.values(SortOption).map((option) => (
-            <SelectItem key={option} value={option}>
-              {sortOptionLabels[option]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <BaseSortSelect
+      value={value}
+      options={options}
+      onChange={(newValue) => onChange(newValue as SortOption)}
+      placeholder="Sắp xếp"
+      icon="arrowDownAZ"
+    />
   );
 }
