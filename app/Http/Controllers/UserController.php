@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\Store;
+use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,5 +48,94 @@ class UserController extends Controller
       'filters' => $request->only(['position', 'store_id']),
       'sort' => $request->input('sort', 'created_at_desc'),
     ]);
+  }
+
+  /**
+   * Hiển thị form tạo người dùng mới
+   *
+   * @return \Inertia\Response
+   */
+  public function create()
+  {
+    // Lấy danh sách cửa hàng để hiển thị trong dropdown
+    $stores = Store::all();
+
+    return Inertia::render('Users/Create', [
+      'stores' => $stores,
+      'user' => Auth::user(),
+    ]);
+  }
+
+  /**
+   * Lưu người dùng mới
+   *
+   * @param StoreUserRequest $request
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function store(StoreUserRequest $request)
+  {
+    // Xử lý tạo người dùng qua service
+    $this->userService->createUser($request->validated());
+
+    return redirect()->route('users.index')
+      ->with('success', 'Người dùng đã được tạo thành công.');
+  }
+
+  /**
+   * Hiển thị form chỉnh sửa người dùng
+   *
+   * @param  mixed  $userId
+   * @return \Inertia\Response
+   */
+  public function edit($userId)
+  {
+    // Tìm người dùng theo ID truyền vào
+    $user = User::findOrFail($userId);
+
+    // Lấy danh sách cửa hàng để hiển thị trong dropdown
+    $stores = Store::all();
+
+    return Inertia::render('Users/Edit', [
+      'editUser' => $user->load('store'),
+      'stores' => $stores,
+      'user' => Auth::user(),
+    ]);
+  }
+
+  /**
+   * Cập nhật thông tin người dùng
+   *
+   * @param  UpdateUserRequest  $request
+   * @param  mixed  $userId
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function update(UpdateUserRequest $request, $userId)
+  {
+    // Tìm người dùng theo ID
+    $user = User::findOrFail($userId);
+
+    // Xử lý cập nhật người dùng qua service
+    $this->userService->updateUser($user, $request->validated());
+
+    return redirect()->route('users.index')
+      ->with('success', 'Thông tin người dùng đã được cập nhật thành công.');
+  }
+
+  /**
+   * Xóa người dùng
+   *
+   * @param  mixed  $userId
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function destroy($userId)
+  {
+    // Tìm người dùng theo ID
+    $user = User::findOrFail($userId);
+
+    // Xử lý xóa người dùng qua service
+    $this->userService->deleteUser($user);
+
+    return redirect()->route('users.index')
+      ->with('success', 'Người dùng đã được xóa thành công.');
   }
 }

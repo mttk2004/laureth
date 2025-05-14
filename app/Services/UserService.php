@@ -38,7 +38,7 @@ class UserService
         $sortField = str_replace("_{$sortDirection}", '', $sort);
 
         // Đảm bảo chỉ áp dụng cho các trường sắp xếp hợp lệ
-        if (in_array($sortField, ['created_at', 'full_name', 'email', 'phone', 'position', 'store_id'])) {
+        if (in_array($sortField, ['created_at', 'full_name', 'position'])) {
           $direction = $sortDirection === 'asc' ? 'asc' : 'desc';
           $query->orderBy($sortField, $direction);
         }
@@ -49,5 +49,67 @@ class UserService
     }
 
     return $query->paginate($perPage)->withQueryString();
+  }
+
+  /**
+   * Tạo người dùng mới
+   *
+   * @param array $data
+   * @return User
+   */
+  public function createUser(array $data)
+  {
+    // Xử lý mật khẩu
+    if (isset($data['password'])) {
+      $data['password'] = bcrypt($data['password']);
+    }
+
+    // Xử lý các trường lương theo vị trí
+    if ($data['position'] === 'SM') {
+      $data['hourly_wage'] = null;
+    } elseif (in_array($data['position'], ['SL', 'SA'])) {
+      $data['base_salary'] = null;
+    }
+
+    return User::create($data);
+  }
+
+  /**
+   * Cập nhật thông tin người dùng
+   *
+   * @param User $user
+   * @param array $data
+   * @return User
+   */
+  public function updateUser(User $user, array $data)
+  {
+    // Chỉ cập nhật mật khẩu nếu có nhập mới
+    if (isset($data['password']) && !empty($data['password'])) {
+      $data['password'] = bcrypt($data['password']);
+    } else {
+      unset($data['password']);
+    }
+
+    // Xử lý các trường lương theo vị trí
+    if ($data['position'] === 'SM') {
+      $data['hourly_wage'] = null;
+    } elseif (in_array($data['position'], ['SL', 'SA'])) {
+      $data['base_salary'] = null;
+    }
+
+    $user->update($data);
+
+    return $user;
+  }
+
+  /**
+   * Xóa người dùng
+   *
+   * @param User $user
+   * @return bool
+   */
+  public function deleteUser(User $user)
+  {
+    return $user->delete();
   }
 }

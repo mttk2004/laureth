@@ -27,6 +27,11 @@ Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
   Route::delete('/products/{productId}', [ProductController::class, 'destroy'])->name('products.destroy');
 
   Route::get('/users', [UserController::class, 'index'])->name('users.index');
+  Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+  Route::post('/users', [UserController::class, 'store'])->name('users.store');
+  Route::get('/users/{userId}/edit', [UserController::class, 'edit'])->name('users.edit');
+  Route::put('/users/{userId}', [UserController::class, 'update'])->name('users.update');
+  Route::delete('/users/{userId}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
 require __DIR__ . '/settings.php';

@@ -1,19 +1,22 @@
 import { UserRole, roleLabels } from '@/types/user';
 
 /**
- * Format số điện thoại theo chuẩn Việt Nam
+ * Định dạng số điện thoại
  */
 export function formatPhoneNumber(phone: string): string {
   if (!phone) return '';
 
-  // Xóa các ký tự không phải số
-  const cleanedPhone = phone.replace(/\D/g, '');
+  // Xóa bỏ tất cả ký tự không phải số
+  const cleaned = phone.replace(/\D/g, '');
 
-  // Định dạng số điện thoại
-  if (cleanedPhone.length === 10) {
-    return cleanedPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+  // Kiểm tra độ dài của số điện thoại
+  if (cleaned.length === 10) {
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
+  } else if (cleaned.length === 11) {
+    return `${cleaned.slice(0, 4)} ${cleaned.slice(4, 7)} ${cleaned.slice(7)}`;
   }
 
+  // Nếu không đúng định dạng, trả về chuỗi ban đầu
   return phone;
 }
 
@@ -39,16 +42,24 @@ export function getRoleClassName(role: UserRole): string {
 }
 
 /**
- * Các tùy chọn sắp xếp nhân viên
+ * Các tùy chọn sắp xếp có sẵn
  */
 export enum SortOption {
   NEWEST = 'created_at_desc',
   OLDEST = 'created_at_asc',
   NAME_ASC = 'full_name_asc',
   NAME_DESC = 'full_name_desc',
-  ROLE_ASC = 'position_asc',
-  ROLE_DESC = 'position_desc',
 }
+
+/**
+ * Map các tùy chọn sắp xếp với nhãn hiển thị
+ */
+export const sortOptionLabels: Record<SortOption, string> = {
+  [SortOption.NEWEST]: 'Mới nhất',
+  [SortOption.OLDEST]: 'Cũ nhất',
+  [SortOption.NAME_ASC]: 'Tên A-Z',
+  [SortOption.NAME_DESC]: 'Tên Z-A',
+};
 
 /**
  * Lấy label hiển thị cho tùy chọn sắp xếp
@@ -59,8 +70,6 @@ export function getSortLabel(option: SortOption): string {
     [SortOption.OLDEST]: 'Cũ nhất',
     [SortOption.NAME_ASC]: 'Tên A-Z',
     [SortOption.NAME_DESC]: 'Tên Z-A',
-    [SortOption.ROLE_ASC]: 'Vai trò tăng dần',
-    [SortOption.ROLE_DESC]: 'Vai trò giảm dần',
   };
   return labels[option];
 }

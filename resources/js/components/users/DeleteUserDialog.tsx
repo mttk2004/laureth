@@ -1,13 +1,14 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface DeleteUserDialogProps {
   open: boolean;
@@ -22,18 +23,27 @@ export default function DeleteUserDialog({
 }: DeleteUserDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Xác nhận xóa nhân viên</DialogTitle>
-          <DialogDescription>
-            Bạn có chắc chắn muốn xóa nhân viên này không? Hành động này không thể hoàn tác.
+          <DialogTitle className="text-xl font-semibold">Xác nhận xóa nhân viên</DialogTitle>
+          <DialogDescription className="text-base text-gray-600 mt-2">
+            Bạn có chắc chắn muốn xóa nhân viên này? Hành động này không thể hoàn tác.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Hủy
-          </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+
+        <DialogFooter className="flex justify-end space-x-2 pt-4">
+          <DialogClose asChild>
+            <Button variant="outline" type="button">
+              Hủy
+            </Button>
+          </DialogClose>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              onConfirm();
+              onOpenChange(false);
+            }}
+          >
             Xóa
           </Button>
         </DialogFooter>
