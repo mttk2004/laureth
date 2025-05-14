@@ -1,4 +1,3 @@
-import React from 'react';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
 import { User } from '@/types/user';
