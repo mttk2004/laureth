@@ -1,5 +1,7 @@
 export type UserRole = 'DM' | 'SM' | 'SL' | 'SA';
 
+import { Store } from './store';
+
 export interface User {
   id: string;
   full_name: string;
@@ -11,6 +13,7 @@ export interface User {
   base_salary?: number;
   commission_rate?: number;
   store_id?: string;
+  store?: Store;
   last_login?: string;
   created_at: string;
   updated_at: string;
