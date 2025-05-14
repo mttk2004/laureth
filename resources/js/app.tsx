@@ -3,8 +3,8 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import { initializeTheme } from './hooks/use-appearance';
 import { ToastProvider } from './hooks/use-toast';
+import { ThemeProvider } from './lib/theme-provider';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -31,17 +31,16 @@ createInertiaApp({
             console.log('No authenticated user');
         }
 
-        // Wrap App with ToastProvider
+        // Wrap App with ThemeProvider và ToastProvider
         root.render(
-            <ToastProvider>
-                <App {...props} />
-            </ToastProvider>
+            <ThemeProvider defaultTheme="system">
+                <ToastProvider>
+                    <App {...props} />
+                </ToastProvider>
+            </ThemeProvider>
         );
     },
     progress: {
         color: '#4B5563',
     },
 });
-
-// This will set light / dark mode on load...
-initializeTheme();

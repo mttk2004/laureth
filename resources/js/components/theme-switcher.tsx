@@ -1,44 +1,62 @@
-import { useEffect, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, MonitorSmartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/lib/theme-provider';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ThemeSwitcherProps {
     className?: string;
 }
 
 export default function ThemeSwitcher({ className }: ThemeSwitcherProps) {
-    const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-    // Kiểm tra theme từ localStorage khi component mount
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-        if (savedTheme) {
-            setTheme(savedTheme);
-            document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            setTheme('dark');
-            document.documentElement.classList.add('dark');
-        }
-    }, []);
+    const { theme, setTheme } = useTheme();
 
     const toggleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-        document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        // Chu kỳ: light -> dark -> system -> light
+        const nextTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
+        setTheme(nextTheme);
+    };
+
+    // Xác định icon hiển thị
+    const getIcon = () => {
+        if (theme === 'light') {
+            return <Sun className="h-5 w-5" />;
+        } else if (theme === 'dark') {
+            return <Moon className="h-5 w-5" />;
+        } else {
+            // Sử dụng icon màn hình khi ở chế độ system
+            return <MonitorSmartphone className="h-5 w-5" />;
+        }
+    };
+
+    const getTooltipText = () => {
+        if (theme === 'light') {
+            return 'Chuyển sang chế độ tối';
+        } else if (theme === 'dark') {
+            return 'Chuyển sang chế độ theo hệ thống';
+        } else {
+            return 'Chuyển sang chế độ sáng';
+        }
     };
 
     return (
-        <button
-            onClick={toggleTheme}
-            className={cn("flex h-9 w-9 items-center justify-center rounded-full bg-secondary/50 hover:bg-secondary/70 cursor-pointer", className)}
-            title={theme === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
-        >
-            {theme === 'light' ? (
-                <Moon className="h-4 w-4" />
-            ) : (
-                <Sun className="h-4 w-4" />
-            )}
-        </button>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button
+                        onClick={toggleTheme}
+                        className={cn(
+                            "flex h-9 w-9 items-center justify-center rounded-md border border-border/40 bg-card shadow-sm hover:border-border/70 transition-all",
+                            className
+                        )}
+                        aria-label={getTooltipText()}
+                    >
+                        {getIcon()}
+                    </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    {getTooltipText()}
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     );
 }
