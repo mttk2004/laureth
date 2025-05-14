@@ -4,7 +4,7 @@
 
 LAURETH là ứng dụng quản lý toàn diện dành cho chuỗi cửa hàng bán phụ kiện thời trang cao cấp. Hệ thống được thiết kế để hỗ trợ quản lý hiệu quả hoạt động bán hàng, kho hàng, nhân sự và báo cáo doanh số.
 
-Ứng dụng này được xây dựng trên nền tảng Laravel, với giao diện người dùng thân thiện, đáp ứng đầy đủ các yêu cầu nghiệp vụ của doanh nghiệp bán lẻ trong lĩnh vực thời trang.
+Ứng dụng này được xây dựng trên nền tảng Laravel + Inertia.js + React, với giao diện người dùng thân thiện, đáp ứng đầy đủ các yêu cầu nghiệp vụ của doanh nghiệp bán lẻ trong lĩnh vực thời trang.
 
 ## Mô hình kinh doanh
 
@@ -146,3 +146,8 @@ Chúng tôi luôn chào đón sự đóng góp từ cộng đồng để cải t
 ## Giấy phép
 
 LAURETH được phát hành dưới giấy phép [MIT](LICENSE).
+
+
+## Tác giả
+
+[Mai Trần Tuấn Kiệt](https://github.com/mttk2004)
