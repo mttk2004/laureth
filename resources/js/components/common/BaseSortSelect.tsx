@@ -72,7 +72,7 @@ export default function BaseSortSelect({
         value={value}
         onValueChange={onChange}
       >
-        <SelectTrigger className={width}>
+        <SelectTrigger className={`${width} h-9`}>
           <div className="flex items-center gap-2">
             {getIcon()}
             <SelectValue placeholder={placeholder} />
