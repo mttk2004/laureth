@@ -18,6 +18,7 @@ interface FilterOptions {
   status: string;
   price_min: number;
   price_max: number;
+  name: string;
 }
 
 interface ProductFiltersProps {
@@ -32,6 +33,7 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
     status: initialFilters.status || 'all',
     price_min: initialFilters.price_min || 0,
     price_max: initialFilters.price_max || 10000000,
+    name: initialFilters.name || '',
   });
 
   const [priceRange, setPriceRange] = useState<[number, number]>([
@@ -43,6 +45,14 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
     setFilterOptions((prev) => ({
       ...prev,
       [key]: value,
+    }));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFilterOptions((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -61,6 +71,7 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
       status: filterOptions.status !== 'all' ? filterOptions.status : undefined,
       price_min: filterOptions.price_min > 0 ? filterOptions.price_min : undefined,
       price_max: filterOptions.price_max < 10000000 ? filterOptions.price_max : undefined,
+      name: filterOptions.name.trim() ? filterOptions.name.trim() : undefined,
     });
   };
 
@@ -70,6 +81,7 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
       status: 'all',
       price_min: 0,
       price_max: 10000000,
+      name: '',
     });
     setPriceRange([0, 10000000]);
     onApplyFilters({});
@@ -79,7 +91,8 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
     initialFilters.category_id ||
     initialFilters.status ||
     initialFilters.price_min ||
-    initialFilters.price_max
+    initialFilters.price_max ||
+    initialFilters.name
   );
 
   return (
@@ -93,6 +106,15 @@ export default function ProductFilters({ categories, initialFilters, onApplyFilt
       dialogWidth="sm:max-w-md"
     >
       <BaseFilterForm>
+        <BaseFilterRow label="Tên" labelPosition="top">
+          <Input
+            placeholder="Nhập tên sản phẩm"
+            name="name"
+            value={filterOptions.name}
+            onChange={handleInputChange}
+          />
+        </BaseFilterRow>
+
         <BaseFilterRow label="Danh mục" labelPosition="top">
           <Select
             value={filterOptions.category_id}

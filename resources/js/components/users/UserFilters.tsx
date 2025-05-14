@@ -10,23 +10,31 @@ import {
 } from '@/components/ui/select';
 import BaseFilterDialog from '@/components/common/BaseFilterDialog';
 import BaseFilterForm, { BaseFilterRow } from '@/components/common/BaseFilterForm';
+import { Input } from '@/components/ui/input';
 
 interface UserFiltersProps {
   stores: Store[];
   initialFilters: {
     position?: string;
     store_id?: string;
+    name?: string;
   };
-  onApplyFilters: (filters: { position?: string; store_id?: string }) => void;
+  onApplyFilters: (filters: { position?: string; store_id?: string; name?: string }) => void;
 }
 
 export default function UserFilters({ stores, initialFilters, onApplyFilters }: UserFiltersProps) {
   const [filters, setFilters] = useState({
     position: initialFilters.position || 'all',
     store_id: initialFilters.store_id || 'all',
+    name: initialFilters.name || '',
   });
 
   const handleSelectChange = (name: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -34,11 +42,12 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
     setFilters({
       position: 'all',
       store_id: 'all',
+      name: '',
     });
   };
 
   const handleApplyFilters = () => {
-    const appliedFilters: { position?: string; store_id?: string } = {};
+    const appliedFilters: { position?: string; store_id?: string; name?: string } = {};
 
     if (filters.position !== 'all') {
       appliedFilters.position = filters.position;
@@ -48,11 +57,15 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
       appliedFilters.store_id = filters.store_id;
     }
 
+    if (filters.name.trim()) {
+      appliedFilters.name = filters.name.trim();
+    }
+
     onApplyFilters(appliedFilters);
   };
 
   // Kiểm tra xem đã áp dụng filter nào chưa
-  const hasActiveFilters = Boolean(initialFilters.position || initialFilters.store_id);
+  const hasActiveFilters = Boolean(initialFilters.position || initialFilters.store_id || initialFilters.name);
 
   return (
     <BaseFilterDialog
@@ -64,6 +77,15 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
       triggerText="Lọc nhân viên"
     >
       <BaseFilterForm>
+        <BaseFilterRow label="Tên">
+          <Input
+            placeholder="Nhập tên nhân viên"
+            name="name"
+            value={filters.name}
+            onChange={handleInputChange}
+          />
+        </BaseFilterRow>
+
         <BaseFilterRow label="Vị trí">
           <Select
             value={filters.position}
