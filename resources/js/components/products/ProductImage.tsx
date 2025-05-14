@@ -7,7 +7,7 @@ interface ProductImageProps {
   src: string | null;
   alt: string;
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export default function ProductImage({ src, alt, className, size = 'md' }: ProductImageProps) {
@@ -17,6 +17,7 @@ export default function ProductImage({ src, alt, className, size = 'md' }: Produ
     sm: 'h-10 w-10',
     md: 'h-16 w-16',
     lg: 'h-40 w-40',
+    xl: 'h-52 w-52',
   };
 
   if (!imageUrl) {
