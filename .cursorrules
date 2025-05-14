@@ -27,6 +27,7 @@
 - Các hook được tạo trong resources/js/hooks
 - Các utils được tạo trong resources/js/lib
 - Các type được tạo sẵn trong resources/js/types
+- Các request được tạo trong app/Http/Requests
 
 # Quy ước code
 - Code nên được giữ clean và dễ đọc, dễ bảo trì
@@ -52,6 +53,7 @@
 - Xem định nghĩa đầy đủ các model trong resources/js/types để hiểu rõ về type của các bảng. Không được tạo hoặc sửa định nghĩa model trong resources/js/types mà phải sử dụng định nghĩa đã có.
 - Xem định nghĩa đầy đủ các model trong app/Models để hiểu rõ về các Model và các quan hệ giữa chúng, không tạo mới model trong app/Models mà phải sử dụng định nghĩa đã có, chỉ được chỉnh sửa Model khi cần thiết.
 - Xem roles-and-layouts.md để hiểu phân quyền
-- Dùng cấu trúc Controller -> Service để tổ chức code
+- Dùng cấu trúc Controller -> Service để tổ chức code, dùng Request để validate dữ liệu
+- Luôn tạo request cho các action create, update trong controller (tạo vào thư mục app/Http/Requests) nếu chúng chưa có, nếu có rồi thì không cần tạo mới
 - Tách biệt logic admin (quản lý) và staff (nhân viên)
 - Mô hình kinh doanh tập trung vào bán hàng tại cửa hàng, quản lý kho và tính lương theo hiệu suất
