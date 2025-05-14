@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import UserRoleBadge from '@/components/users/UserRoleBadge';
 import { formatPhoneNumber, formatLastLogin } from '@/lib/userUtils';
+import { formatCurrency } from '@/lib/productUtils';
 
 interface UserDetailDialogProps {
   user: User | null;
@@ -56,7 +57,7 @@ export default function UserDetailDialog({ user, open, onOpenChange }: UserDetai
             {user.position === 'SL' || user.position === 'SA' ? (
               <>
                 <div className="font-medium">Lương theo giờ:</div>
-                <div>{user.hourly_wage ? user.hourly_wage.toLocaleString('vi-VN') + ' VNĐ/giờ' : 'Chưa cài đặt'}</div>
+                <div>{user.hourly_wage ? formatCurrency(user.hourly_wage) + ' VNĐ/giờ' : 'Chưa cài đặt'}</div>
 
                 <div className="font-medium">Hoa hồng:</div>
                 <div>{user.commission_rate ? (user.commission_rate * 100).toFixed(1) + '%' : 'Chưa cài đặt'}</div>
@@ -64,7 +65,7 @@ export default function UserDetailDialog({ user, open, onOpenChange }: UserDetai
             ) : (
               <>
                 <div className="font-medium">Lương cơ bản:</div>
-                <div>{user.base_salary ? user.base_salary.toLocaleString('vi-VN') + ' VNĐ' : 'Chưa cài đặt'}</div>
+                <div>{user.base_salary ? formatCurrency(user.base_salary) + ' VNĐ' : 'Chưa cài đặt'}</div>
               </>
             )}
 
