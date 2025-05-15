@@ -27,6 +27,11 @@ class StoreService
       $query->whereNotNull('manager_id');
     }
 
+    // Lọc cửa hàng chưa có quản lý
+    if (isset($filters['no_manager']) && $filters['no_manager']) {
+      $query->whereNull('manager_id');
+    }
+
     // Lọc theo tên
     if (isset($filters['name']) && ! empty($filters['name'])) {
       $query->where('name', 'like', '%' . $filters['name'] . '%');

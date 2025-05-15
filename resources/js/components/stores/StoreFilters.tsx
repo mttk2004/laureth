@@ -9,6 +9,7 @@ import BaseFilterForm, { BaseFilterRow } from '@/components/common/BaseFilterFor
 interface FilterValues {
   manager_id?: string;
   has_manager?: boolean;
+  no_manager?: boolean;
 }
 
 interface StoreFiltersProps {
@@ -21,6 +22,26 @@ export default function StoreFilters({ managers, initialFilters, onApplyFilters 
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
 
   const handleFilterChange = (key: keyof FilterValues, value: string | boolean | undefined) => {
+    // Nếu đang bật "Chỉ hiện cửa hàng chưa có quản lý" và người dùng bật "Chỉ hiện cửa hàng đã có quản lý"
+    if (key === 'has_manager' && value === true && filters.no_manager) {
+      setFilters(prev => ({
+        ...prev,
+        [key]: value,
+        no_manager: undefined // Tắt filter ngược lại
+      }));
+      return;
+    }
+
+    // Nếu đang bật "Chỉ hiện cửa hàng đã có quản lý" và người dùng bật "Chỉ hiện cửa hàng chưa có quản lý"
+    if (key === 'no_manager' && value === true && filters.has_manager) {
+      setFilters(prev => ({
+        ...prev,
+        [key]: value,
+        has_manager: undefined // Tắt filter ngược lại
+      }));
+      return;
+    }
+
     setFilters(prev => ({
       ...prev,
       [key]: value
@@ -68,16 +89,31 @@ export default function StoreFilters({ managers, initialFilters, onApplyFilters 
           </Select>
         </BaseFilterRow>
 
-        <BaseFilterRow label="" labelPosition="top">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="has-manager"
-              checked={!!filters.has_manager}
-              onCheckedChange={(checked) =>
-                handleFilterChange('has_manager', checked === true ? true : undefined)
-              }
-            />
-            <Label htmlFor="has-manager">Chỉ hiện cửa hàng đã có quản lý</Label>
+        <BaseFilterRow label="Trạng thái quản lý" labelPosition="top">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="has-manager"
+                checked={!!filters.has_manager}
+                onCheckedChange={(checked) =>
+                  handleFilterChange('has_manager', checked === true ? true : undefined)
+                }
+                disabled={!!filters.no_manager}
+              />
+              <Label htmlFor="has-manager">Chỉ hiện cửa hàng đã có quản lý</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="no-manager"
+                checked={!!filters.no_manager}
+                onCheckedChange={(checked) =>
+                  handleFilterChange('no_manager', checked === true ? true : undefined)
+                }
+                disabled={!!filters.has_manager}
+              />
+              <Label htmlFor="no-manager">Chỉ hiện cửa hàng chưa có quản lý</Label>
+            </div>
           </div>
         </BaseFilterRow>
       </BaseFilterForm>

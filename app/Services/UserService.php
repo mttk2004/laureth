@@ -22,8 +22,12 @@ class UserService
       $query->where('position', $filters['position']);
     }
 
-    // Lọc theo cửa hàng
-    if (isset($filters['store_id']) && $filters['store_id'] !== 'all') {
+    // Lọc nhân viên chưa phân công
+    if (isset($filters['unassigned']) && $filters['unassigned']) {
+      $query->whereNull('store_id');
+    }
+    // Lọc theo cửa hàng (chỉ áp dụng nếu không lọc theo nhân viên chưa phân công)
+    elseif (isset($filters['store_id']) && $filters['store_id'] !== 'all') {
       $query->where('store_id', $filters['store_id']);
     }
 

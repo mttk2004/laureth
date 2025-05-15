@@ -44,7 +44,7 @@ class StoreController extends Controller
       'stores' => $stores,
       'user' => $user,
       'managers' => $managers,
-      'filters' => $request->only(['manager_id', 'has_manager']),
+      'filters' => $request->only(['manager_id', 'has_manager', 'no_manager']),
       'sort' => $request->input('sort', 'newest'),
     ]);
   }

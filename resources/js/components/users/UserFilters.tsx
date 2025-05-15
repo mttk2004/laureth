@@ -11,6 +11,8 @@ import {
 import BaseFilterDialog from '@/components/common/BaseFilterDialog';
 import BaseFilterForm, { BaseFilterRow } from '@/components/common/BaseFilterForm';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 interface UserFiltersProps {
   stores: Store[];
@@ -18,8 +20,9 @@ interface UserFiltersProps {
     position?: string;
     store_id?: string;
     name?: string;
+    unassigned?: boolean;
   };
-  onApplyFilters: (filters: { position?: string; store_id?: string; name?: string }) => void;
+  onApplyFilters: (filters: { position?: string; store_id?: string; name?: string; unassigned?: boolean }) => void;
 }
 
 export default function UserFilters({ stores, initialFilters, onApplyFilters }: UserFiltersProps) {
@@ -27,9 +30,16 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
     position: initialFilters.position || 'all',
     store_id: initialFilters.store_id || 'all',
     name: initialFilters.name || '',
+    unassigned: initialFilters.unassigned || false,
   });
 
   const handleSelectChange = (name: string, value: string) => {
+    // Nếu đã chọn filter chưa phân công mà chọn một cửa hàng cụ thể, hãy tắt filter chưa phân công
+    if (name === 'store_id' && value !== 'all' && filters.unassigned) {
+      setFilters((prev) => ({ ...prev, [name]: value, unassigned: false }));
+      return;
+    }
+
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -38,16 +48,26 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleCheckboxChange = (checked: boolean) => {
+    // Nếu đang chọn filter chưa phân công, hãy reset store_id về 'all'
+    if (checked) {
+      setFilters((prev) => ({ ...prev, unassigned: checked, store_id: 'all' }));
+    } else {
+      setFilters((prev) => ({ ...prev, unassigned: checked }));
+    }
+  };
+
   const handleResetFilters = () => {
     setFilters({
       position: 'all',
       store_id: 'all',
       name: '',
+      unassigned: false,
     });
   };
 
   const handleApplyFilters = () => {
-    const appliedFilters: { position?: string; store_id?: string; name?: string } = {};
+    const appliedFilters: { position?: string; store_id?: string; name?: string; unassigned?: boolean } = {};
 
     if (filters.position !== 'all') {
       appliedFilters.position = filters.position;
@@ -61,11 +81,15 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
       appliedFilters.name = filters.name.trim();
     }
 
+    if (filters.unassigned) {
+      appliedFilters.unassigned = true;
+    }
+
     onApplyFilters(appliedFilters);
   };
 
   // Kiểm tra xem đã áp dụng filter nào chưa
-  const hasActiveFilters = Boolean(initialFilters.position || initialFilters.store_id || initialFilters.name);
+  const hasActiveFilters = Boolean(initialFilters.position || initialFilters.store_id || initialFilters.name || initialFilters.unassigned);
 
   return (
     <BaseFilterDialog
@@ -107,6 +131,7 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
           <Select
             value={filters.store_id}
             onValueChange={(value) => handleSelectChange('store_id', value)}
+            disabled={filters.unassigned}
           >
             <SelectTrigger id="store_id">
               <SelectValue placeholder="Tất cả cửa hàng" />
@@ -120,6 +145,17 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
               ))}
             </SelectContent>
           </Select>
+        </BaseFilterRow>
+
+        <BaseFilterRow label="">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="unassigned"
+              checked={filters.unassigned}
+              onCheckedChange={handleCheckboxChange}
+            />
+            <Label htmlFor="unassigned">Chỉ hiện nhân viên chưa phân công</Label>
+          </div>
         </BaseFilterRow>
       </BaseFilterForm>
     </BaseFilterDialog>
