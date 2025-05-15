@@ -14,48 +14,49 @@
 - Màu chủ đạo: #06f (xanh)
 - Tập trung vào UX đơn giản, trực quan, dễ sử dụng cho nhân viên
 - Các nút tác vụ nên nhất quán về vị trí, màu sắc và kích thước
+- Giao diện được xây dựng theo phong cách tối giản, hiện đại và chuyên nghiệp
 
 # Kiến trúc
 - Dùng mô hình MVC của Laravel
-- Database gồm 15 bảng chính quản lý users, stores, products, orders, warehouses, shifts, payrolls, v.v. Hãy đọc database.md và các định nghĩa của các bảng trong thư mục database/migrations để hiểu hơn.
-- Sử dụng Eloquent ORM với quan hệ nhiều-nhiều, một-nhiều
-- Business logic nằm trong services
-- Validation sử dụng Laravel Request validation
+- Business logic nằm trong các Service (trong thư mục app/Services)
+- Validation logic nằm trong các Request (trong thư mục app/Http/Requests)
 - Authentication sử dụng Laravel Sanctum với policy và gate
 - Các components được tạo trong resources/js/components
 - Các page được tạo trong resources/js/pages
 - Các hook được tạo trong resources/js/hooks
 - Các utils được tạo trong resources/js/lib
-- Các type được tạo sẵn trong resources/js/types
 - Các request được tạo trong app/Http/Requests
+- Các type đã được tạo sẵn trong resources/js/types
 
 # Quy ước code
-- Code nên được giữ clean và dễ đọc, dễ bảo trì
-- Kiểm tra file đã tồn tại chưa trước khi tạo mới để giữ codebase nhất quán
 - Sử dụng namespace đúng chuẩn PSR-4
 - Viết docblock cho method và class
 - Tách biệt logic nghiệp vụ khỏi controllers bằng services
 - Tách biệt data validation khỏi controller bằng Request
-- Sử dụng các constant thay vì magic numbers/strings
+- Dùng cấu trúc Controller -> Service để tổ chức code, dùng Request để validate dữ liệu
 - Tuân thủ nguyên tắc SOLID nhưng không cần quá nghiêm ngặt
-- Luôn giữ code nhất quán, đơn giản, dễ đọc dễ hiểu
+- Luôn sử dụng các constant thay vì magic numbers/strings
+- Luôn giữ code clean, nhất quán, đơn giản, dễ đọc dễ hiểu, có khả năng mở rộng/bảo trì cao, có tính nhất quán về cấu trúc và tên biến, hàm, file, folder, ...
+- Luôn kiểm tra file đã tồn tại chưa trước khi tạo mới để giữ codebase nhất quán, không tạo file mới nếu đã tồn tại.
 
 # Lưu ý khi phát triển
-- Luôn xác thực quyền trước khi thực hiện actions
-- Kiểm tra dữ liệu theo store_id với vai trò SM
+- Luôn xác thực quyền trước khi thực hiện actions.
+- Kiểm tra dữ liệu theo store_id với vai trò SM.
+- Mỗi cửa hàng (store) chỉ có duy nhất 1 SM (store_manager) tại một thời điểm.
 - Tính lương theo giờ/hoa hồng cho SL, SA và lương cơ bản/doanh số cho SM
 - Kiểm tra tồn kho khi bán hàng hoặc chuyển kho
 - Chuyển kho cần xác nhận từ cả 2 cửa hàng
 - Ca làm việc chia thành 2 ca: A (8h-16h) và B (14h30-22h30)
-- Xem định nghĩa đầy đủ các model trong resources/js/types để hiểu rõ về type của các bảng. Không được tạo hoặc sửa định nghĩa model trong resources/js/types mà phải sử dụng định nghĩa đã có.
+- Database gồm 15 bảng chính quản lý users, stores, products, orders, warehouses, shifts, payrolls, v.v. Hãy đọc database.md và các định nghĩa của các bảng trong thư mục database/migrations để hiểu hơn.
+- Xem định nghĩa đầy đủ các type trong resources/js/types để hiểu rõ về type của các bảng. Không được tạo hoặc sửa định nghĩa type trong resources/js/types mà phải sử dụng định nghĩa đã có.
 - Xem định nghĩa đầy đủ các model trong app/Models để hiểu rõ về các Model và các quan hệ giữa chúng, không tạo mới model trong app/Models mà phải sử dụng định nghĩa đã có, chỉ được chỉnh sửa Model khi cần thiết.
-- Dùng cấu trúc Controller -> Service để tổ chức code, dùng Request để validate dữ liệu
-- Tạo request cho các action create, update trong controller (tạo vào thư mục app/Http/Requests) nếu chúng chưa có, nếu có rồi thì không cần tạo mới
-- Khi tạo trang Index, nếu cần dùng bảng thì luôn tái sử dụng data-table.tsx trong resources/js/components/ui, nếu cần chức năng lọc và sắp xếp thì luôn tái sử dụng BaseFilterDialog.tsx, BaseFilterForm.tsx và BaseSortSelect.tsx trong resources/js/components/common
+- Tạo request cho các action create, update trong controller (tạo vào thư mục app/Http/Requests) nếu chúng chưa có, nếu có rồi thì không tạo mới.
+- Khi tạo trang Index, nếu cần dùng bảng thì luôn tái sử dụng data-table.tsx trong resources/js/components/ui, nếu cần chức năng lọc và sắp xếp thì luôn tái sử dụng BaseFilterDialog.tsx, BaseFilterForm.tsx và BaseSortSelect.tsx trong resources/js/components/common.
+- Khi tạo trang Index, Create hay Edit hãy luôn luôn tham khảo các trang Index, Create, Edit tương ứng của các resource khác để đảm bảo tính nhất quán và đồng bộ (về cả UI và logic).
 
 # Mẹo hữu ích
 - Xem readme.md để hiểu mô tả doanh nghiệp của dự án
 - Xem database.md để hiểu về định nghĩa các bảng
-- Xem roles-and-layouts.md để hiểu phân quyền
+- Xem roles-and-layouts.md để hiểu quy ước về phân quyền và layout
 - Tách biệt logic admin (quản lý) và staff (nhân viên)
 - Mô hình kinh doanh tập trung vào bán hàng tại cửa hàng, quản lý kho và tính lương theo hiệu suất
