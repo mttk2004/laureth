@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { router } from '@inertiajs/react';
-import { User, roleLabels } from '@/types/user';
+import { User, UserRole, roleLabels } from '@/types/user';
 import { Store } from '@/types/store';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -42,13 +42,67 @@ export default function UserEdit({ editUser, stores, user }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addToast } = useToast();
 
+  // Lọc ra các vị trí có thể thăng cấp dựa trên vai trò hiện tại
+  const availablePositions = useMemo(() => {
+    const positions: { value: UserRole; label: string }[] = [];
+
+    // Luôn có thể giữ nguyên vai trò hiện tại
+    positions.push({ value: editUser.position, label: roleLabels[editUser.position] });
+
+    // Thêm các vai trò có thể thăng cấp
+    if (editUser.position === 'SA') {
+      positions.push({ value: 'SL', label: roleLabels['SL'] });
+      positions.push({ value: 'SM', label: roleLabels['SM'] });
+    } else if (editUser.position === 'SL') {
+      positions.push({ value: 'SM', label: roleLabels['SM'] });
+    }
+
+    return positions;
+  }, [editUser.position]);
+
+  // Lọc danh sách cửa hàng phù hợp dựa trên vai trò hiện tại và vai trò mới
+  const availableStores = useMemo(() => {
+    // Nếu nhân viên đang ở cửa hàng, luôn có sẵn trong danh sách
+    if (formData.position === 'SM') {
+      // Nếu là SM hoặc thăng cấp lên SM
+      // Hiển thị các cửa hàng không có quản lý và cửa hàng hiện tại của nhân viên
+      return stores.filter(store =>
+        !store.manager_id ||
+        store.manager_id === editUser.id ||
+        store.id === editUser.store_id
+      );
+    } else {
+      // Nếu là SL, SA thì hiển thị tất cả các cửa hàng
+      return stores;
+    }
+  }, [stores, formData.position, editUser.store_id, editUser.id]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'position') {
+      // Khi thay đổi vị trí, cập nhật các trường lương tương ứng
+      if (value === 'SM') {
+        setFormData((prev) => ({
+          ...prev,
+          position: value as UserRole,
+          hourly_wage: '',
+          base_salary: prev.base_salary || '10000000', // Mặc định lương cơ bản cho SM
+        }));
+      } else if (['SL', 'SA'].includes(value)) {
+        setFormData((prev) => ({
+          ...prev,
+          position: value as UserRole,
+          base_salary: '',
+          hourly_wage: prev.hourly_wage || '25000', // Mặc định lương theo giờ
+        }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -148,12 +202,19 @@ export default function UserEdit({ editUser, stores, user }: Props) {
                       <SelectValue placeholder="Chọn vị trí" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="SM">{roleLabels.SM}</SelectItem>
-                      <SelectItem value="SL">{roleLabels.SL}</SelectItem>
-                      <SelectItem value="SA">{roleLabels.SA}</SelectItem>
+                      {availablePositions.map(position => (
+                        <SelectItem key={position.value} value={position.value}>
+                          {position.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {errors.position && <p className="text-red-500 text-sm mt-1">{errors.position}</p>}
+                  {formData.position !== editUser.position && (
+                    <p className="text-blue-500 text-sm mt-1">
+                      Lưu ý: Việc thay đổi vai trò sẽ thay đổi cách tính lương của nhân viên
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -166,14 +227,21 @@ export default function UserEdit({ editUser, stores, user }: Props) {
                       <SelectValue placeholder="Chọn cửa hàng" />
                     </SelectTrigger>
                     <SelectContent>
-                      {stores.map((store) => (
+                      {availableStores.map((store) => (
                         <SelectItem key={store.id} value={store.id.toString()}>
-                          {store.name}
+                          {store.name} {store.manager_id && store.manager_id !== editUser.id ? '(Đã có SM)' : ''}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   {errors.store_id && <p className="text-red-500 text-sm mt-1">{errors.store_id}</p>}
+                  {formData.position === 'SM' && formData.store_id &&
+                   availableStores.find(s => s.id === formData.store_id)?.manager_id &&
+                   availableStores.find(s => s.id === formData.store_id)?.manager_id !== editUser.id && (
+                    <p className="text-amber-500 text-sm mt-1">
+                      Cửa hàng đã có quản lý. Nếu tiếp tục, quản lý hiện tại sẽ bị gỡ khỏi cửa hàng.
+                    </p>
+                  )}
                 </div>
 
                 <div>

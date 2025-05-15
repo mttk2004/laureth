@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useState, useMemo } from 'react';
 import { router } from '@inertiajs/react';
 import { User } from '@/types/user';
 import { Store } from '@/types/store';
@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface StoreWithManager extends Store {
   manager?: User | null;
@@ -29,6 +31,52 @@ export default function StoreEdit({ user, managers, editStore }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addToast } = useToast();
+
+  // Nhóm nhân viên theo vai trò và cửa hàng
+  const potentialManagersByType = useMemo(() => {
+    const result: {
+      currentManager: User | null;
+      availableSMs: User[];
+      storeEmployees: User[];
+    } = {
+      currentManager: null,
+      availableSMs: [],
+      storeEmployees: [],
+    };
+
+    managers.forEach(manager => {
+      // Quản lý hiện tại của cửa hàng
+      if (manager.id === editStore.manager_id) {
+        result.currentManager = manager;
+      }
+      // Các SM chưa được phân công
+      else if (manager.position === 'SM' && !manager.store_id) {
+        result.availableSMs.push(manager);
+      }
+      // Các nhân viên của cửa hàng này (có thể thăng cấp)
+      else if (['SL', 'SA'].includes(manager.position) && manager.store_id === editStore.id) {
+        result.storeEmployees.push(manager);
+      }
+    });
+
+    return result;
+  }, [managers, editStore]);
+
+  // Kiểm tra nếu đang chọn một nhân viên không phải SM làm quản lý
+  const isPromotingEmployee = useMemo(() => {
+    if (formData.manager_id !== 'no_manager') {
+      const selectedManager = managers.find(m => m.id === formData.manager_id);
+      return selectedManager && ['SL', 'SA'].includes(selectedManager.position);
+    }
+    return false;
+  }, [formData.manager_id, managers]);
+
+  // Kiểm tra nếu đang thay đổi quản lý cửa hàng
+  const isChangingManager = useMemo(() => {
+    return formData.manager_id !== editStore.manager_id &&
+           formData.manager_id !== 'no_manager' &&
+           editStore.manager_id !== null;
+  }, [formData.manager_id, editStore.manager_id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> | { name: string, value: string }
@@ -94,6 +142,31 @@ export default function StoreEdit({ user, managers, editStore }: Props) {
             </div>
           </div>
 
+          {/* Hiển thị thông báo nếu đang thay đổi quản lý */}
+          {(isChangingManager || isPromotingEmployee) && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>
+                {isPromotingEmployee
+                  ? <strong className='text-red-500'>Thăng cấp nhân viên lên quản lý cửa hàng</strong>
+                  : <strong className='text-red-500'>Thay đổi quản lý cửa hàng</strong>}
+              </AlertTitle>
+              <AlertDescription>
+                {isPromotingEmployee ? (
+                  <p className="text-sm text-red-500">
+                    Nhân viên này sẽ được thăng cấp lên vị trí Quản lý cửa hàng (SM).
+                    Hệ thống sẽ tự động điều chỉnh lương từ giờ sang lương cơ bản.
+                  </p>
+                ) : (
+                  <p className="text-sm text-red-500">
+                    Quản lý hiện tại ({potentialManagersByType.currentManager?.full_name || 'N/A'})
+                    sẽ bị gỡ khỏi cửa hàng và trở thành nhân viên chờ phân công.
+                  </p>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
@@ -139,11 +212,43 @@ export default function StoreEdit({ user, managers, editStore }: Props) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="no_manager">Không có</SelectItem>
-                      {managers.map((manager) => (
-                        <SelectItem key={manager.id} value={manager.id}>
-                          {manager.full_name}
-                        </SelectItem>
-                      ))}
+
+                      {/* Quản lý hiện tại */}
+                      {potentialManagersByType.currentManager && (
+                        <>
+                          <SelectItem value={potentialManagersByType.currentManager.id}>
+                            {potentialManagersByType.currentManager.full_name} (SM hiện tại)
+                          </SelectItem>
+                          <SelectItem value="divider" disabled>
+                            ──────────
+                          </SelectItem>
+                        </>
+                      )}
+
+                      {/* Các SM khác chưa được phân công */}
+                      {potentialManagersByType.availableSMs.length > 0 && (
+                        <>
+                          {potentialManagersByType.availableSMs.map(manager => (
+                            <SelectItem key={manager.id} value={manager.id}>
+                              {manager.full_name} (SM)
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="divider2" disabled>
+                            ──────────
+                          </SelectItem>
+                        </>
+                      )}
+
+                      {/* Các nhân viên cửa hàng (tiềm năng thăng cấp) */}
+                      {potentialManagersByType.storeEmployees.length > 0 && (
+                        <>
+                          {potentialManagersByType.storeEmployees.map(employee => (
+                            <SelectItem key={employee.id} value={employee.id}>
+                              {employee.full_name} ({employee.position} → SM)
+                            </SelectItem>
+                          ))}
+                        </>
+                      )}
                     </SelectContent>
                   </Select>
                   {errors.manager_id && <p className="text-red-500 text-sm mt-1">{errors.manager_id}</p>}
@@ -155,8 +260,8 @@ export default function StoreEdit({ user, managers, editStore }: Props) {
                     id="monthly_target"
                     name="monthly_target"
                     type="number"
-                    min="0"
-                    step="1000000"
+                    min="1000000"
+                    step="100000"
                     value={formData.monthly_target}
                     onChange={handleChange}
                     required

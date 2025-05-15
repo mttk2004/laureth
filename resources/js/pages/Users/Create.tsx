@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { router } from '@inertiajs/react';
 import { User, UserRole, roleLabels } from '@/types/user';
 import { Store } from '@/types/store';
@@ -36,13 +36,44 @@ export default function UserCreate({ stores, user }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addToast } = useToast();
 
+  // Lọc danh sách cửa hàng phù hợp dựa trên vai trò đã chọn
+  const availableStores = useMemo(() => {
+    if (formData.position === 'SM') {
+      // Nếu tạo SM mới, chỉ hiển thị các cửa hàng chưa có quản lý
+      return stores.filter(store => !store.manager_id);
+    } else {
+      // Nếu tạo SL, SA thì hiển thị tất cả các cửa hàng
+      return stores;
+    }
+  }, [stores, formData.position]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'position') {
+      // Khi thay đổi vị trí, cập nhật các trường lương tương ứng và reset store_id
+      if (value === 'SM') {
+        setFormData((prev) => ({
+          ...prev,
+          position: value as UserRole,
+          hourly_wage: '',
+          base_salary: '10000000', // Mặc định lương cơ bản cho SM
+          store_id: '', // Reset store_id khi chuyển vai trò
+        }));
+      } else if (['SL', 'SA'].includes(value)) {
+        setFormData((prev) => ({
+          ...prev,
+          position: value as UserRole,
+          base_salary: '',
+          hourly_wage: '25000', // Mặc định lương theo giờ
+        }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -156,19 +187,30 @@ export default function UserCreate({ stores, user }: Props) {
                   <Select
                     value={formData.store_id}
                     onValueChange={(value) => handleSelectChange('store_id', value)}
+                    disabled={formData.position === 'SM' && availableStores.length === 0}
                   >
                     <SelectTrigger id="store_id" className={errors.store_id ? 'border-red-500' : ''}>
                       <SelectValue placeholder="Chọn cửa hàng" />
                     </SelectTrigger>
                     <SelectContent>
-                      {stores.map((store) => (
+                      {availableStores.map((store) => (
                         <SelectItem key={store.id} value={store.id.toString()}>
-                          {store.name}
+                          {store.name} {store.manager_id ? '(Đã có SM)' : ''}
                         </SelectItem>
                       ))}
+                      {formData.position === 'SM' && availableStores.length === 0 && (
+                        <SelectItem value="no_available_stores" disabled>
+                          Không có cửa hàng khả dụng (tất cả đã có SM)
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   {errors.store_id && <p className="text-red-500 text-sm mt-1">{errors.store_id}</p>}
+                  {formData.position === 'SM' && availableStores.length === 0 && (
+                    <p className="text-amber-500 text-sm mt-1">
+                      Tất cả cửa hàng đã có quản lý. Vui lòng tạo cửa hàng mới hoặc thay đổi quản lý hiện tại.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -184,6 +226,7 @@ export default function UserCreate({ stores, user }: Props) {
                     step="1"
                     className={errors.commission_rate ? 'border-red-500' : ''}
                     placeholder="Nhập % hoa hồng (vd: 5 cho 5%)"
+                    disabled={formData.position === 'SM'}
                   />
                   {errors.commission_rate && (
                     <p className="text-red-500 text-sm mt-1">{errors.commission_rate}</p>
