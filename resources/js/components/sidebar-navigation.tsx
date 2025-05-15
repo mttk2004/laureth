@@ -9,9 +9,9 @@ import {
     Home,
     Layers,
     Package,
+    Package2,
     ShoppingBag,
     Store,
-    User as UserIcon,
     Users
 } from 'lucide-react';
 import { ReactNode } from 'react';
@@ -47,13 +47,13 @@ const roleLinks: Record<UserRole, SidebarLinkProps[]> = {
         { href: '/stores', label: 'Cửa hàng', icon: <Store className="w-5 h-5" /> },
         { href: '/users', label: 'Nhân viên', icon: <Users className="w-5 h-5" /> },
         { href: '/products', label: 'Sản phẩm', icon: <Package className="w-5 h-5" /> },
+        { href: '/suppliers', label: 'Nhà cung cấp', icon: <Package2 className="w-5 h-5" /> },
         { href: '/warehouses', label: 'Kho hàng', icon: <Box className="w-5 h-5" /> },
         { href: '/transfers', label: 'Chuyển kho', icon: <Layers className="w-5 h-5" /> },
         { href: '/reports', label: 'Báo cáo', icon: <BarChart3 className="w-5 h-5" /> },
     ],
     'SM': [
         { href: '/dashboard', label: 'Tổng quan', icon: <Home className="w-5 h-5" /> },
-        { href: '/store', label: 'Cửa hàng', icon: <Store className="w-5 h-5" /> },
         { href: '/staff', label: 'Nhân viên', icon: <Users className="w-5 h-5" /> },
         { href: '/inventory', label: 'Kho hàng', icon: <Box className="w-5 h-5" /> },
         { href: '/orders', label: 'Đơn hàng', icon: <ShoppingBag className="w-5 h-5" /> },
@@ -63,17 +63,15 @@ const roleLinks: Record<UserRole, SidebarLinkProps[]> = {
     'SL': [
         { href: '/dashboard', label: 'Tổng quan', icon: <Home className="w-5 h-5" /> },
         { href: '/pos', label: 'Bán hàng', icon: <ShoppingBag className="w-5 h-5" /> },
+        { href: '/attendance', label: 'Chấm công', icon: <Calendar className="w-5 h-5" /> },
         { href: '/shift', label: 'Ca làm việc', icon: <Calendar className="w-5 h-5" /> },
-        { href: '/check-inventory', label: 'Kiểm tra kho', icon: <Box className="w-5 h-5" /> },
         { href: '/shift-reports', label: 'Báo cáo ca', icon: <ClipboardList className="w-5 h-5" /> },
-        { href: '/profile', label: 'Thông tin cá nhân', icon: <UserIcon className="w-5 h-5" /> },
     ],
     'SA': [
         { href: '/dashboard', label: 'Tổng quan', icon: <Home className="w-5 h-5" /> },
         { href: '/pos', label: 'Bán hàng', icon: <ShoppingBag className="w-5 h-5" /> },
-        { href: '/products-list', label: 'Sản phẩm', icon: <Package className="w-5 h-5" /> },
         { href: '/attendance', label: 'Chấm công', icon: <Calendar className="w-5 h-5" /> },
-        { href: '/profile', label: 'Thông tin cá nhân', icon: <UserIcon className="w-5 h-5" /> },
+        { href: '/shift', label: 'Ca làm việc', icon: <Calendar className="w-5 h-5" /> },
     ],
 };
 
