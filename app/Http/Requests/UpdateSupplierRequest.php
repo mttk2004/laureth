@@ -13,9 +13,9 @@ class UpdateSupplierRequest extends FormRequest
    */
   public function authorize(): bool
   {
-    // Chỉ cho phép DM và SM cập nhật nhà cung cấp
+    // Chỉ cho phép DM cập nhật nhà cung cấp
     $user = Auth::user();
-    return $user && ($user->isDM() || $user->isSM());
+    return $user && $user->isDM();
   }
 
   /**

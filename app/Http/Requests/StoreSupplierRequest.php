@@ -12,9 +12,9 @@ class StoreSupplierRequest extends FormRequest
    */
   public function authorize(): bool
   {
-    // Chỉ cho phép DM và SM tạo mới nhà cung cấp
+    // Chỉ cho phép DM tạo mới nhà cung cấp
     $user = Auth::user();
-    return $user && ($user->isDM() || $user->isSM());
+    return $user && $user->isDM();
   }
 
   /**
