@@ -18,8 +18,8 @@ export default function UserSortSelect({ value, onChange }: UserSortSelectProps)
       value={value}
       options={options}
       onChange={(newValue) => onChange(newValue as SortOption)}
-      placeholder="Sắp xếp"
-      icon="arrowDownAZ"
+      placeholder="Sắp xếp theo"
+      icon="arrowUpDown"
     />
   );
 }

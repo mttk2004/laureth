@@ -28,8 +28,8 @@ export function getSortLabel(option: SortOption): string {
     [SortOption.OLDEST]: 'Cũ nhất',
     [SortOption.NAME_ASC]: 'Tên A-Z',
     [SortOption.NAME_DESC]: 'Tên Z-A',
-    [SortOption.TARGET_ASC]: 'Mục tiêu tăng dần',
-    [SortOption.TARGET_DESC]: 'Mục tiêu giảm dần',
+    [SortOption.TARGET_ASC]: 'Mục tiêu tăng',
+    [SortOption.TARGET_DESC]: 'Mục tiêu giảm',
   };
   return labels[option];
 }
