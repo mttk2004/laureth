@@ -1,19 +1,19 @@
-# Hu01b0u1edbng du1eabn su1eed du1ee5ng FilterSortTrait vu00e0 BaseService
+# Hướng dẫn sử dụng FilterSortTrait và BaseService
 
-## Giu1edbi thiu1ec7u
+## Giới thiệu
 
-Cu00e1c thu00e0nh phu1ea7n nu00e0y u0111u01b0u1ee3c xiu00e2y du1ef1ng u0111u1ec3 tu00e1i su1eed du1ee5ng logic lu1ecdc vu00e0 su1eafp xu1ebfp chung cho tu1ea5t cu1ea3 cu00e1c service trong u1ee9ng du1ee5ng Laureth. Mu1ee5c tiu00eau lu00e0 giu00fap:
+Các thành phần này được xây dựng để tái sử dụng logic lọc và sắp xếp chung cho tất cả các service trong ứng dụng Laureth. Mục tiêu là giúp:
 
-- Giu1ea3m code lu1eb7p lu1ea1i
-- Tu0103ng tu00ednh nhu1ea5t quu00e1n giu1eefa cu00e1c service
-- Du1ec5 du00e0ng thu00eam mu1edbi thu00e0nh phu1ea7n
-- Tu0103ng khu1ea3 nu0103ng bu1ea3o tru00ec
+- Giảm code lặp lại
+- Tăng tính nhất quán giữa các service
+- Dễ dàng thêm mới thành phần
+- Tăng khả năng bảo trì
 
 ## 1. FilterSortTrait
 
-Trait nu00e0y cung cu1ea5p cu00e1c phu01b0u01a1ng thu1ee9c hu1ec7 thu1ed1ng cho viu1ec7c lu1ecdc vu00e0 su1eafp xu1ebfp du1eef liu1ec7u:
+Trait này cung cấp các phương thức hệ thống cho việc lọc và sắp xếp dữ liệu:
 
-### Su1eafp xu1ebfp
+### Sắp xếp
 
 ```php
 protected function applySorting(
@@ -25,9 +25,9 @@ protected function applySorting(
 ): Builder
 ```
 
-Hu1ed7 tru1ee3 cu1ea3 chu1ed7i su1eafp xu1ebfp `field_direction` (vd: created_at_desc) vu00e0 cu00e1c keyword u0111u1eb7c biu1ec7t (vd: newest, oldest).
+Hỗ trợ cả chuỗi sắp xếp `field_direction` (vd: created_at_desc) và các keyword đặc biệt (vd: newest, oldest).
 
-### Lu1ecdc theo tu00ean
+### Lọc theo tên
 
 ```php
 protected function applyNameFilter(
@@ -38,9 +38,9 @@ protected function applyNameFilter(
 ): Builder
 ```
 
-Cho phu00e9p tu00ecm kiu1ebfm theo tu00ean hou1eb7c tu1eeb khu00f3a trong nhiu1ec1u tru01b0u1eddng.
+Cho phép tìm kiếm theo tên hoặc từ khóa trong nhiều trường.
 
-### Lu1ecdc theo quan hu1ec7 ID
+### Lọc theo quan hệ ID
 
 ```php
 protected function applyRelationFilter(
@@ -51,9 +51,9 @@ protected function applyRelationFilter(
 ): Builder
 ```
 
-Du00f9ng cho lu1ecdc theo ID cu1ee7a mu1ed9t mu1ed1i quan hu1ec7 (store_id, category_id, etc).
+Dùng cho lọc theo ID của một mối quan hệ (store_id, category_id, etc).
 
-### Lu1ecdc theo giu00e1 tru1ecb boolean
+### Lọc theo giá trị boolean
 
 ```php
 protected function applyBooleanFilter(
@@ -64,9 +64,9 @@ protected function applyBooleanFilter(
 ): Builder
 ```
 
-Lu1ecdc theo cu00e1c tru01b0u1eddng cu00f3/khu00f4ng (is_main, is_active, etc).
+Lọc theo các trường có/không (is_main, is_active, etc).
 
-### Lu1ecdc theo khuu1edfn giu00e1 tru1ecb
+### Lọc theo khuần giá trị
 
 ```php
 protected function applyRangeFilter(
@@ -78,34 +78,33 @@ protected function applyRangeFilter(
 ): Builder
 ```
 
-Lu1ecdc theo khou1ea3ng (price_min/price_max, date_from/date_to, etc).
+Lọc theo khoảng (price_min/price_max, date_from/date_to, etc).
 
 ## 2. BaseService
 
-`BaseService` lu00e0 lu1edbp tru1eeba tu01b0u1ee3ng ku1ebf thu1eeba `FilterSortTrait`, cung cu1ea5p mu1ed9t nu1ec1n tu1ea3ng thu1ed1ng nhu1ea5t cho tu1ea5t cu1ea3 service:
+`BaseService` là lớp trừu tượng kế thừa `FilterSortTrait`, cung cấp một nền tảng thống nhất cho tất cả service:
 
-### Cu00e1c phu01b0u01a1ng thu1ee9c mu1edai service phu1ea3i triu1ec3n khai:
+### Các phương thức mỗi service phải triển khai:
 
 ```php
-// Tru1ea3 vu1ec1 class Model mu00e0 service nu00e0y lu00e0m viu1ec7c vu1edbi
+// Trả về class Model mà service này làm việc với
 protected function getModelClass(): string
 ```
 
-### Cu00e1c phu01b0u01a1ng thu1ee9c cu00f3 thu1ec3 ghi u0111u00e8:
+### Các phương thức có thể ghi đè:
 
 ```php
-// Tru1ea3 vu1ec1 mu1ea3ng cu00e1c tru01b0u1eddng hu1ee3p lu1ec7 u0111u1ec3 su1eafp xu1ebfp
+// Trả về mảng các trường hợp lệ để sắp xếp
 protected function getValidSortFields(): array
 
-// u00c1p du1ee5ng cu00e1c bu1ed9 lu1ecdc cu1ee5 thu1ec3 cho tu1eebng loa
-i entity
+// Áp dụng các bộ lọc cụ thể cho từng loại entity
 protected function applyFilters(Builder $query, array $filters): Builder
 ```
 
-### Phu01b0u01a1ng thu1ee9c chung cho tu1ea5t cu1ea3 service:
+### Phương thức chung cho tất cả service:
 
 ```php
-// Lu1ea5y du1eef liu1ec7u vu1edbi bu1ed9 lu1ecdc, su1eafp xu1ebfp vu00e0 phu00e2n trang
+// Lấy dữ liệu với bộ lọc, sắp xếp và phân trang
 public function getDataWithFilters(
   array $filters = [],
   int $perPage = 10,
@@ -114,9 +113,9 @@ public function getDataWithFilters(
 )
 ```
 
-## Cu00e1ch su1eed du1ee5ng
+## Cách sử dụng
 
-### 1. Tu1ea1o service mu1edbi ku1ebf thu1eeba BaseService
+### 1. Tạo service mới kế thừa BaseService
 
 ```php
 class MyEntityService extends BaseService
@@ -133,16 +132,16 @@ class MyEntityService extends BaseService
 
   protected function applyFilters(Builder $query, array $filters): Builder
   {
-    // Lu1ecdc theo tu00ean
+    // Lọc theo tên
     $query = $this->applyNameFilter($query, $filters, 'name', ['name', 'description']);
 
-    // Lu1ecdc theo quan hu1ec7
+    // Lọc theo quan hệ
     $query = $this->applyRelationFilter($query, $filters, 'category_id');
 
-    // Lu1ecdc theo boolean
+    // Lọc theo boolean
     $query = $this->applyBooleanFilter($query, $filters, 'is_active');
 
-    // Lu1ecdc theo khou1ea3ng giu00e1
+    // Lọc theo khoảng giá
     $query = $this->applyRangeFilter(
       $query,
       $filters,
@@ -151,7 +150,7 @@ class MyEntityService extends BaseService
       'price_max'
     );
 
-    // Cu00e1c logic lu1ecdc u0111u1eb7c thu00f9
+    // Các logic lọc đặc thù
     if (isset($filters['custom_filter'])) {
       $query->where('custom_field', $filters['custom_filter']);
     }
@@ -166,7 +165,7 @@ class MyEntityService extends BaseService
 }
 ```
 
-### 2. Su1eed du1ee5ng trong controller
+### 2. Sử dụng trong controller
 
 ```php
 class MyEntityController extends Controller
@@ -195,9 +194,9 @@ class MyEntityController extends Controller
 }
 ```
 
-## Lu01b0u u00fd
+## Lưu ý
 
-Khi chim mu1edbi chu1ee9c nu0103ng lu1ecdc hou1eb7c su1eafp xu1ebfp chung:
+Khi thêm mới chức năng lọc hoặc sắp xếp chung:
 
-1. Nu1ebfu chu1ee9c nu0103ng lu00e0 thu00f4ng du1ee5ng cho nhiu1ec1u entity, hu00e3y thu00eam vu00e0o `FilterSortTrait`
-2. Nu1ebfu chu1ee9c nu0103ng chu1ec9 diu00f9ng cho 1 hou1eb7c mu1ed9t su1ed1 u00edt entity, hu00e3y liu00ean ku1ebft triu1ec3n khai trong phu01b0u01a1ng thu1ee9c `applyFilters` cu1ee7a service tu01b0u01a1ng u1ee9ng
+1. Nếu chức năng là thông dụng cho nhiều entity, hãy thêm vào `FilterSortTrait`
+2. Nếu chức năng chỉ dùng cho 1 hoặc một số ít entity, hãy triển khai trong phương thức `applyFilters` của service tương ứng

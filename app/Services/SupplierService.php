@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class SupplierService extends BaseService
 {
   /**
-   * Lu1ea5y model class
+   * Lấy model class
    *
    * @return string
    */
@@ -19,7 +19,7 @@ class SupplierService extends BaseService
   }
 
   /**
-   * Lu1ea5y danh su00e1ch cu00e1c tru01b0u1eddng hu1ee3p lu1ec7 u0111u1ec3 su1eafp xu1ebfp
+   * Lấy danh sách các trường hợp lệ để sắp xếp
    *
    * @return array
    */
@@ -29,7 +29,7 @@ class SupplierService extends BaseService
   }
 
   /**
-   * u00c1p du1ee5ng cu00e1c bu1ed9 lu1ecdc cho supplier
+   * Áp dụng các bộ lọc cho supplier
    *
    * @param Builder $query
    * @param array $filters
@@ -37,15 +37,15 @@ class SupplierService extends BaseService
    */
   protected function applyFilters(Builder $query, array $filters): Builder
   {
-    // Lu1ecdc theo tu00ean
+    // Lọc theo tên
     $query = $this->applyNameFilter($query, $filters, 'name', ['name']);
 
-    // Lu1ecdc theo su1ed1 u0111iu1ec7n thou1ea1i
+    // Lọc theo số điện thoại
     if (isset($filters['phone']) && ! empty($filters['phone'])) {
       $query->where('phone', 'like', '%' . $filters['phone'] . '%');
     }
 
-    // Lu1ecdc theo email
+    // Lọc theo email
     if (isset($filters['email']) && ! empty($filters['email'])) {
       $query->where('email', 'like', '%' . $filters['email'] . '%');
     }
@@ -54,7 +54,7 @@ class SupplierService extends BaseService
   }
 
   /**
-   * Lu1ea5y danh su00e1ch nhu00e0 cung cu1ea5p vu1edbi bu1ed9 lu1ecdc vu00e0 su1eafp xu1ebfp
+   * Lấy danh sách nhà cung cấp với bộ lọc và sắp xếp
    *
    * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
@@ -64,21 +64,21 @@ class SupplierService extends BaseService
   }
 
   /**
-   * Lu1ea5y danh su00e1ch nhu00e0 cung cu1ea5p ku00e8m theo lu1ecbch su1eed u0111u01a1n nhu1eadp hu00e0ng
+   * Lấy danh sách nhà cung cấp kèm theo lịch sử đơn nhập hàng
    *
-   * @param array $filters Bu1ed9 lu1ecdc
-   * @param int $perPage Su1ed1 mu1ee5c tru00ean mu1ed7i trang
-   * @param string $sort Cu00e1ch su1eafp xu1ebfp
+   * @param array $filters Bộ lọc
+   * @param int $perPage Số mục trên mỗi trang
+   * @param string $sort Cách sắp xếp
    * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
   public function getSuppliersWithPurchaseOrders(array $filters = [], int $perPage = 10, string $sort = 'name_asc')
   {
-    // Lu1ea5y query cu01a1 bu1ea3n vu1edbi cu00e1c bu1ed9 lu1ecdc vu00e0 su1eafp xu1ebfp
+    // Lấy query cơ bản với các bộ lọc và sắp xếp
     $query = $this->getQueryWithRelations([]);
     $query = $this->applyFilters($query, $filters);
     $query = $this->applySorting($query, $sort, $this->getValidSortFields(), 'name', 'asc');
 
-    // Eagerly load purchase orders cho mu1ed7i nhu00e0 cung cu1ea5p, giu1edbi hu1ea1n 5 u0111u01a1n hu00e0ng gu1ea7n nhu1ea5t
+    // Eagerly load purchase orders cho mỗi nhà cung cấp, giới hạn 5 đơn hàng gần nhất
     $query->with(['purchaseOrders' => function ($query) {
       $query->orderBy('created_at', 'desc')
         ->take(5);
@@ -88,24 +88,24 @@ class SupplierService extends BaseService
   }
 
   /**
-   * Lu1ea5y thu00f4ng tin chi tiu1ebft cu1ee7a nhu00e0 cung cu1ea5p ku00e8m theo lu1ecbch su1eed u0111u01a1n hu00e0ng
+   * Lấy thông tin chi tiết của nhà cung cấp kèm theo lịch sử đơn hàng
    *
    * @param int $supplierId
    * @return \App\Models\Supplier
    */
   public function getSupplierWithPurchaseOrders($supplierId)
   {
-    // Lu1ea5y thu00f4ng tin nhu00e0 cung cu1ea5p theo ID
+    // Lấy thông tin nhà cung cấp theo ID
     $supplier = Supplier::with(['purchaseOrders' => function ($query) {
       $query->orderBy('created_at', 'desc')
-        ->take(5); // Giu1edbi hu1ea1n chu1ec9 lu1ea5y 5 u0111u01a1n hu00e0ng gu1ea7n nhu1ea5t
+        ->take(5); // Giới hạn chỉ lấy 5 đơn hàng gần nhất
     }])->findOrFail($supplierId);
 
     return $supplier;
   }
 
   /**
-   * Lu1ea5y thu00f4ng tin chi tiu1ebft cu1ee7a mu1ed9t nhu00e0 cung cu1ea5p
+   * Lấy thông tin chi tiết của một nhà cung cấp
    *
    * @param int $id
    * @return \App\Models\Supplier
@@ -116,7 +116,7 @@ class SupplierService extends BaseService
   }
 
   /**
-   * Tu1ea1o mu1edbi mu1ed9t nhu00e0 cung cu1ea5p
+   * Tạo mới một nhà cung cấp
    *
    * @param array $data
    * @return \App\Models\Supplier
@@ -126,7 +126,7 @@ class SupplierService extends BaseService
     DB::beginTransaction();
 
     try {
-      // Tu1ea1o nhu00e0 cung cu1ea5p mu1edbi
+      // Tạo nhà cung cấp mới
       $supplier = new Supplier();
       $supplier->name = $data['name'];
       $supplier->phone = $data['phone'];
@@ -142,7 +142,7 @@ class SupplierService extends BaseService
   }
 
   /**
-   * Cu1eadp nhu1eadt thu00f4ng tin nhu00e0 cung cu1ea5p
+   * Cập nhật thông tin nhà cung cấp
    *
    * @param int $id
    * @param array $data
@@ -153,7 +153,7 @@ class SupplierService extends BaseService
     DB::beginTransaction();
 
     try {
-      // Tu00ecm vu00e0 cu1eadp nhu1eadt nhu00e0 cung cu1ea5p
+      // Tìm và cập nhật nhà cung cấp
       $supplier = Supplier::findOrFail($id);
       $supplier->name = $data['name'];
       $supplier->phone = $data['phone'];
@@ -169,7 +169,7 @@ class SupplierService extends BaseService
   }
 
   /**
-   * Xu00f3a nhu00e0 cung cu1ea5p
+   * Xóa nhà cung cấp
    *
    * @param int $id
    * @return bool
@@ -179,12 +179,12 @@ class SupplierService extends BaseService
     DB::beginTransaction();
 
     try {
-      // Kiu1ec3m tra xem cu00f3 thu1ec3 xu00f3a hay khu00f4ng (vu00ed du1ee5: nhu00e0 cung cu1ea5p cu00f3 u0111u01a1n hu00e0ng liu00ean quan)
+      // Kiểm tra xem có thể xóa hay không (ví dụ: nhà cung cấp có đơn hàng liên quan)
       $supplier = Supplier::findOrFail($id);
 
-      // Nu1ebfu nhu00e0 cung cu1ea5p cu00f3 u0111u01a1n hu00e0ng, khu00f4ng cho phu00e9p xu00f3a
+      // Nếu nhà cung cấp có đơn hàng, không cho phép xóa
       if ($supplier->purchaseOrders()->count() > 0) {
-        throw new \Exception('Khu00f4ng thu1ec3 xu00f3a nhu00e0 cung cu1ea5p u0111u00e3 cu00f3 u0111u01a1n hu00e0ng liu00ean quan');
+        throw new \Exception('Không thể xóa nhà cung cấp đã có đơn hàng liên quan');
       }
 
       $supplier->delete();

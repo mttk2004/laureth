@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class StoreService extends BaseService
 {
   /**
-   * Lu1ea5y model class
+   * Lấy model class
    *
    * @return string
    */
@@ -20,7 +20,7 @@ class StoreService extends BaseService
   }
 
   /**
-   * Lu1ea5y danh su00e1ch cu00e1c tru01b0u1eddng hu1ee3p lu1ec7 u0111u1ec3 su1eafp xu1ebfp
+   * Lấy danh sách các trường hợp lệ để sắp xếp
    *
    * @return array
    */
@@ -30,7 +30,7 @@ class StoreService extends BaseService
   }
 
   /**
-   * u00c1p du1ee5ng cu00e1c bu1ed9 lu1ecdc cho store
+   * Áp dụng các bộ lọc cho store
    *
    * @param Builder $query
    * @param array $filters
@@ -38,29 +38,29 @@ class StoreService extends BaseService
    */
   protected function applyFilters(Builder $query, array $filters): Builder
   {
-    // Lu1ecdc theo quu1ea3n lu00fd
+    // Lọc theo quản lý
     if (isset($filters['manager_id']) && ! empty($filters['manager_id'])) {
       $query->where('manager_id', $filters['manager_id']);
     }
 
-    // Lu1ecdc cu1eeda hu00e0ng u0111u00e3 cu00f3 quu1ea3n lu00fd
+    // Lọc cửa hàng đã có quản lý
     if (isset($filters['has_manager']) && $filters['has_manager']) {
       $query->whereNotNull('manager_id');
     }
 
-    // Lu1ecdc cu1eeda hu00e0ng chu01b0a cu00f3 quu1ea3n lu00fd
+    // Lọc cửa hàng chưa có quản lý
     if (isset($filters['no_manager']) && $filters['no_manager']) {
       $query->whereNull('manager_id');
     }
 
-    // Lu1ecdc theo tu00ean
+    // Lọc theo tên
     $query = $this->applyNameFilter($query, $filters, 'name', ['name']);
 
     return $query;
   }
 
   /**
-   * Lu1ea5y danh su00e1ch cu1eeda hu00e0ng vu1edbi bu1ed9 lu1ecdc vu00e0 su1eafp xu1ebfp
+   * Lấy danh sách cửa hàng với bộ lọc và sắp xếp
    *
    * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
@@ -70,7 +70,7 @@ class StoreService extends BaseService
   }
 
   /**
-   * Tu1ea1o cu1eeda hu00e0ng mu1edbi
+   * Tạo cửa hàng mới
    *
    * @return Store
    */
@@ -79,9 +79,9 @@ class StoreService extends BaseService
     return DB::transaction(function () use ($data) {
       $store = Store::create($data);
 
-      // Nu1ebfu cu1eeda hu00e0ng mu1edbi u0111u01b0u1ee3c chu1ec9 u0111u1ecbnh manager_id
+      // Nếu cửa hàng mới được chỉ định manager_id
       if (!empty($data['manager_id'])) {
-        // Cu1eadp nhu1eadt store_id cu1ee7a manager
+        // Cập nhật store_id của manager
         User::where('id', $data['manager_id'])->update(['store_id' => $store->id]);
       }
 
@@ -90,7 +90,7 @@ class StoreService extends BaseService
   }
 
   /**
-   * Cu1eadp nhu1eadt thu00f4ng tin cu1eeda hu00e0ng
+   * Cập nhật thông tin cửa hàng
    *
    * @return Store
    */
@@ -100,9 +100,9 @@ class StoreService extends BaseService
       $oldManagerId = $store->manager_id;
       $newManagerId = $data['manager_id'] ?? null;
 
-      // Nu1ebfu cu00f3 su1ef1 thay u0111u1ed5i quu1ea3n lu00fd
+      // Nếu có sự thay đổi quản lý
       if ($oldManagerId !== $newManagerId) {
-        // 1. Nu1ebfu cu00f3 manager cu0169, cu1eadp nhu1eadt store_id = null
+        // 1. Nếu có manager cũ, cập nhật store_id = null
         if ($oldManagerId) {
           $oldManager = User::find($oldManagerId);
           if ($oldManager) {
@@ -110,21 +110,21 @@ class StoreService extends BaseService
           }
         }
 
-        // 2. Nu1ebfu cu00f3 manager mu1edbi
+        // 2. Nếu có manager mới
         if ($newManagerId) {
           $newManager = User::find($newManagerId);
 
           if ($newManager) {
-            // Nu1ebfu u0111u00f3 lu00e0 nhu00e2n viu00ean cu1ee7a cu1eeda hu00e0ng (SL, SA) thu00ec thu0103ng cu1ea5p lu00ean SM
+            // Nếu đó là nhân viên của cửa hàng (SL, SA) thì thăng cấp lên SM
             if (in_array($newManager->position, ['SL', 'SA'])) {
               $newManager->update([
                 'position' => 'SM',
                 'hourly_wage' => null,
-                'base_salary' => 10000000, // Lu01b0u01a1ng cu01a1 bu1ea3n mu1eb7c u0111u1ecbnh
+                'base_salary' => 10000000, // Lương cơ bản mặc định
                 'store_id' => $store->id
               ]);
             } else {
-              // Nu1ebfu u0111u00e3 lu00e0 SM, cu1eadp nhu1eadt store_id
+              // Nếu đã là SM, cập nhật store_id
               $newManager->update(['store_id' => $store->id]);
             }
           }
@@ -138,14 +138,14 @@ class StoreService extends BaseService
   }
 
   /**
-   * Xu00f3a cu1eeda hu00e0ng
+   * Xóa cửa hàng
    *
    * @return bool
    */
   public function deleteStore(Store $store)
   {
     return DB::transaction(function () use ($store) {
-      // Cu1eadp nhu1eadt nhu00e2n viu00ean cu1ee7a cu1eeda hu00e0ng nu00e0y thu00e0nh null (chu1edd phu00e2n cu00f4ng)
+      // Cập nhật nhân viên của cửa hàng này thành null (chờ phân công)
       User::where('store_id', $store->id)->update(['store_id' => null]);
 
       return $store->delete();

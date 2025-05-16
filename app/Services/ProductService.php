@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 class ProductService extends BaseService
 {
   /**
-   * Lu1ea5y model class
+   * Lấy model class
    *
    * @return string
    */
@@ -20,7 +20,7 @@ class ProductService extends BaseService
   }
 
   /**
-   * Lu1ea5y danh su00e1ch cu00e1c tru01b0u1eddng hu1ee3p lu1ec7 u0111u1ec3 su1eafp xu1ebfp
+   * Lấy danh sách các trường hợp lệ để sắp xếp
    *
    * @return array
    */
@@ -30,7 +30,7 @@ class ProductService extends BaseService
   }
 
   /**
-   * u00c1p du1ee5ng cu00e1c bu1ed9 lu1ecdc cho product
+   * Áp dụng các bộ lọc cho product
    *
    * @param Builder $query
    * @param array $filters
@@ -38,23 +38,23 @@ class ProductService extends BaseService
    */
   protected function applyFilters(Builder $query, array $filters): Builder
   {
-    // Lu1ecdc theo danh mu1ee5c
+    // Lọc theo danh mục
     $query = $this->applyRelationFilter($query, $filters, 'category_id');
 
-    // Lu1ecdc theo tru1ea1ng thu00e1i
+    // Lọc theo trạng thái
     $query = $this->applyRelationFilter($query, $filters, 'status');
 
-    // Lu1ecdc theo khou1ea3ng giu00e1
+    // Lọc theo khoảng giá
     $query = $this->applyRangeFilter($query, $filters, 'price', 'price_min', 'price_max');
 
-    // Lu1ecdc theo tu00ean
+    // Lọc theo tên
     $query = $this->applyNameFilter($query, $filters, 'name', ['name', 'sku']);
 
     return $query;
   }
 
   /**
-   * Lu1ea5y danh su00e1ch su1ea3n phu1ea9m vu1edbi bu1ed9 lu1ecdc vu00e0 su1eafp xu1ebfp
+   * Lấy danh sách sản phẩm với bộ lọc và sắp xếp
    *
    * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
@@ -64,13 +64,13 @@ class ProductService extends BaseService
   }
 
   /**
-   * Tu1ea1o su1ea3n phu1ea9m mu1edbi
+   * Tạo sản phẩm mới
    *
    * @return Product
    */
   public function createProduct(array $data)
   {
-    // Xu1eed lu00fd upload u1ea3nh nu1ebfu cu00f3
+    // Xử lý upload ảnh nếu có
     if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
       $data['image'] = $this->uploadImage($data['image']);
     }
@@ -79,15 +79,15 @@ class ProductService extends BaseService
   }
 
   /**
-   * Cu1eadp nhu1eadt su1ea3n phu1ea9m
+   * Cập nhật sản phẩm
    *
    * @return Product
    */
   public function updateProduct(Product $product, array $data)
   {
-    // Xu1eed lu00fd upload u1ea3nh mu1edbi nu1ebfu cu00f3
+    // Xử lý upload ảnh mới nếu có
     if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
-      // Xu00f3a u1ea3nh cu0169
+      // Xóa ảnh cũ
       if ($product->image) {
         $this->deleteImage($product->image);
       }
@@ -101,13 +101,13 @@ class ProductService extends BaseService
   }
 
   /**
-   * Xu00f3a su1ea3n phu1ea9m
+   * Xóa sản phẩm
    *
    * @return bool
    */
   public function deleteProduct(Product $product)
   {
-    // Xu00f3a u1ea3nh tru01b0u1edbc khi xu00f3a su1ea3n phu1ea9m
+    // Xóa ảnh trước khi xóa sản phẩm
     if ($product->image) {
       $this->deleteImage($product->image);
     }
@@ -116,7 +116,7 @@ class ProductService extends BaseService
   }
 
   /**
-   * Upload u1ea3nh su1ea3n phu1ea9m
+   * Upload ảnh sản phẩm
    *
    * @return string
    */
@@ -128,7 +128,7 @@ class ProductService extends BaseService
   }
 
   /**
-   * Xu00f3a u1ea3nh su1ea3n phu1ea9m
+   * Xóa ảnh sản phẩm
    *
    * @return bool
    */
