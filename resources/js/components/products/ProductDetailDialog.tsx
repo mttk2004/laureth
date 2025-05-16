@@ -57,24 +57,24 @@ export default function ProductDetailDialog({ product, open, onOpenChange }: Pro
                     {/* Cột trái - Ảnh sản phẩm */}
                     <div className="flex flex-col items-center justify-center">
                         <ProductImage src={product.image} alt={product.name} size="xl" className="mb-4" />
-                        <h3 className="text-center font-semibold">{product.name}</h3>
+                        <h3 className="text-center font-medium">{product.name}</h3>
                     </div>
 
                     {/* Cột phải - Thông tin sản phẩm */}
                     <div className="flex flex-col space-y-4">
                         <div className="grid grid-cols-3 gap-2 gap-y-3 text-sm">
-                            <div className="font-semibold">Danh mục:</div>
+                            <div className="font-medium">Danh mục:</div>
                             <div className="col-span-2">{product.category?.name}</div>
 
-                            <div className="font-semibold">Giá:</div>
+                            <div className="font-medium">Giá:</div>
                             <div className="col-span-2">{formatCurrency(product.price)}</div>
 
-                            <div className="font-semibold">Trạng thái:</div>
+                            <div className="font-medium">Trạng thái:</div>
                             <div className="col-span-2">
                                 <ProductStatusBadge status={product.status} />
                             </div>
 
-                            <div className="font-semibold">Số lượng:</div>
+                            <div className="font-medium">Số lượng:</div>
                             <div className="col-span-2">
                                 {loading ? (
                                     <span className="text-muted-foreground italic">Đang tải...</span>
@@ -91,7 +91,7 @@ export default function ProductDetailDialog({ product, open, onOpenChange }: Pro
 
                         {product.description && (
                             <div className="mt-2 text-sm">
-                                <div className="mb-1 font-semibold">Mô tả:</div>
+                                <div className="mb-1 font-medium">Mô tả:</div>
                                 <p>{product.description}</p>
                             </div>
                         )}
