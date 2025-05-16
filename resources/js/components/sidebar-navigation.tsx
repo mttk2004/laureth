@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { User, UserRole } from '@/types/user';
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, Box, Calendar, ClipboardList, Home, Layers, Package, Package2, ShoppingBag, Store, Users } from 'lucide-react';
+import { BarChart3, Box, Calendar, ClipboardList, DollarSign, Home, Layers, Package, Package2, ShoppingBag, Store, Users } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface SidebarLinkProps {
@@ -36,7 +36,8 @@ const roleLinks: Record<UserRole, SidebarLinkProps[]> = {
         { href: '/suppliers', label: 'Nhà cung cấp', icon: <Package2 className="h-5 w-5" /> },
         { href: '/warehouses', label: 'Kho hàng', icon: <Box className="h-5 w-5" /> },
         { href: '/purchase-orders', label: 'Đơn nhập hàng', icon: <ClipboardList className="h-5 w-5" /> },
-        { href: '/transfers', label: 'Chuyển kho', icon: <Layers className="h-5 w-5" /> },
+        { href: '/transfers', label: 'Duyệt chuyển kho', icon: <Layers className="h-5 w-5" /> },
+        { href: '/payrolls', label: 'Duyệt lương', icon: <DollarSign className="h-5 w-5" /> },
         { href: '/reports', label: 'Báo cáo', icon: <BarChart3 className="h-5 w-5" /> },
     ],
     SM: [

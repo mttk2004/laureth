@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductInventoryController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -37,6 +38,10 @@ Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
   ], [
     'except' => ['show'],
   ]);
+
+  // Route cho payrolls
+  Route::get('/payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
+  Route::put('/payrolls/{payroll}/approve', [PayrollController::class, 'approve'])->name('payrolls.approve');
 
   // Route cho warehouse purchase
   Route::get('/warehouses/{warehouse}/purchase', [WarehousePurchaseController::class, 'create'])->name('warehouses.purchase.create');
