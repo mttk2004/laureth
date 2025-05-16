@@ -1,5 +1,5 @@
-import BaseSortSelect from '@/components/common/BaseSortSelect';
-import { UserSortOption, UserSortOptionLabels } from '@/types/user';
+import { BaseSortSelect } from '@/components/common';
+import { UserSortOption, UserSortOptionLabels } from '@/types';
 
 interface UserSortSelectProps {
   value: UserSortOption;

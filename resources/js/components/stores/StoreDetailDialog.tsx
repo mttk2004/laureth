@@ -1,11 +1,9 @@
-import React from 'react';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Store } from '@/types/store';
-import { User } from '@/types/user';
-import { formatCurrency } from '@/lib/storeUtils';
+import { Store, User } from '@/types';
+import { formatCurrency } from '@/lib';
 
 interface StoreWithManager extends Store {
   manager?: User | null;

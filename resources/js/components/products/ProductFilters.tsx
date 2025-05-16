@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { formatCurrency } from '@/lib/productUtils';
-import { Category, ProductStatus } from '@/types/product';
+import { formatCurrency } from '@/lib';
+import { Category, ProductStatus } from '@/types';
 import {
   Select,
   SelectContent,
@@ -10,8 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import BaseFilterDialog from '@/components/common/BaseFilterDialog';
-import BaseFilterForm, { BaseFilterRow } from '@/components/common/BaseFilterForm';
+import { BaseFilterDialog, BaseFilterForm, BaseFilterRow } from '@/components/common';
 
 interface FilterOptions {
   category_id: string;

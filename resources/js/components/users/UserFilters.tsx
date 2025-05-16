@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Store } from '@/types/store';
-import { roleLabels } from '@/types/user';
+import { useState } from 'react';
+import { Store, roleLabels } from '@/types';
 import {
   Select,
   SelectContent,
@@ -8,8 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import BaseFilterDialog from '@/components/common/BaseFilterDialog';
-import BaseFilterForm, { BaseFilterRow } from '@/components/common/BaseFilterForm';
+import { BaseFilterDialog, BaseFilterForm, BaseFilterRow } from '@/components/common';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';

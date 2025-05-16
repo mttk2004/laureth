@@ -1,10 +1,8 @@
-import React from 'react';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { WarehouseWithStore } from '@/types/warehouse';
-
+import { WarehouseWithStore } from '@/types';
 
 interface WarehouseDetailDialogProps {
   warehouse: WarehouseWithStore | null;

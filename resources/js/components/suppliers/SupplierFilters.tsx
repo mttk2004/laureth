@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import BaseFilterDialog from '@/components/common/BaseFilterDialog';
-import BaseFilterForm, { BaseFilterRow } from '@/components/common/BaseFilterForm';
+import { BaseFilterDialog, BaseFilterForm, BaseFilterRow } from '@/components/common';
 
 interface FilterOptions {
   name: string;

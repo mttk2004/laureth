@@ -52,7 +52,7 @@ interface BaseSortSelectProps<T extends string = string> {
   icon?: 'arrowDownAZ' | 'arrowUpDown' | 'none';
 }
 
-export default function BaseSortSelect<T extends string = string>({
+export function BaseSortSelect<T extends string = string>({
   value,
   options,
   labels,

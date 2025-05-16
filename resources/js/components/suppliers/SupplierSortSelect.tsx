@@ -1,5 +1,5 @@
-import BaseSortSelect from '@/components/common/BaseSortSelect';
-import { SupplierSortOption, SupplierSortOptionLabels } from '@/types/supplier';
+import { BaseSortSelect } from '@/components/common';
+import { SupplierSortOption, SupplierSortOptionLabels } from '@/types';
 
 interface SupplierSortSelectProps {
   value: SupplierSortOption;

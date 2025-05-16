@@ -1,7 +1,6 @@
-import React from 'react';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
-import { Product } from '@/types/product';
+import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,9 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import ProductImage from '@/components/products/ProductImage';
-import ProductStatusBadge from '@/components/products/ProductStatusBadge';
-import { formatCurrency } from '@/lib/productUtils';
+import { ProductImage, ProductStatusBadge } from '@/components/products';
+import { formatCurrency } from '@/lib';
 
 interface ProductDetailDialogProps {
   product: Product | null;

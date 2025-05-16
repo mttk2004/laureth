@@ -1,5 +1,5 @@
-import BaseSortSelect from '@/components/common/BaseSortSelect';
-import { StoreSortOption, StoreSortOptionLabels } from '@/types/store';
+import { BaseSortSelect } from '@/components/common';
+import { StoreSortOption, StoreSortOptionLabels } from '@/types';
 
 interface StoreSortSelectProps {
   value: StoreSortOption;

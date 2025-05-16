@@ -53,7 +53,7 @@ interface BaseFilterDialogProps {
   dialogWidth?: 'sm:max-w-[425px]' | 'sm:max-w-md' | 'sm:max-w-lg';
 }
 
-export default function BaseFilterDialog({
+export function BaseFilterDialog({
   title,
   description,
   children,

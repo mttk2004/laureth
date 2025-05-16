@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Label } from '@/components/ui/label';
 
 interface BaseFilterRowProps {
@@ -80,7 +80,7 @@ interface BaseFilterFormProps {
 /**
  * Container cho form filter
  */
-export default function BaseFilterForm({
+export function BaseFilterForm({
   children,
   gap = "gap-4"
 }: BaseFilterFormProps) {

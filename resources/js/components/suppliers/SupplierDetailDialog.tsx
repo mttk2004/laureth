@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Supplier } from '@/types/supplier';
-import { formatPhoneNumber } from '@/lib/supplierUtils';
-import { PurchaseOrder, PurchaseOrderStatus } from '@/types/purchase_order';
+import { Supplier, PurchaseOrder, PurchaseOrderStatus } from '@/types';
+import { formatPhoneNumber, formatCurrency } from '@/lib';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatCurrency } from '@/lib/productUtils';
 import { Badge } from '@/components/ui/badge';
 
 interface SupplierWithPurchaseOrders extends Supplier {

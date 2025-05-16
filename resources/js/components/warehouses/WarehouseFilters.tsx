@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import BaseFilterDialog from '@/components/common/BaseFilterDialog';
-import BaseFilterForm, { BaseFilterRow } from '@/components/common/BaseFilterForm';
-import { Store } from '@/types/store';
+import { BaseFilterDialog, BaseFilterForm, BaseFilterRow } from '@/components/common';
+import { Store } from '@/types';
 
 interface FilterValues {
   name?: string;

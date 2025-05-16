@@ -1,7 +1,6 @@
-import React from 'react';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
-import { User, roleLabels } from '@/types/user';
+import { User, roleLabels } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { formatPhoneNumber, formatLastLogin } from '@/lib/utils';
+import { formatPhoneNumber, formatLastLogin, formatCurrency } from '@/lib';
 
 interface UserDetailDialogProps {
   user: User | null;

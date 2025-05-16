@@ -3,7 +3,7 @@ import { EyeIcon, TrashIcon, PencilIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ProductImage from '@/components/products/ProductImage';
 import ProductStatusBadge from '@/components/products/ProductStatusBadge';
-import { formatCurrency } from '@/lib/productUtils';
+import { formatCurrency } from '@/lib';
 
 interface ProductListItemProps {
   product: Product;
