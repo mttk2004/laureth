@@ -36,6 +36,9 @@ export function PayrollTabs({
   payrolls,
   handlePageChange,
 }: PayrollTabsProps) {
+  // Kiểm tra xem links có tồn tại và có đủ phần tử không
+  const hasPageLinks = payrolls.links && payrolls.links.length > 3;
+
   return (
     <>
       <Tabs defaultValue="byStore" className="w-full">
@@ -131,12 +134,12 @@ export function PayrollTabs({
       </Tabs>
 
       {/* Pagination */}
-      {payrolls.links && payrolls.links.length > 3 && (
+      {hasPageLinks && (
         <div className="flex justify-center mt-4">
           <div className="flex gap-1">
-            {payrolls.links.map((link, i) => {
+            {payrolls.links?.map((link, i) => {
               // Skip first and last elements if they are "Previous" and "Next" buttons
-              if (i === 0 || i === payrolls.links.length - 1) return null;
+              if (i === 0 || i === payrolls.links!.length - 1) return null;
 
               const page = link.label === "..."
                 ? null

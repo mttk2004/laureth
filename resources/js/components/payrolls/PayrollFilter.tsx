@@ -1,10 +1,10 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, ArrowUpDown } from 'lucide-react';
 import { PayrollStatus, PayrollSortOptionLabels } from '@/types/payroll';
 import { Store } from '@/types/store';
 
@@ -23,6 +23,7 @@ interface PayrollFilterProps {
   handleSearch: (e: React.FormEvent) => void;
   handleSortChange: (value: string) => void;
   applyFilter: () => void;
+  resetFilter: () => void;
   sort: string;
   isFilterOpen: boolean;
   setIsFilterOpen: (value: boolean) => void;
@@ -38,11 +39,20 @@ export function PayrollFilter({
   handleSearch,
   handleSortChange,
   applyFilter,
+  resetFilter,
   sort,
   isFilterOpen,
   setIsFilterOpen,
   periodYears,
 }: PayrollFilterProps) {
+  // Kiểm tra xem có bộ lọc nào đang được áp dụng không
+  const hasActiveFilters =
+    filterData.month !== 'all' ||
+    filterData.year !== 'all' ||
+    filterData.status !== 'all' ||
+    filterData.store_id !== 'all' ||
+    filterData.position !== 'all';
+
   return (
     <div className="flex items-center gap-2">
       <div className="relative">
@@ -61,8 +71,12 @@ export function PayrollFilter({
 
       <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" className="flex items-center gap-2" size="sm">
             <Filter className="h-4 w-4" />
+            <span>Lọc lương</span>
+            {hasActiveFilters && (
+              <span className="flex h-2 w-2 rounded-full bg-primary"></span>
+            )}
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-md">
@@ -157,15 +171,23 @@ export function PayrollFilter({
             </div>
           </div>
 
-          <div className="flex justify-end">
-            <Button onClick={applyFilter}>Áp dụng</Button>
-          </div>
+          <DialogFooter className="flex justify-between">
+            <Button variant="outline" onClick={resetFilter} type="button">
+              Xóa bộ lọc
+            </Button>
+            <Button onClick={applyFilter} type="submit">
+              Áp dụng
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Select value={sort} onValueChange={handleSortChange}>
-        <SelectTrigger className="w-40">
-          <SelectValue placeholder="Sắp xếp" />
+        <SelectTrigger className="w-48 flex items-center">
+          <div className="flex items-center gap-2">
+            <ArrowUpDown className="h-4 w-4" />
+            <SelectValue placeholder="Sắp xếp" />
+          </div>
         </SelectTrigger>
         <SelectContent>
           {Object.entries(PayrollSortOptionLabels).map(([value, label]) => (

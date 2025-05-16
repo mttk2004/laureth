@@ -91,6 +91,26 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
     setIsFilterOpen(false);
   };
 
+  // Reset filter
+  const resetFilter = () => {
+    const resetData = {
+      month: 'all',
+      year: 'all',
+      status: 'all',
+      store_id: 'all',
+      position: 'all',
+    };
+    setFilterData(resetData);
+    setSearchFilter('');
+
+    router.get('/payrolls', {
+      ...resetData,
+      name: '',
+      sort,
+    });
+    setIsFilterOpen(false);
+  };
+
   // Xử lý tìm kiếm
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,6 +201,7 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
               handleSearch={handleSearch}
               handleSortChange={handleSortChange}
               applyFilter={applyFilter}
+              resetFilter={resetFilter}
               sort={sort}
               isFilterOpen={isFilterOpen}
               setIsFilterOpen={setIsFilterOpen}
