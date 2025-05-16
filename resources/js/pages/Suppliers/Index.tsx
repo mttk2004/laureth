@@ -1,17 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-react';
-import { Supplier, SupplierSortOption } from '@/types/supplier';
-import { Button } from '@/components/ui/button';
+import { Supplier, SupplierSortOption, User } from '@/types';
+import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
-import { User } from '@/types/user';
-import DataTable from '@/components/ui/data-table';
 import { useToast } from '@/hooks/use-toast';
-import { formatPhoneNumber } from '@/lib/supplierUtils';
-import DeleteSupplierDialog from '@/components/suppliers/DeleteSupplierDialog';
-import SupplierDetailDialog from '@/components/suppliers/SupplierDetailDialog';
-import SupplierFilters from '@/components/suppliers/SupplierFilters';
-import SupplierSortSelect from '@/components/suppliers/SupplierSortSelect';
+import { formatPhoneNumber } from '@/lib/utils';
+import { DeleteSupplierDialog, SupplierDetailDialog, SupplierFilters, SupplierSortSelect } from '@/components/suppliers';
 
 interface Props {
   suppliers: {

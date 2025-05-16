@@ -1,18 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { User, UserSortOption } from '@/types/user';
-import { Store } from '@/types/store';
-import { Button } from '@/components/ui/button';
+import { User, UserSortOption, Store } from '@/types';
+import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
-import DataTable from '@/components/ui/data-table';
 import { useToast } from '@/hooks/use-toast';
-import UserRoleBadge from '@/components/users/UserRoleBadge';
-import UserDetailDialog from '@/components/users/UserDetailDialog';
-import DeleteUserDialog from '@/components/users/DeleteUserDialog';
-import UserFilters from '@/components/users/UserFilters';
-import UserSortSelect from '@/components/users/UserSortSelect';
-import { formatPhoneNumber } from '@/lib/userUtils';
+import { UserRoleBadge, UserDetailDialog, DeleteUserDialog, UserFilters, UserSortSelect } from '@/components/users';
+import { formatPhoneNumber } from '@/lib/utils';
 
 interface Props {
   users: {

@@ -1,17 +1,12 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { Store, StoreSortOption } from '@/types/store';
-import { User } from '@/types/user';
-import { Button } from '@/components/ui/button';
+import { Store, StoreSortOption, User } from '@/types';
+import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
-import DataTable from '@/components/ui/data-table';
 import { useToast } from '@/hooks/use-toast';
-import StoreDetailDialog from '@/components/stores/StoreDetailDialog';
-import DeleteStoreDialog from '@/components/stores/DeleteStoreDialog';
-import StoreFilters from '@/components/stores/StoreFilters';
-import StoreSortSelect from '@/components/stores/StoreSortSelect';
-import { formatCurrency } from '@/lib/storeUtils';
+import { StoreDetailDialog, DeleteStoreDialog, StoreFilters, StoreSortSelect } from '@/components/stores';
+import { formatCurrency } from '@/lib/utils';
 
 interface StoreWithManager extends Store {
   manager?: User | null;

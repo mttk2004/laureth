@@ -10,13 +10,6 @@ export function getImageUrl(path: string | null): string | null {
 }
 
 /**
- * Format giá tiền theo định dạng tiền tệ Việt Nam
- */
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-}
-
-/**
  * Lấy text hiển thị cho trạng thái sản phẩm
  */
 export function getStatusText(status: ProductStatus): string {

@@ -1,19 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { Product, Category, ProductSortOption } from '@/types/product';
-import { Button } from '@/components/ui/button';
+import { Product, Category, ProductSortOption, User } from '@/types';
+import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
-import { User } from '@/types/user';
-import DataTable from '@/components/ui/data-table';
 import { useToast } from '@/hooks/use-toast';
-import ProductImage from '@/components/products/ProductImage';
-import ProductStatusBadge from '@/components/products/ProductStatusBadge';
-import ProductDetailDialog from '@/components/products/ProductDetailDialog';
-import DeleteProductDialog from '@/components/products/DeleteProductDialog';
-import ProductFilters from '@/components/products/ProductFilters';
-import ProductSortSelect from '@/components/products/ProductSortSelect';
-import { formatCurrency } from '@/lib/productUtils';
+import { ProductImage, ProductStatusBadge, ProductDetailDialog, DeleteProductDialog, ProductFilters, ProductSortSelect } from '@/components/products';
+import { formatCurrency } from '@/lib/utils';
 
 interface Props {
   products: {

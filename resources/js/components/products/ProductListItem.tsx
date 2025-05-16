@@ -1,4 +1,3 @@
-import React from 'react';
 import { Product } from '@/types/product';
 import { EyeIcon, TrashIcon, PencilIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';

@@ -1,17 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { Store } from '@/types/store';
-import { User } from '@/types/user';
-import { Button } from '@/components/ui/button';
+import { Store, User, WarehouseWithStore, WarehouseSortOption } from '@/types';
+import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
-import DataTable from '@/components/ui/data-table';
 import { useToast } from '@/hooks/use-toast';
-import WarehouseFilters from '@/components/warehouses/WarehouseFilters';
-import WarehouseSortSelect from '@/components/warehouses/WarehouseSortSelect';
-import { WarehouseWithStore, WarehouseSortOption } from '@/types/warehouse';
-import WarehouseDetailDialog from '@/components/warehouses/WarehouseDetailDialog';
-import DeleteWarehouseDialog from '@/components/warehouses/DeleteWarehouseDialog';
+import { WarehouseFilters, WarehouseSortSelect, WarehouseDetailDialog, DeleteWarehouseDialog } from '@/components/warehouses';
 
 interface Props {
   warehouses: {

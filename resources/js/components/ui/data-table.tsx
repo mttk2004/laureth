@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 
@@ -24,7 +24,7 @@ interface DataTableProps<T> {
   emptyState?: ReactNode;
 }
 
-export default function DataTable<T>({
+export function DataTable<T>({
   data,
   columns,
   actions,
