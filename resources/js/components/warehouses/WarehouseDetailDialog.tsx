@@ -3,11 +3,11 @@ import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Warehouse } from '@/types/warehouse';
+import { WarehouseWithStore } from '@/types/warehouse';
 
 
 interface WarehouseDetailDialogProps {
-  warehouse: Warehouse | null;
+  warehouse: WarehouseWithStore | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -32,21 +32,15 @@ export default function WarehouseDetailDialog({ warehouse, open, onOpenChange }:
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div className="font-medium">ID:</div>
                 <div className="col-span-2">{warehouse.id}</div>
-
+                <div className="font-medium">Tên kho:</div>
+                <div className="col-span-2">{warehouse.name}</div>
+                <div className="font-medium">Cửa hàng:</div>
+                <div className="col-span-2">{warehouse.store?.name ?? 'Không có cửa hàng'}</div>
                 <div className="font-medium">Ngày tạo:</div>
                 <div className="col-span-2">
                   {new Date(warehouse.created_at).toLocaleDateString('vi-VN')}
                 </div>
               </div>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-sm text-muted-foreground mb-1">Quản lý kho</h3>
-              <div className="grid grid-cols-3 gap-2 text-sm">
-                <div className="font-medium">Cửa hàng:</div>
-                <div className="col-span-2">{warehouse.store_id}</div>
-              </div>
-
             </div>
           </div>
         </div>

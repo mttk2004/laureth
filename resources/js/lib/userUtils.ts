@@ -42,39 +42,6 @@ export function getRoleClassName(role: UserRole): string {
 }
 
 /**
- * Các tùy chọn sắp xếp có sẵn
- */
-export enum SortOption {
-  NEWEST = 'created_at_desc',
-  OLDEST = 'created_at_asc',
-  NAME_ASC = 'full_name_asc',
-  NAME_DESC = 'full_name_desc',
-}
-
-/**
- * Map các tùy chọn sắp xếp với nhãn hiển thị
- */
-export const sortOptionLabels: Record<SortOption, string> = {
-  [SortOption.NEWEST]: 'Mới nhất',
-  [SortOption.OLDEST]: 'Cũ nhất',
-  [SortOption.NAME_ASC]: 'Tên A-Z',
-  [SortOption.NAME_DESC]: 'Tên Z-A',
-};
-
-/**
- * Lấy label hiển thị cho tùy chọn sắp xếp
- */
-export function getSortLabel(option: SortOption): string {
-  const labels: Record<SortOption, string> = {
-    [SortOption.NEWEST]: 'Mới nhất',
-    [SortOption.OLDEST]: 'Cũ nhất',
-    [SortOption.NAME_ASC]: 'Tên A-Z',
-    [SortOption.NAME_DESC]: 'Tên Z-A',
-  };
-  return labels[option];
-}
-
-/**
  * Kiểm tra xem người dùng có quyền admin không
  */
 export function isAdmin(role: UserRole): boolean {

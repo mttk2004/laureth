@@ -16,7 +16,7 @@ class WarehouseService
    */
   public function getWarehouses(array $filters = [], int $perPage = 10, string $sort = 'newest')
   {
-    $query = Warehouse::query();
+    $query = Warehouse::query()->with('store');
 
     // Lọc theo tên
     if (isset($filters['name']) && ! empty($filters['name'])) {

@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import WarehouseFilters from '@/components/warehouses/WarehouseFilters';
 import WarehouseSortSelect from '@/components/warehouses/WarehouseSortSelect';
 import { SortOption } from '@/lib/storeUtils';
-import { Warehouse, WarehouseWithStore } from '@/types/warehouse';
+import { WarehouseWithStore } from '@/types/warehouse';
 import WarehouseDetailDialog from '@/components/warehouses/WarehouseDetailDialog';
 import DeleteWarehouseDialog from '@/components/warehouses/DeleteWarehouseDialog';
 
@@ -42,15 +42,15 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteWarehouseId, setDeleteWarehouseId] = useState<number | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
+  const [selectedWarehouse, setSelectedWarehouse] = useState<WarehouseWithStore | null>(null);
   const { addToast } = useToast();
 
-  const handleViewWarehouse = (warehouse: Warehouse) => {
+  const handleViewWarehouse = (warehouse: WarehouseWithStore) => {
     setSelectedWarehouse(warehouse);
     setDetailDialogOpen(true);
   };
 
-  const handleEditWarehouse = (warehouse: Warehouse) => {
+  const handleEditWarehouse = (warehouse: WarehouseWithStore) => {
     router.visit(`/warehouses/${warehouse.id}/edit`);
   };
 
@@ -109,21 +109,21 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
     {
       key: 'name',
       label: 'Tên cửa hàng',
-      render: (warehouse: Warehouse) => (
+      render: (warehouse: WarehouseWithStore) => (
         <div className="text-sm font-medium">{warehouse.name}</div>
       ),
     },
     {
       key: 'store_id',
       label: 'Cửa hàng',
-      render: (warehouse: Warehouse) => (
-        <div className="text-sm max-w-md truncate">{warehouse.store_id}</div>
+      render: (warehouse: WarehouseWithStore) => (
+        <div className="text-sm max-w-md truncate">{warehouse.store?.name}</div>
       ),
     },
     {
       key: 'is_main',
       label: 'Kho chính',
-      render: (warehouse: Warehouse) => (
+      render: (warehouse: WarehouseWithStore) => (
         <div className="text-sm">
           {warehouse.is_main ? 'Có' : 'Không'}
         </div>
@@ -132,7 +132,7 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
     {
       key: 'created_at',
       label: 'Ngày tạo',
-      render: (warehouse: Warehouse) => (
+      render: (warehouse: WarehouseWithStore) => (
         <div className="text-sm font-medium">
           {new Date(warehouse.created_at).toLocaleDateString('vi-VN')}
         </div>
@@ -165,7 +165,7 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
         <DataTable
           data={warehouses.data}
           columns={columns}
-          actions={(warehouse: Warehouse) => (
+          actions={(warehouse: WarehouseWithStore) => (
             <div className="flex">
               <Button variant="ghost" size="sm" onClick={() => handleViewWarehouse(warehouse)}>
                 <EyeIcon className="h-4 w-4" />

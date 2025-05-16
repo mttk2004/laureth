@@ -1,23 +1,27 @@
-import React from 'react';
-import { SortOption, getSortLabel } from '@/lib/supplierUtils';
 import BaseSortSelect from '@/components/common/BaseSortSelect';
 
+enum Option {
+  NAME_ASC = 'name_asc',
+  NAME_DESC = 'name_desc',
+}
+
+const OptionLabels: Record<Option, string> = {
+  [Option.NAME_ASC]: 'Tên A-Z',
+  [Option.NAME_DESC]: 'Tên Z-A',
+};
+
 interface SupplierSortSelectProps {
-  value: SortOption;
-  onChange: (value: SortOption) => void;
+  value: Option;
+  onChange: (value: Option) => void;
 }
 
 export default function SupplierSortSelect({ value, onChange }: SupplierSortSelectProps) {
-  const options = [
-    { value: SortOption.NAME_ASC, label: getSortLabel(SortOption.NAME_ASC) },
-    { value: SortOption.NAME_DESC, label: getSortLabel(SortOption.NAME_DESC) },
-  ];
-
   return (
-    <BaseSortSelect
+    <BaseSortSelect<Option>
       value={value}
-      options={options}
-      onChange={(val) => onChange(val as SortOption)}
+      options={Option}
+      labels={OptionLabels}
+      onChange={onChange}
       placeholder="Sắp xếp theo"
       width="w-40"
       icon="arrowUpDown"

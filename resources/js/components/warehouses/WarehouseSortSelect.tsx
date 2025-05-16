@@ -1,27 +1,31 @@
-import React from 'react';
 import BaseSortSelect from '@/components/common/BaseSortSelect';
-import { SortOption, getSortLabel } from '@/lib/storeUtils';
+
+enum Option {
+  NEWEST = 'newest',
+  OLDEST = 'oldest',
+  NAME_ASC = 'name_asc',
+  NAME_DESC = 'name_desc',
+}
+
+const OptionLabels: Record<Option, string> = {
+  [Option.NEWEST]: 'Mới nhất',
+  [Option.OLDEST]: 'Cũ nhất',
+  [Option.NAME_ASC]: 'Tên A-Z',
+  [Option.NAME_DESC]: 'Tên Z-A',
+};
 
 interface WarehouseSortSelectProps {
-  value: SortOption;
-  onChange: (value: SortOption) => void;
+  value: Option;
+  onChange: (value: Option) => void;
 }
 
 export default function WarehouseSortSelect({ value, onChange }: WarehouseSortSelectProps) {
-  const sortOptions = Object.values(SortOption).map(option => ({
-    value: option,
-    label: getSortLabel(option)
-  }));
-
-  const handleSortChange = (newValue: string) => {
-    onChange(newValue as SortOption);
-  };
-
   return (
-    <BaseSortSelect
+    <BaseSortSelect<Option>
       value={value}
-      options={sortOptions}
-      onChange={handleSortChange}
+      options={Option}
+      labels={OptionLabels}
+      onChange={onChange}
       placeholder="Sắp xếp theo"
       icon="arrowUpDown"
     />

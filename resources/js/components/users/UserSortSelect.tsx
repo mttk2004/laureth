@@ -1,23 +1,31 @@
-import React from 'react';
-import { SortOption, sortOptionLabels } from '@/lib/userUtils';
 import BaseSortSelect from '@/components/common/BaseSortSelect';
 
+enum Option {
+  NEWEST = 'created_at_desc',
+  OLDEST = 'created_at_asc',
+  NAME_ASC = 'full_name_asc',
+  NAME_DESC = 'full_name_desc',
+}
+
+const OptionLabels: Record<Option, string> = {
+  [Option.NEWEST]: 'Mới nhất',
+  [Option.OLDEST]: 'Cũ nhất',
+  [Option.NAME_ASC]: 'Tên A-Z',
+  [Option.NAME_DESC]: 'Tên Z-A',
+};
+
 interface UserSortSelectProps {
-  value: SortOption;
-  onChange: (value: SortOption) => void;
+  value: Option;
+  onChange: (value: Option) => void;
 }
 
 export default function UserSortSelect({ value, onChange }: UserSortSelectProps) {
-  const options = Object.values(SortOption).map(option => ({
-    value: option,
-    label: sortOptionLabels[option]
-  }));
-
   return (
-    <BaseSortSelect
+    <BaseSortSelect<Option>
       value={value}
-      options={options}
-      onChange={(newValue) => onChange(newValue as SortOption)}
+      options={Option}
+      labels={OptionLabels}
+      onChange={onChange}
       placeholder="Sắp xếp theo"
       icon="arrowUpDown"
     />
