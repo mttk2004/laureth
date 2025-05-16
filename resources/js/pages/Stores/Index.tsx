@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { Store } from '@/types/store';
+import { Store, StoreSortOption } from '@/types/store';
 import { User } from '@/types/user';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
@@ -11,7 +11,7 @@ import StoreDetailDialog from '@/components/stores/StoreDetailDialog';
 import DeleteStoreDialog from '@/components/stores/DeleteStoreDialog';
 import StoreFilters from '@/components/stores/StoreFilters';
 import StoreSortSelect from '@/components/stores/StoreSortSelect';
-import { formatCurrency, SortOption } from '@/lib/storeUtils';
+import { formatCurrency } from '@/lib/storeUtils';
 
 interface StoreWithManager extends Store {
   manager?: User | null;
@@ -40,7 +40,7 @@ interface Props {
   sort?: string;
 }
 
-export default function StoresIndex({ stores, user, managers = [], filters = {}, sort = SortOption.NEWEST }: Props) {
+export default function StoresIndex({ stores, user, managers = [], filters = {}, sort = StoreSortOption.NEWEST }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteStoreId, setDeleteStoreId] = useState<string | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -95,7 +95,7 @@ export default function StoresIndex({ stores, user, managers = [], filters = {},
     });
   };
 
-  const handleSortChange = (sortOption: SortOption) => {
+  const handleSortChange = (sortOption: StoreSortOption) => {
     router.get('/stores', {
       ...filters,
       sort: sortOption,
@@ -148,7 +148,7 @@ export default function StoresIndex({ stores, user, managers = [], filters = {},
           <h1 className="text-2xl font-bold">Quản lý cửa hàng</h1>
           <div className="flex space-x-2">
             <StoreSortSelect
-              value={sort as SortOption}
+              value={sort as StoreSortOption}
               onChange={handleSortChange}
             />
             <StoreFilters

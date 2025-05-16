@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { Product, Category } from '@/types/product';
+import { Product, Category, ProductSortOption } from '@/types/product';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { User } from '@/types/user';
@@ -13,7 +13,7 @@ import ProductDetailDialog from '@/components/products/ProductDetailDialog';
 import DeleteProductDialog from '@/components/products/DeleteProductDialog';
 import ProductFilters from '@/components/products/ProductFilters';
 import ProductSortSelect from '@/components/products/ProductSortSelect';
-import { formatCurrency, SortOption } from '@/lib/productUtils';
+import { formatCurrency } from '@/lib/productUtils';
 
 interface Props {
   products: {
@@ -40,7 +40,7 @@ interface Props {
   sort?: string;
 }
 
-export default function ProductsIndex({ products, user, categories = [], filters = {}, sort = SortOption.NEWEST }: Props) {
+export default function ProductsIndex({ products, user, categories = [], filters = {}, sort = ProductSortOption.NEWEST }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -97,7 +97,7 @@ export default function ProductsIndex({ products, user, categories = [], filters
     });
   };
 
-  const handleSortChange = (sortOption: SortOption) => {
+  const handleSortChange = (sortOption: ProductSortOption) => {
     router.get('/products', {
       ...filters,
       sort: sortOption,
@@ -151,7 +151,7 @@ export default function ProductsIndex({ products, user, categories = [], filters
           <h1 className="text-2xl font-bold">Sản phẩm</h1>
           <div className="flex space-x-2">
             <ProductSortSelect
-              value={sort as SortOption}
+              value={sort as ProductSortOption}
               onChange={handleSortChange}
             />
             <ProductFilters

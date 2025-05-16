@@ -9,8 +9,7 @@ import DataTable from '@/components/ui/data-table';
 import { useToast } from '@/hooks/use-toast';
 import WarehouseFilters from '@/components/warehouses/WarehouseFilters';
 import WarehouseSortSelect from '@/components/warehouses/WarehouseSortSelect';
-import { SortOption } from '@/lib/storeUtils';
-import { WarehouseWithStore } from '@/types/warehouse';
+import { WarehouseWithStore, WarehouseSortOption } from '@/types/warehouse';
 import WarehouseDetailDialog from '@/components/warehouses/WarehouseDetailDialog';
 import DeleteWarehouseDialog from '@/components/warehouses/DeleteWarehouseDialog';
 
@@ -38,7 +37,7 @@ interface Props {
   sort?: string;
 }
 
-export default function WarehousesIndex({ warehouses, user, stores = [], filters = {}, sort = SortOption.NEWEST }: Props) {
+export default function WarehousesIndex({ warehouses, user, stores = [], filters = {}, sort = WarehouseSortOption.NEWEST }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteWarehouseId, setDeleteWarehouseId] = useState<number | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -94,7 +93,7 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
     });
   };
 
-  const handleSortChange = (sortOption: SortOption) => {
+  const handleSortChange = (sortOption: WarehouseSortOption) => {
     router.get('/warehouses', {
       ...filters,
       sort: sortOption,
@@ -147,7 +146,7 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
           <h1 className="text-2xl font-bold">Quản lý kho</h1>
           <div className="flex space-x-2">
             <WarehouseSortSelect
-              value={sort as SortOption}
+              value={sort as WarehouseSortOption}
               onChange={handleSortChange}
             />
             <WarehouseFilters

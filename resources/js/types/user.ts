@@ -31,3 +31,19 @@ export const roleLabels: Record<UserRole, string> = {
     SL: 'Trưởng ca',
     SA: 'Nhân viên bán hàng'
 };
+
+
+
+export enum UserSortOption {
+  NEWEST = 'created_at_desc',
+  OLDEST = 'created_at_asc',
+  NAME_ASC = 'full_name_asc',
+  NAME_DESC = 'full_name_desc',
+}
+
+export const UserSortOptionLabels: Record<UserSortOption, string> = {
+  [UserSortOption.NEWEST]: 'Mới nhất',
+  [UserSortOption.OLDEST]: 'Cũ nhất',
+  [UserSortOption.NAME_ASC]: 'Tên A-Z',
+  [UserSortOption.NAME_DESC]: 'Tên Z-A',
+};

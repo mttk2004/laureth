@@ -1,30 +1,17 @@
 import BaseSortSelect from '@/components/common/BaseSortSelect';
-
-enum Option {
-  NEWEST = 'newest',
-  OLDEST = 'oldest',
-  NAME_ASC = 'name_asc',
-  NAME_DESC = 'name_desc',
-}
-
-const OptionLabels: Record<Option, string> = {
-  [Option.NEWEST]: 'Mới nhất',
-  [Option.OLDEST]: 'Cũ nhất',
-  [Option.NAME_ASC]: 'Tên A-Z',
-  [Option.NAME_DESC]: 'Tên Z-A',
-};
+import { WarehouseSortOption, WarehouseSortOptionLabels } from '@/types/warehouse';
 
 interface WarehouseSortSelectProps {
-  value: Option;
-  onChange: (value: Option) => void;
+  value: WarehouseSortOption;
+  onChange: (value: WarehouseSortOption) => void;
 }
 
 export default function WarehouseSortSelect({ value, onChange }: WarehouseSortSelectProps) {
   return (
-    <BaseSortSelect<Option>
+    <BaseSortSelect<WarehouseSortOption>
       value={value}
-      options={Option}
-      labels={OptionLabels}
+      options={WarehouseSortOption}
+      labels={WarehouseSortOptionLabels}
       onChange={onChange}
       placeholder="Sắp xếp theo"
       icon="arrowUpDown"

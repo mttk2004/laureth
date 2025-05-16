@@ -1,26 +1,17 @@
 import BaseSortSelect from '@/components/common/BaseSortSelect';
-
-enum Option {
-  NAME_ASC = 'name_asc',
-  NAME_DESC = 'name_desc',
-}
-
-const OptionLabels: Record<Option, string> = {
-  [Option.NAME_ASC]: 'Tên A-Z',
-  [Option.NAME_DESC]: 'Tên Z-A',
-};
+import { SupplierSortOption, SupplierSortOptionLabels } from '@/types/supplier';
 
 interface SupplierSortSelectProps {
-  value: Option;
-  onChange: (value: Option) => void;
+  value: SupplierSortOption;
+  onChange: (value: SupplierSortOption) => void;
 }
 
 export default function SupplierSortSelect({ value, onChange }: SupplierSortSelectProps) {
   return (
-    <BaseSortSelect<Option>
+    <BaseSortSelect<SupplierSortOption>
       value={value}
-      options={Option}
-      labels={OptionLabels}
+      options={SupplierSortOption}
+      labels={SupplierSortOptionLabels}
       onChange={onChange}
       placeholder="Sắp xếp theo"
       width="w-40"

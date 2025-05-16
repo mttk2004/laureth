@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-react';
-import { Supplier } from '@/types/supplier';
+import { Supplier, SupplierSortOption } from '@/types/supplier';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { User } from '@/types/user';
@@ -12,7 +12,6 @@ import DeleteSupplierDialog from '@/components/suppliers/DeleteSupplierDialog';
 import SupplierDetailDialog from '@/components/suppliers/SupplierDetailDialog';
 import SupplierFilters from '@/components/suppliers/SupplierFilters';
 import SupplierSortSelect from '@/components/suppliers/SupplierSortSelect';
-import { SortOption } from '@/lib/supplierUtils';
 
 interface Props {
   suppliers: {
@@ -37,7 +36,7 @@ interface Props {
   sort?: string;
 }
 
-export default function SuppliersIndex({ suppliers, user, filters = {}, sort = SortOption.NAME_ASC }: Props) {
+export default function SuppliersIndex({ suppliers, user, filters = {}, sort = SupplierSortOption.NAME_ASC }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteSupplierId, setDeleteSupplierId] = useState<string | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -93,7 +92,7 @@ export default function SuppliersIndex({ suppliers, user, filters = {}, sort = S
     });
   };
 
-  const handleSortChange = (sortOption: SortOption) => {
+  const handleSortChange = (sortOption: SupplierSortOption) => {
     router.get('/suppliers', {
       ...filters,
       sort: sortOption,
@@ -135,7 +134,7 @@ export default function SuppliersIndex({ suppliers, user, filters = {}, sort = S
           <h1 className="text-2xl font-bold">Nhà cung cấp</h1>
           <div className="flex space-x-2">
             <SupplierSortSelect
-              value={sort as SortOption}
+              value={sort as SupplierSortOption}
               onChange={handleSortChange}
             />
             <SupplierFilters

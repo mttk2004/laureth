@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { PlusIcon, EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { User } from '@/types/user';
+import { User, UserSortOption } from '@/types/user';
 import { Store } from '@/types/store';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
@@ -12,7 +12,7 @@ import UserDetailDialog from '@/components/users/UserDetailDialog';
 import DeleteUserDialog from '@/components/users/DeleteUserDialog';
 import UserFilters from '@/components/users/UserFilters';
 import UserSortSelect from '@/components/users/UserSortSelect';
-import { formatPhoneNumber, SortOption } from '@/lib/userUtils';
+import { formatPhoneNumber } from '@/lib/userUtils';
 
 interface Props {
   users: {
@@ -37,7 +37,7 @@ interface Props {
   sort?: string;
 }
 
-export default function UsersIndex({ users, user, stores = [], filters = {}, sort = SortOption.NEWEST }: Props) {
+export default function UsersIndex({ users, user, stores = [], filters = {}, sort = UserSortOption.NEWEST }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -92,7 +92,7 @@ export default function UsersIndex({ users, user, stores = [], filters = {}, sor
     });
   };
 
-  const handleSortChange = (sortOption: SortOption) => {
+  const handleSortChange = (sortOption: UserSortOption) => {
     router.get('/users', {
       ...filters,
       sort: sortOption,
@@ -151,7 +151,7 @@ export default function UsersIndex({ users, user, stores = [], filters = {}, sor
           <h1 className="text-2xl font-bold">Quản lý nhân viên</h1>
           <div className="flex space-x-2">
             <UserSortSelect
-              value={sort as SortOption}
+              value={sort as UserSortOption}
               onChange={handleSortChange}
             />
             <UserFilters
