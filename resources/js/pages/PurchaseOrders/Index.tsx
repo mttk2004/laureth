@@ -1,11 +1,12 @@
-import { PurchaseOrderDetailDialog, PurchaseOrderFilters, PurchaseOrderSortSelect } from '@/components/purchase-orders';
+import { PurchaseOrderDetailDialog, PurchaseOrderFilters, PurchaseOrderSortSelect, PurchaseOrderPrintPreview } from '@/components/purchase-orders';
+import { WarehouseSelectDialog } from '@/components/warehouses';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib';
 import { PurchaseOrder, PurchaseOrderSortOption, Supplier, User, Warehouse } from '@/types';
 import { router } from '@inertiajs/react';
-import { EyeIcon, PrinterIcon } from 'lucide-react';
+import { EyeIcon, PrinterIcon, PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface PurchaseOrderWithRelations extends PurchaseOrder {
@@ -42,6 +43,8 @@ interface Props {
 
 export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = [], warehouses = [], filters = {}, sort = PurchaseOrderSortOption.NEWEST }: Props) {
     const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+    const [printDialogOpen, setPrintDialogOpen] = useState(false);
+    const [warehouseSelectDialogOpen, setWarehouseSelectDialogOpen] = useState(false);
     const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState<PurchaseOrderWithRelations | null>(null);
 
     const handleApplyFilters = (
@@ -84,6 +87,11 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
     const handleViewPurchaseOrder = (purchaseOrder: PurchaseOrderWithRelations) => {
         setSelectedPurchaseOrder(purchaseOrder);
         setDetailDialogOpen(true);
+    };
+
+    const handlePrintPurchaseOrder = (purchaseOrder: PurchaseOrderWithRelations) => {
+        setSelectedPurchaseOrder(purchaseOrder);
+        setPrintDialogOpen(true);
     };
 
     const formatDate = (dateString: string) => {
@@ -135,6 +143,13 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Quản lý đơn nhập hàng</h1>
                     <div className="flex space-x-2">
+                        <Button
+                            onClick={() => setWarehouseSelectDialogOpen(true)}
+                            className="bg-blue-600 hover:bg-blue-700"
+                        >
+                            <PlusIcon className="mr-2 h-4 w-4" />
+                            Nhập hàng
+                        </Button>
                         <PurchaseOrderSortSelect value={sort as PurchaseOrderSortOption} onChange={handleSortChange} />
                         <PurchaseOrderFilters
                             suppliers={suppliers}
@@ -154,7 +169,7 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
                                 <EyeIcon className="h-4 w-4" />
                                 <span className="sr-only">Xem</span>
                             </Button>
-                            <Button variant="ghost" size="sm" onClick={() => window.print()}>
+                            <Button variant="ghost" size="sm" onClick={() => handlePrintPurchaseOrder(purchaseOrder)}>
                                 <PrinterIcon className="h-4 w-4" />
                                 <span className="sr-only">In</span>
                             </Button>
@@ -172,6 +187,18 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
                     purchaseOrder={selectedPurchaseOrder}
                     open={detailDialogOpen}
                     onOpenChange={setDetailDialogOpen}
+                />
+
+                <PurchaseOrderPrintPreview
+                    purchaseOrder={selectedPurchaseOrder}
+                    open={printDialogOpen}
+                    onOpenChange={setPrintDialogOpen}
+                />
+
+                <WarehouseSelectDialog
+                    warehouses={warehouses}
+                    open={warehouseSelectDialogOpen}
+                    onOpenChange={setWarehouseSelectDialogOpen}
                 />
             </div>
         </AppLayout>
