@@ -15,8 +15,8 @@ export interface WarehouseWithStore extends Warehouse {
 }
 
 export enum WarehouseSortOption {
-    NEWEST = 'newest',
-    OLDEST = 'oldest',
+    NEWEST = 'created_at_desc',
+    OLDEST = 'created_at_asc',
     NAME_ASC = 'name_asc',
     NAME_DESC = 'name_desc',
 }
