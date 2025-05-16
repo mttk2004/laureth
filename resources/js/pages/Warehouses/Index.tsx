@@ -111,26 +111,19 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
     const columns = [
         {
             key: 'name',
-            label: 'Tên cửa hàng',
+            label: 'Tên kho',
             render: (warehouse: WarehouseWithStore) => <div className="text-sm font-medium">{warehouse.name}</div>,
         },
         {
+            key: 'address',
+            label: 'Địa chỉ',
+            render: (warehouse: WarehouseWithStore) => <div className="max-w-md truncate text-sm">{warehouse.address}</div>,
+        },
+        {
             key: 'store_id',
-            label: 'Cửa hàng',
+            label: 'Thuộc cửa hàng',
             render: (warehouse: WarehouseWithStore) => <div className="max-w-md truncate text-sm">{warehouse.store?.name}</div>,
-        },
-        {
-            key: 'is_main',
-            label: 'Kho chính',
-            render: (warehouse: WarehouseWithStore) => <div className="text-sm">{warehouse.is_main ? 'Có' : 'Không'}</div>,
-        },
-        {
-            key: 'created_at',
-            label: 'Ngày tạo',
-            render: (warehouse: WarehouseWithStore) => (
-                <div className="text-sm font-medium">{new Date(warehouse.created_at).toLocaleDateString('vi-VN')}</div>
-            ),
-        },
+        }
     ];
 
     return (
