@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PurchaseOrder;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class PurchaseOrderService extends BaseService
 {
@@ -65,5 +66,17 @@ class PurchaseOrderService extends BaseService
       $sort,
       ['supplier', 'warehouse', 'user']
     );
+  }
+
+  /**
+   * Lấy chi tiết các sản phẩm trong đơn nhập hàng
+   *
+   * @param PurchaseOrder $purchaseOrder
+   * @return Collection
+   */
+  public function getPurchaseOrderItems(PurchaseOrder $purchaseOrder): Collection
+  {
+    // Lấy các mục trong đơn hàng kèm theo thông tin sản phẩm
+    return $purchaseOrder->items()->with('product')->get();
   }
 }

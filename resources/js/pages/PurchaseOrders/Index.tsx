@@ -1,4 +1,4 @@
-import { PurchaseOrderFilters, PurchaseOrderSortSelect } from '@/components/purchase-orders';
+import { PurchaseOrderDetailDialog, PurchaseOrderFilters, PurchaseOrderSortSelect } from '@/components/purchase-orders';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
@@ -6,6 +6,7 @@ import { formatCurrency } from '@/lib';
 import { PurchaseOrder, PurchaseOrderSortOption, Supplier, User, Warehouse } from '@/types';
 import { router } from '@inertiajs/react';
 import { EyeIcon, PrinterIcon } from 'lucide-react';
+import { useState } from 'react';
 
 interface PurchaseOrderWithRelations extends PurchaseOrder {
     supplier?: Supplier;
@@ -40,6 +41,9 @@ interface Props {
 }
 
 export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = [], warehouses = [], filters = {}, sort = PurchaseOrderSortOption.NEWEST }: Props) {
+    const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+    const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState<PurchaseOrderWithRelations | null>(null);
+
     const handleApplyFilters = (
         newFilters: Partial<{
             supplier_id: string;
@@ -78,7 +82,8 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
     };
 
     const handleViewPurchaseOrder = (purchaseOrder: PurchaseOrderWithRelations) => {
-        router.visit(`/purchase-orders/${purchaseOrder.id}/edit`);
+        setSelectedPurchaseOrder(purchaseOrder);
+        setDetailDialogOpen(true);
     };
 
     const formatDate = (dateString: string) => {
@@ -161,6 +166,12 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
                         to: purchaseOrders.to,
                         total: purchaseOrders.total,
                     }}
+                />
+
+                <PurchaseOrderDetailDialog
+                    purchaseOrder={selectedPurchaseOrder}
+                    open={detailDialogOpen}
+                    onOpenChange={setDetailDialogOpen}
                 />
             </div>
         </AppLayout>

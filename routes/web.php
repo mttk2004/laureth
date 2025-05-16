@@ -46,6 +46,9 @@ Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
 
   // API route để lấy tổng số lượng của một sản phẩm trong tất cả kho
   Route::get('/api/products/{product}/total-inventory', [ProductInventoryController::class, 'getTotalInventory']);
+
+  // API route để lấy chi tiết các sản phẩm trong đơn nhập hàng
+  Route::get('/api/purchase-orders/{purchaseOrder}/items', [PurchaseOrderController::class, 'getItems']);
 });
 
 require __DIR__ . '/settings.php';

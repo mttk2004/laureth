@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Services\PurchaseOrderService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -50,5 +52,19 @@ class PurchaseOrderController extends Controller
       'filters' => $request->only(['supplier_id', 'warehouse_id', 'date_from', 'date_to']),
       'sort' => $request->input('sort', 'created_at_desc'),
     ]);
+  }
+
+  /**
+   * Lấy chi tiết các sản phẩm trong đơn nhập hàng
+   *
+   * @param PurchaseOrder $purchaseOrder
+   * @return JsonResponse
+   */
+  public function getItems(PurchaseOrder $purchaseOrder): JsonResponse
+  {
+    // Lấy chi tiết các sản phẩm trong đơn nhập hàng kèm theo thông tin sản phẩm
+    $items = $this->purchaseOrderService->getPurchaseOrderItems($purchaseOrder);
+
+    return response()->json($items);
   }
 }
