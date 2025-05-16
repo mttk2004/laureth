@@ -175,7 +175,6 @@ Quản lý việc nhập hàng từ nhà cung cấp.
 | user_id | INT | ID người tạo đơn, khóa ngoại tới bảng users |
 | order_date | TIMESTAMP | Ngày đặt hàng |
 | total_amount | DECIMAL(12,2) | Tổng giá trị đơn hàng |
-| status | ENUM | Trạng thái: pending, received, cancelled |
 | created_at | TIMESTAMP | Thời gian tạo |
 
 ### 14. `purchase_order_items` - Chi tiết đơn nhập hàng

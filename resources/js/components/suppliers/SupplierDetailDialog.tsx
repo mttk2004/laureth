@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatCurrency, formatPhoneNumber } from '@/lib';
-import { PurchaseOrder, PurchaseOrderStatus, Supplier } from '@/types';
+import { PurchaseOrder, Supplier } from '@/types';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -23,20 +23,6 @@ export default function SupplierDetailDialog({ supplier, open, onOpenChange }: S
     const [activeTab, setActiveTab] = useState('info');
 
     if (!supplier) return null;
-
-    // Hiển thị badge theo trạng thái đơn hàng
-    const getStatusBadge = (status: PurchaseOrderStatus) => {
-        switch (status) {
-            case PurchaseOrderStatus.PENDING:
-                return <Badge className="bg-yellow-500">Chờ xử lý</Badge>;
-            case PurchaseOrderStatus.RECEIVED:
-                return <Badge className="bg-green-500">Đã nhận</Badge>;
-            case PurchaseOrderStatus.CANCELLED:
-                return <Badge className="bg-red-500">Đã hủy</Badge>;
-            default:
-                return <Badge className="bg-gray-500">Không xác định</Badge>;
-        }
-    };
 
     // Format ngày hiển thị
     const formatDate = (dateString: string) => {
@@ -103,7 +89,7 @@ export default function SupplierDetailDialog({ supplier, open, onOpenChange }: S
                                             <div key={order.id} className="rounded-md border p-3 text-sm">
                                                 <div className="mb-2 flex items-center justify-between">
                                                     <div className="font-medium">Đơn hàng #{order.id}</div>
-                                                    {getStatusBadge(order.status)}
+                                                    <Badge className="bg-green-500">Đã nhận</Badge>;
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-1">
                                                     <div className="text-muted-foreground">Ngày đặt:</div>

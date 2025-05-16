@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class WarehousePurchaseService
 {
   /**
-   * Tạo đơn nhập hàng mới
+   * Tạo đơn nhập hàng mới và cập nhật kho ngay lập tức
    *
    * @param Warehouse $warehouse Kho cần nhập hàng
    * @param array $data Dữ liệu đơn nhập hàng
@@ -34,10 +34,9 @@ class WarehousePurchaseService
         'user_id' => Auth::id(),
         'order_date' => $data['order_date'],
         'total_amount' => $totalAmount,
-        'status' => 'pending',
       ]);
 
-      // Tạo chi tiết đơn nhập hàng
+      // Tạo chi tiết đơn nhập hàng và cập nhật kho
       foreach ($data['items'] as $item) {
         // Kiểm tra các trường bắt buộc
         if (
@@ -59,6 +58,7 @@ class WarehousePurchaseService
           continue; // Skip sản phẩm không hợp lệ
         }
 
+        // Tạo chi tiết đơn nhập hàng
         PurchaseOrderItem::create([
           'purchase_order_id' => $purchaseOrder->id,
           'product_id' => $item['product_id'],
@@ -66,52 +66,42 @@ class WarehousePurchaseService
           'purchase_price' => $item['purchase_price'],
           'selling_price' => $item['selling_price'],
         ]);
-      }
 
-      // Cập nhật đơn hàng thành đã nhận
-      $this->receivePurchaseOrder($purchaseOrder);
+        // Cập nhật kho ngay lập tức
+        $this->updateInventory($warehouse->id, $item['product_id'], $item['quantity']);
+      }
 
       return $purchaseOrder;
     });
   }
 
   /**
-   * Xử lý khi nhận đơn hàng
+   * Cập nhật số lượng sản phẩm trong kho
    *
-   * @param PurchaseOrder $purchaseOrder Đơn nhập hàng cần xử lý
-   * @return bool
+   * @param int $warehouseId ID của kho
+   * @param string $productId ID của sản phẩm
+   * @param int $quantity Số lượng cần thêm
+   * @return void
    */
-  public function receivePurchaseOrder(PurchaseOrder $purchaseOrder)
+  private function updateInventory($warehouseId, $productId, $quantity)
   {
-    return DB::transaction(function () use ($purchaseOrder) {
-      // Cập nhật trạng thái đơn hàng
-      $purchaseOrder->update(['status' => 'received']);
+    // Kiểm tra xem sản phẩm đã có trong kho chưa
+    $inventoryItem = InventoryItem::where('warehouse_id', $warehouseId)
+      ->where('product_id', $productId)
+      ->first();
 
-      // Cập nhật kho
-      $items = PurchaseOrderItem::where('purchase_order_id', $purchaseOrder->id)->get();
-
-      foreach ($items as $item) {
-        // Kiểm tra xem sản phẩm đã có trong kho chưa
-        $inventoryItem = InventoryItem::where('warehouse_id', $purchaseOrder->warehouse_id)
-          ->where('product_id', $item->product_id)
-          ->first();
-
-        if ($inventoryItem) {
-          // Cập nhật số lượng sản phẩm
-          $inventoryItem->update([
-            'quantity' => $inventoryItem->quantity + $item->quantity,
-          ]);
-        } else {
-          // Thêm sản phẩm mới vào kho
-          InventoryItem::create([
-            'warehouse_id' => $purchaseOrder->warehouse_id,
-            'product_id' => $item->product_id,
-            'quantity' => $item->quantity,
-          ]);
-        }
-      }
-
-      return true;
-    });
+    if ($inventoryItem) {
+      // Cập nhật số lượng sản phẩm
+      $inventoryItem->update([
+        'quantity' => $inventoryItem->quantity + $quantity,
+      ]);
+    } else {
+      // Thêm sản phẩm mới vào kho
+      InventoryItem::create([
+        'warehouse_id' => $warehouseId,
+        'product_id' => $productId,
+        'quantity' => $quantity,
+      ]);
+    }
   }
 }

@@ -1,9 +1,3 @@
-export enum PurchaseOrderStatus {
-    PENDING = 'pending',
-    RECEIVED = 'received',
-    CANCELLED = 'cancelled',
-}
-
 export interface PurchaseOrder {
     id: number;
     supplier_id: number;
@@ -11,7 +5,6 @@ export interface PurchaseOrder {
     user_id: string;
     order_date: string;
     total_amount: number;
-    status: PurchaseOrderStatus;
     created_at: string;
     updated_at: string;
     deleted_at?: string;
