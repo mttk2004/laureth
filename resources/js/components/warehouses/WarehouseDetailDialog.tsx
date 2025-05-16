@@ -6,9 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatCurrency } from '@/lib';
 import { InventoryItem, Product, WarehouseWithStore } from '@/types';
 import { router } from '@inertiajs/react';
-import { PencilIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { PencilIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface InventoryItemWithProduct extends InventoryItem {
     product?: Product;
@@ -28,11 +28,12 @@ export default function WarehouseDetailDialog({ warehouse, open, onOpenChange }:
     useEffect(() => {
         if (open && warehouse) {
             setLoading(true);
-            axios.get(`/api/warehouses/${warehouse.id}/inventory`)
-                .then(response => {
+            axios
+                .get(`/api/warehouses/${warehouse.id}/inventory`)
+                .then((response) => {
                     setInventoryItems(response.data);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Không thể tải dữ liệu tồn kho:', error);
                 })
                 .finally(() => {
@@ -57,9 +58,7 @@ export default function WarehouseDetailDialog({ warehouse, open, onOpenChange }:
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold">Chi tiết kho</DialogTitle>
-                    <DialogDescription className="mt-2 text-sm text-gray-600">
-                        Thông tin chi tiết và hàng tồn kho
-                    </DialogDescription>
+                    <DialogDescription className="mt-2 text-sm text-gray-600">Thông tin chi tiết và hàng tồn kho</DialogDescription>
                 </DialogHeader>
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -113,7 +112,7 @@ export default function WarehouseDetailDialog({ warehouse, open, onOpenChange }:
                             </CardHeader>
                             <CardContent>
                                 {loading ? (
-                                    <div className="py-4 text-center italic text-muted-foreground">Đang tải dữ liệu...</div>
+                                    <div className="text-muted-foreground py-4 text-center italic">Đang tải dữ liệu...</div>
                                 ) : inventoryItems && inventoryItems.length > 0 ? (
                                     <div className="space-y-4">
                                         {inventoryItems.map((item) => (
@@ -136,7 +135,7 @@ export default function WarehouseDetailDialog({ warehouse, open, onOpenChange }:
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="py-4 text-center italic text-muted-foreground">Không có sản phẩm nào trong kho</div>
+                                    <div className="text-muted-foreground py-4 text-center italic">Không có sản phẩm nào trong kho</div>
                                 )}
                             </CardContent>
                         </Card>

@@ -4,9 +4,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
-import { format } from 'date-fns';
 import { Product, Supplier, User, WarehouseWithStore } from '@/types';
 import { router } from '@inertiajs/react';
+import { format } from 'date-fns';
 import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import React, { FormEvent, useState } from 'react';
 
@@ -264,11 +264,7 @@ export default function WarehousePurchase({ user, warehouse, suppliers, products
                                                             value={item.product_id}
                                                             onValueChange={(value) => updateItem(index, 'product_id', value)}
                                                         >
-                                                            <SelectTrigger
-                                                                className={
-                                                                    errors[`items.${index}.product_id`] ? 'border-red-500' : ''
-                                                                }
-                                                            >
+                                                            <SelectTrigger className={errors[`items.${index}.product_id`] ? 'border-red-500' : ''}>
                                                                 <SelectValue placeholder="Chọn sản phẩm" />
                                                             </SelectTrigger>
                                                             <SelectContent>
@@ -280,9 +276,7 @@ export default function WarehousePurchase({ user, warehouse, suppliers, products
                                                             </SelectContent>
                                                         </Select>
                                                         {errors[`items.${index}.product_id`] && (
-                                                            <p className="mt-1 text-sm text-red-500">
-                                                                {errors[`items.${index}.product_id`]}
-                                                            </p>
+                                                            <p className="mt-1 text-sm text-red-500">{errors[`items.${index}.product_id`]}</p>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-2">
@@ -290,19 +284,11 @@ export default function WarehousePurchase({ user, warehouse, suppliers, products
                                                             type="number"
                                                             min="1"
                                                             value={item.quantity}
-                                                            onChange={(e) =>
-                                                                updateItem(index, 'quantity', parseInt(e.target.value, 10) || 0)
-                                                            }
-                                                            className={
-                                                                errors[`items.${index}.quantity`]
-                                                                    ? 'border-red-500 text-right'
-                                                                    : 'text-right'
-                                                            }
+                                                            onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value, 10) || 0)}
+                                                            className={errors[`items.${index}.quantity`] ? 'border-red-500 text-right' : 'text-right'}
                                                         />
                                                         {errors[`items.${index}.quantity`] && (
-                                                            <p className="mt-1 text-sm text-red-500">
-                                                                {errors[`items.${index}.quantity`]}
-                                                            </p>
+                                                            <p className="mt-1 text-sm text-red-500">{errors[`items.${index}.quantity`]}</p>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-2">
@@ -311,23 +297,13 @@ export default function WarehousePurchase({ user, warehouse, suppliers, products
                                                             min="0"
                                                             step="1000"
                                                             value={item.purchase_price}
-                                                            onChange={(e) =>
-                                                                updateItem(
-                                                                    index,
-                                                                    'purchase_price',
-                                                                    parseFloat(e.target.value) || 0,
-                                                                )
-                                                            }
+                                                            onChange={(e) => updateItem(index, 'purchase_price', parseFloat(e.target.value) || 0)}
                                                             className={
-                                                                errors[`items.${index}.purchase_price`]
-                                                                    ? 'border-red-500 text-right'
-                                                                    : 'text-right'
+                                                                errors[`items.${index}.purchase_price`] ? 'border-red-500 text-right' : 'text-right'
                                                             }
                                                         />
                                                         {errors[`items.${index}.purchase_price`] && (
-                                                            <p className="mt-1 text-sm text-red-500">
-                                                                {errors[`items.${index}.purchase_price`]}
-                                                            </p>
+                                                            <p className="mt-1 text-sm text-red-500">{errors[`items.${index}.purchase_price`]}</p>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-2">
@@ -336,35 +312,20 @@ export default function WarehousePurchase({ user, warehouse, suppliers, products
                                                             min="0"
                                                             step="1000"
                                                             value={item.selling_price}
-                                                            onChange={(e) =>
-                                                                updateItem(
-                                                                    index,
-                                                                    'selling_price',
-                                                                    parseFloat(e.target.value) || 0,
-                                                                )
-                                                            }
+                                                            onChange={(e) => updateItem(index, 'selling_price', parseFloat(e.target.value) || 0)}
                                                             className={
-                                                                errors[`items.${index}.selling_price`]
-                                                                    ? 'border-red-500 text-right'
-                                                                    : 'text-right'
+                                                                errors[`items.${index}.selling_price`] ? 'border-red-500 text-right' : 'text-right'
                                                             }
                                                         />
                                                         {errors[`items.${index}.selling_price`] && (
-                                                            <p className="mt-1 text-sm text-red-500">
-                                                                {errors[`items.${index}.selling_price`]}
-                                                            </p>
+                                                            <p className="mt-1 text-sm text-red-500">{errors[`items.${index}.selling_price`]}</p>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-2 text-right">
                                                         {(item.purchase_price * item.quantity).toLocaleString('vi-VN')}
                                                     </td>
                                                     <td className="px-4 py-2 text-center">
-                                                        <Button
-                                                            type="button"
-                                                            onClick={() => removeItem(index)}
-                                                            variant="ghost"
-                                                            size="sm"
-                                                        >
+                                                        <Button type="button" onClick={() => removeItem(index)} variant="ghost" size="sm">
                                                             <MinusCircleIcon className="h-4 w-4 text-red-500" />
                                                             <span className="sr-only">Xóa</span>
                                                         </Button>
@@ -377,9 +338,7 @@ export default function WarehousePurchase({ user, warehouse, suppliers, products
                                                 <td colSpan={4} className="px-4 py-2 text-right font-bold">
                                                     Tổng tiền:
                                                 </td>
-                                                <td className="px-4 py-2 text-right font-bold">
-                                                    {totalPurchaseAmount.toLocaleString('vi-VN')} VNĐ
-                                                </td>
+                                                <td className="px-4 py-2 text-right font-bold">{totalPurchaseAmount.toLocaleString('vi-VN')} VNĐ</td>
                                                 <td></td>
                                             </tr>
                                         </tfoot>

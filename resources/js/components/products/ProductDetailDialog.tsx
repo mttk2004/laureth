@@ -4,9 +4,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { formatCurrency } from '@/lib';
 import { Product } from '@/types';
 import { router } from '@inertiajs/react';
-import { PencilIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { PencilIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ProductDetailDialogProps {
     product: Product | null;
@@ -27,11 +27,12 @@ export default function ProductDetailDialog({ product, open, onOpenChange }: Pro
     useEffect(() => {
         if (open && product) {
             setLoading(true);
-            axios.get(`/api/products/${product.id}/total-inventory`)
-                .then(response => {
+            axios
+                .get(`/api/products/${product.id}/total-inventory`)
+                .then((response) => {
                     setInventoryInfo(response.data);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Không thể tải thông tin tồn kho:', error);
                 })
                 .finally(() => {
