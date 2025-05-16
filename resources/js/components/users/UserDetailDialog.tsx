@@ -40,46 +40,46 @@ export default function UserDetailDialog({ user, open, onOpenChange }: UserDetai
 
                     <div className="mt-4 space-y-2 text-sm">
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="font-semibold">Vai trò:</div>
+                            <div className="font-medium">Vai trò:</div>
                             <div>{roleLabels[user.position]}</div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="font-semibold">Điện thoại:</div>
+                            <div className="font-medium">Điện thoại:</div>
                             <div>{formatPhoneNumber(user.phone)}</div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="font-semibold">Cửa hàng:</div>
+                            <div className="font-medium">Cửa hàng:</div>
                             <div>{user.store?.name || 'Chưa phân công'}</div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="font-semibold">Hoa hồng:</div>
+                            <div className="font-medium">Hoa hồng:</div>
                             <div>{formattedCommissionRate}</div>
                         </div>
 
                         {user.position === 'SM' && (
                             <div className="grid grid-cols-2 gap-2">
-                                <div className="font-semibold">Lương cơ bản:</div>
+                                <div className="font-medium">Lương cơ bản:</div>
                                 <div>{user.base_salary ? formatCurrency(user.base_salary) : 'Không áp dụng'}</div>
                             </div>
                         )}
 
                         {['SL', 'SA'].includes(user.position) && (
                             <div className="grid grid-cols-2 gap-2">
-                                <div className="font-semibold">Lương theo giờ:</div>
+                                <div className="font-medium">Lương theo giờ:</div>
                                 <div>{user.hourly_wage ? formatCurrency(user.hourly_wage) : 'Không áp dụng'}</div>
                             </div>
                         )}
 
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="font-semibold">Đăng nhập cuối:</div>
+                            <div className="font-medium">Đăng nhập cuối:</div>
                             <div>{user.last_login ? formatLastLogin(user.last_login) : 'Chưa đăng nhập'}</div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="font-semibold">Ngày tạo:</div>
+                            <div className="font-medium">Ngày tạo:</div>
                             <div>{formatLastLogin(user.created_at)}</div>
                         </div>
                     </div>
