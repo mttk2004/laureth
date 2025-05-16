@@ -1,195 +1,171 @@
-import { useState } from 'react';
+import { BaseFilterDialog, BaseFilterForm, BaseFilterRow } from '@/components/common';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { formatCurrency } from '@/lib';
 import { Category, ProductStatus } from '@/types';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { BaseFilterDialog, BaseFilterForm, BaseFilterRow } from '@/components/common';
+import { useState } from 'react';
 
 interface FilterOptions {
-  category_id: string;
-  status: string;
-  price_min: number;
-  price_max: number;
-  name: string;
+    category_id: string;
+    status: string;
+    price_min: number;
+    price_max: number;
+    name: string;
 }
 
 interface ProductFiltersProps {
-  categories: Category[];
-  initialFilters: Partial<FilterOptions>;
-  onApplyFilters: (filters: Partial<FilterOptions>) => void;
+    categories: Category[];
+    initialFilters: Partial<FilterOptions>;
+    onApplyFilters: (filters: Partial<FilterOptions>) => void;
 }
 
 export default function ProductFilters({ categories, initialFilters, onApplyFilters }: ProductFiltersProps) {
-  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    category_id: initialFilters.category_id || 'all',
-    status: initialFilters.status || 'all',
-    price_min: initialFilters.price_min || 0,
-    price_max: initialFilters.price_max || 10000000,
-    name: initialFilters.name || '',
-  });
-
-  const [priceRange, setPriceRange] = useState<[number, number]>([
-    initialFilters.price_min || 0,
-    initialFilters.price_max || 10000000,
-  ]);
-
-  const handleFilterChange = (key: keyof FilterOptions, value: string | number) => {
-    setFilterOptions((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFilterOptions((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handlePriceRangeChange = (values: number[]) => {
-    setPriceRange([values[0], values[1]]);
-    setFilterOptions((prev) => ({
-      ...prev,
-      price_min: values[0],
-      price_max: values[1],
-    }));
-  };
-
-  const applyFilters = () => {
-    onApplyFilters({
-      category_id: filterOptions.category_id !== 'all' ? filterOptions.category_id : undefined,
-      status: filterOptions.status !== 'all' ? filterOptions.status : undefined,
-      price_min: filterOptions.price_min > 0 ? filterOptions.price_min : undefined,
-      price_max: filterOptions.price_max < 10000000 ? filterOptions.price_max : undefined,
-      name: filterOptions.name.trim() ? filterOptions.name.trim() : undefined,
+    const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+        category_id: initialFilters.category_id || 'all',
+        status: initialFilters.status || 'all',
+        price_min: initialFilters.price_min || 0,
+        price_max: initialFilters.price_max || 10000000,
+        name: initialFilters.name || '',
     });
-  };
 
-  const resetFilters = () => {
-    setFilterOptions({
-      category_id: 'all',
-      status: 'all',
-      price_min: 0,
-      price_max: 10000000,
-      name: '',
-    });
-    setPriceRange([0, 10000000]);
-    onApplyFilters({});
-  };
+    const [priceRange, setPriceRange] = useState<[number, number]>([initialFilters.price_min || 0, initialFilters.price_max || 10000000]);
 
-  const hasActiveFilters = Boolean(
-    initialFilters.category_id ||
-    initialFilters.status ||
-    initialFilters.price_min ||
-    initialFilters.price_max ||
-    initialFilters.name
-  );
+    const handleFilterChange = (key: keyof FilterOptions, value: string | number) => {
+        setFilterOptions((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+    };
 
-  return (
-    <BaseFilterDialog
-      title="Lọc sản phẩm"
-      description="Chọn các tiêu chí để lọc danh sách sản phẩm."
-      onApply={applyFilters}
-      onReset={resetFilters}
-      hasActiveFilters={hasActiveFilters}
-      triggerText="Lọc sản phẩm"
-      dialogWidth="sm:max-w-md"
-    >
-      <BaseFilterForm>
-        <BaseFilterRow label="Tên" labelPosition="top">
-          <Input
-            placeholder="Nhập tên sản phẩm"
-            name="name"
-            value={filterOptions.name}
-            onChange={handleInputChange}
-          />
-        </BaseFilterRow>
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFilterOptions((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
-        <BaseFilterRow label="Danh mục" labelPosition="top">
-          <Select
-            value={filterOptions.category_id}
-            onValueChange={(value) => handleFilterChange('category_id', value)}
-          >
-            <SelectTrigger id="category">
-              <SelectValue placeholder="Chọn danh mục" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id.toString()}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </BaseFilterRow>
+    const handlePriceRangeChange = (values: number[]) => {
+        setPriceRange([values[0], values[1]]);
+        setFilterOptions((prev) => ({
+            ...prev,
+            price_min: values[0],
+            price_max: values[1],
+        }));
+    };
 
-        <BaseFilterRow label="Trạng thái" labelPosition="top">
-          <Select
-            value={filterOptions.status}
-            onValueChange={(value) => handleFilterChange('status', value)}
-          >
-            <SelectTrigger id="status">
-              <SelectValue placeholder="Chọn trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value={ProductStatus.ACTIVE}>Đang bán</SelectItem>
-              <SelectItem value={ProductStatus.INACTIVE}>Không bán</SelectItem>
-            </SelectContent>
-          </Select>
-        </BaseFilterRow>
+    const applyFilters = () => {
+        onApplyFilters({
+            category_id: filterOptions.category_id !== 'all' ? filterOptions.category_id : undefined,
+            status: filterOptions.status !== 'all' ? filterOptions.status : undefined,
+            price_min: filterOptions.price_min > 0 ? filterOptions.price_min : undefined,
+            price_max: filterOptions.price_max < 10000000 ? filterOptions.price_max : undefined,
+            name: filterOptions.name.trim() ? filterOptions.name.trim() : undefined,
+        });
+    };
 
-        <BaseFilterRow label="Khoảng giá" labelPosition="top">
-          <div className="space-y-4">
-            <div className="pt-5 pb-2">
-              <Slider
-                defaultValue={priceRange}
-                max={10000000}
-                step={100000}
-                value={priceRange}
-                onValueChange={handlePriceRangeChange}
-              />
-            </div>
-            <div className="flex justify-between items-center">
-              <Input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value);
-                  setPriceRange([value, priceRange[1]]);
-                  handleFilterChange('price_min', value);
-                }}
-                className="w-[45%]"
-              />
-              <span>đến</span>
-              <Input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value);
-                  setPriceRange([priceRange[0], value]);
-                  handleFilterChange('price_max', value);
-                }}
-                className="w-[45%]"
-              />
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{formatCurrency(priceRange[0])}</span>
-              <span>{formatCurrency(priceRange[1])}</span>
-            </div>
-          </div>
-        </BaseFilterRow>
-      </BaseFilterForm>
-    </BaseFilterDialog>
-  );
+    const resetFilters = () => {
+        setFilterOptions({
+            category_id: 'all',
+            status: 'all',
+            price_min: 0,
+            price_max: 10000000,
+            name: '',
+        });
+        setPriceRange([0, 10000000]);
+        onApplyFilters({});
+    };
+
+    const hasActiveFilters = Boolean(
+        initialFilters.category_id || initialFilters.status || initialFilters.price_min || initialFilters.price_max || initialFilters.name,
+    );
+
+    return (
+        <BaseFilterDialog
+            title="Lọc sản phẩm"
+            description="Chọn các tiêu chí để lọc danh sách sản phẩm."
+            onApply={applyFilters}
+            onReset={resetFilters}
+            hasActiveFilters={hasActiveFilters}
+            triggerText="Lọc sản phẩm"
+            dialogWidth="sm:max-w-md"
+        >
+            <BaseFilterForm>
+                <BaseFilterRow label="Tên" labelPosition="top">
+                    <Input placeholder="Nhập tên sản phẩm" name="name" value={filterOptions.name} onChange={handleInputChange} />
+                </BaseFilterRow>
+
+                <BaseFilterRow label="Danh mục" labelPosition="top">
+                    <Select value={filterOptions.category_id} onValueChange={(value) => handleFilterChange('category_id', value)}>
+                        <SelectTrigger id="category">
+                            <SelectValue placeholder="Chọn danh mục" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả</SelectItem>
+                            {categories.map((category) => (
+                                <SelectItem key={category.id} value={category.id.toString()}>
+                                    {category.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </BaseFilterRow>
+
+                <BaseFilterRow label="Trạng thái" labelPosition="top">
+                    <Select value={filterOptions.status} onValueChange={(value) => handleFilterChange('status', value)}>
+                        <SelectTrigger id="status">
+                            <SelectValue placeholder="Chọn trạng thái" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả</SelectItem>
+                            <SelectItem value={ProductStatus.ACTIVE}>Đang bán</SelectItem>
+                            <SelectItem value={ProductStatus.INACTIVE}>Không bán</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </BaseFilterRow>
+
+                <BaseFilterRow label="Khoảng giá" labelPosition="top">
+                    <div className="space-y-4">
+                        <div className="pt-5 pb-2">
+                            <Slider
+                                defaultValue={priceRange}
+                                max={10000000}
+                                step={100000}
+                                value={priceRange}
+                                onValueChange={handlePriceRangeChange}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Input
+                                type="number"
+                                value={priceRange[0]}
+                                onChange={(e) => {
+                                    const value = parseInt(e.target.value);
+                                    setPriceRange([value, priceRange[1]]);
+                                    handleFilterChange('price_min', value);
+                                }}
+                                className="w-[45%]"
+                            />
+                            <span>đến</span>
+                            <Input
+                                type="number"
+                                value={priceRange[1]}
+                                onChange={(e) => {
+                                    const value = parseInt(e.target.value);
+                                    setPriceRange([priceRange[0], value]);
+                                    handleFilterChange('price_max', value);
+                                }}
+                                className="w-[45%]"
+                            />
+                        </div>
+                        <div className="text-muted-foreground flex justify-between text-xs">
+                            <span>{formatCurrency(priceRange[0])}</span>
+                            <span>{formatCurrency(priceRange[1])}</span>
+                        </div>
+                    </div>
+                </BaseFilterRow>
+            </BaseFilterForm>
+        </BaseFilterDialog>
+    );
 }

@@ -1,10 +1,10 @@
 export interface AttendanceRecord {
-  id: number;
-  user_id: string;
-  shift_id: number;
-  check_in: string | null;
-  check_out: string | null;
-  total_hours: number | null;
-  created_at: string;
-  updated_at: string;
+    id: number;
+    user_id: string;
+    shift_id: number;
+    check_in: string | null;
+    check_out: string | null;
+    total_hours: number | null;
+    created_at: string;
+    updated_at: string;
 }

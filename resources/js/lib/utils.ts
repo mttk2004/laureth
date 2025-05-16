@@ -13,12 +13,12 @@ export function cn(...inputs: ClassValue[]) {
  * Format giá tiền theo định dạng tiền tệ Việt Nam
  */
 export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 }
 
 /**
  * Format số điện thoại theo định dạng 0900000000
  */
 export function formatPhoneNumber(value: string): string {
-  return value.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+    return value.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
 }

@@ -20,28 +20,25 @@ export default function UserDropdown({ user, className }: UserDropdownProps) {
     };
 
     return (
-        <div className={cn("relative", className)}>
+        <div className={cn('relative', className)}>
             <button
                 onClick={toggleDropdown}
-                className="flex items-center gap-2 rounded-full bg-secondary/50 px-3 py-2 text-sm hover:bg-secondary/70 cursor-pointer"
+                className="bg-secondary/50 hover:bg-secondary/70 flex cursor-pointer items-center gap-2 rounded-full px-3 py-2 text-sm"
             >
                 <span className="font-medium">{user.full_name}</span>
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
                     <UserIcon className="h-4 w-4" />
                 </div>
             </button>
 
             {isOpen && (
                 <>
-                    <div
-                        className="fixed inset-0 z-10"
-                        onClick={closeDropdown}
-                    />
-                    <div className="absolute right-0 top-full z-20 mt-1 w-64 rounded-md border bg-card p-1 shadow-md">
+                    <div className="fixed inset-0 z-10" onClick={closeDropdown} />
+                    <div className="bg-card absolute top-full right-0 z-20 mt-1 w-64 rounded-md border p-1 shadow-md">
                         <div className="border-b p-3">
                             <p className="font-medium">{user.full_name}</p>
-                            <p className="text-xs text-muted-foreground">{user.email}</p>
-                            <div className="mt-1 rounded-xs bg-primary/10 px-2 py-1 text-xs text-primary font-medium">
+                            <p className="text-muted-foreground text-xs">{user.email}</p>
+                            <div className="bg-primary/10 text-primary mt-1 rounded-xs px-2 py-1 text-xs font-medium">
                                 {roleLabels[user.position]}
                             </div>
                         </div>
@@ -49,7 +46,7 @@ export default function UserDropdown({ user, className }: UserDropdownProps) {
                         <div className="p-1">
                             <Link
                                 href="/profile"
-                                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
+                                className="hover:bg-accent flex items-center gap-2 rounded-md px-3 py-2 text-sm"
                                 onClick={closeDropdown}
                             >
                                 <Settings className="h-4 w-4" />
@@ -58,7 +55,7 @@ export default function UserDropdown({ user, className }: UserDropdownProps) {
 
                             <Link
                                 href="/notifications"
-                                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
+                                className="hover:bg-accent flex items-center gap-2 rounded-md px-3 py-2 text-sm"
                                 onClick={closeDropdown}
                             >
                                 <Bell className="h-4 w-4" />

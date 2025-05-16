@@ -25,7 +25,7 @@ createInertiaApp({
                 id: auth.user.id,
                 full_name: auth.user.full_name,
                 email: auth.user.email,
-                position: auth.user.position
+                position: auth.user.position,
             });
         } else {
             console.log('No authenticated user');
@@ -37,7 +37,7 @@ createInertiaApp({
                 <ToastProvider>
                     <App {...props} />
                 </ToastProvider>
-            </ThemeProvider>
+            </ThemeProvider>,
         );
     },
     progress: {

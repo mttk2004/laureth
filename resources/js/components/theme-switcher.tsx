@@ -1,7 +1,7 @@
-import { Moon, Sun, MonitorSmartphone } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/lib/theme-provider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTheme } from '@/lib/theme-provider';
+import { cn } from '@/lib/utils';
+import { MonitorSmartphone, Moon, Sun } from 'lucide-react';
 
 interface ThemeSwitcherProps {
     className?: string;
@@ -45,17 +45,15 @@ export default function ThemeSwitcher({ className }: ThemeSwitcherProps) {
                     <button
                         onClick={toggleTheme}
                         className={cn(
-                            "flex h-9 w-9 items-center justify-center rounded-md border border-border/40 bg-card hover:border-border/70 transition-all cursor-pointer",
-                            className
+                            'border-border/40 bg-card hover:border-border/70 flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border transition-all',
+                            className,
                         )}
                         aria-label={getTooltipText()}
                     >
                         {getIcon()}
                     </button>
                 </TooltipTrigger>
-                <TooltipContent>
-                    {getTooltipText()}
-                </TooltipContent>
+                <TooltipContent>{getTooltipText()}</TooltipContent>
             </Tooltip>
         </TooltipProvider>
     );

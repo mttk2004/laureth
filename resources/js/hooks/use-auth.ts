@@ -1,5 +1,5 @@
-import { usePage } from '@inertiajs/react';
 import { User, UserRole, isAdminRole, isStaffRole } from '@/types/user';
+import { usePage } from '@inertiajs/react';
 
 interface AuthPageProps {
     auth: {
@@ -39,10 +39,10 @@ export function useAuth() {
                 DM: ['manage_all', 'view_all_stores', 'manage_users', 'manage_products', 'approve_transfers'],
                 SM: ['manage_store', 'view_store_data', 'manage_store_inventory', 'manage_store_staff'],
                 SL: ['sell', 'view_shift_data', 'manage_shift', 'check_inventory'],
-                SA: ['sell', 'check_inventory', 'view_personal_data']
+                SA: ['sell', 'check_inventory', 'view_personal_data'],
             };
 
             return rolePermissions[user.position]?.includes(permission) || false;
-        }
+        },
     };
 }

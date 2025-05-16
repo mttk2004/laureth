@@ -94,9 +94,9 @@ function SADashboard() {
 // Component thẻ hiển thị cho dashboard
 function DashboardCard({ title, description }: { title: string; description: string }) {
     return (
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="bg-card rounded-lg border p-6 shadow-sm">
             <h3 className="mb-2 text-lg font-medium">{title}</h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="text-muted-foreground text-sm">{description}</p>
         </div>
     );
 }

@@ -30,12 +30,12 @@ export default function Login({ status, canResetPassword, errorMessage }: LoginP
     });
 
     useEffect(() => {
-        console.log("Login component props:", { status, canResetPassword, errorMessage });
+        console.log('Login component props:', { status, canResetPassword, errorMessage });
     }, [status, canResetPassword, errorMessage]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        console.log("Submitting form with data:", data);
+        console.log('Submitting form with data:', data);
         post(route('login'), {
             onFinish: () => reset('password'),
         });

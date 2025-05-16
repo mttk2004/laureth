@@ -1,9 +1,9 @@
 import { PropsWithChildren } from 'react';
 
-import SidebarNavigation from '@/components/sidebar-navigation';
-import { User, isAdminRole } from '@/types/user';
 import AppHeader from '@/components/app-header';
+import SidebarNavigation from '@/components/sidebar-navigation';
 import { ToastContainer } from '@/components/ui/toast';
+import { User, isAdminRole } from '@/types/user';
 
 interface AppLayoutProps {
     user?: User;
@@ -13,7 +13,7 @@ export default function AppLayout({ children, user }: PropsWithChildren<AppLayou
     // Hiển thị layout đơn giản nếu không có thông tin user
     if (!user) {
         return (
-            <div className="min-h-screen bg-background">
+            <div className="bg-background min-h-screen">
                 <div className="flex min-h-screen flex-col p-6">
                     {children}
                     <ToastContainer />
@@ -35,28 +35,23 @@ export default function AppLayout({ children, user }: PropsWithChildren<AppLayou
 
 function AdminLayout({ children, user }: PropsWithChildren<{ user: User }>) {
     return (
-        <div className="min-h-screen bg-background">
+        <div className="bg-background min-h-screen">
             <div className="flex min-h-screen flex-col">
                 <AppHeader user={user} />
 
                 <div className="flex flex-1">
-                    <aside className="w-56 border-r bg-muted/40">
-                        <div className="flex flex-col gap-6 h-full pt-6">
-                            <SidebarNavigation
-                                user={user}
-                                className="px-3 flex-1"
-                            />
+                    <aside className="bg-muted/40 w-56 border-r">
+                        <div className="flex h-full flex-col gap-6 pt-6">
+                            <SidebarNavigation user={user} className="flex-1 px-3" />
 
-                            <div className="p-4 border-t text-xs text-muted-foreground space-y-1.5">
+                            <div className="text-muted-foreground space-y-1.5 border-t p-4 text-xs">
                                 <p>Phát triển bởi:</p>
                                 <p className="font-semibold">Mai Trần Tuấn Kiệt</p>
                             </div>
                         </div>
                     </aside>
                     <main className="flex-1 overflow-auto">
-                        <div className="container p-6">
-                            {children}
-                        </div>
+                        <div className="container p-6">{children}</div>
                     </main>
                 </div>
                 <ToastContainer />
@@ -67,23 +62,21 @@ function AdminLayout({ children, user }: PropsWithChildren<{ user: User }>) {
 
 function StaffLayout({ children, user }: PropsWithChildren<{ user: User }>) {
     return (
-        <div className="min-h-screen bg-background">
+        <div className="bg-background min-h-screen">
             <div className="flex min-h-screen flex-col">
                 <AppHeader user={user} />
 
                 <div className="flex flex-1">
-                    <aside className="w-56 flex flex-col justify-between border-r bg-muted/20 p-4">
+                    <aside className="bg-muted/20 flex w-56 flex-col justify-between border-r p-4">
                         <SidebarNavigation user={user} />
 
-                        <div className="p-4 border-t text-xs text-muted-foreground space-y-1.5">
+                        <div className="text-muted-foreground space-y-1.5 border-t p-4 text-xs">
                             <p>Phát triển bởi:</p>
                             <p className="font-semibold">Mai Trần Tuấn Kiệt</p>
                         </div>
                     </aside>
                     <main className="flex-1 overflow-auto">
-                        <div className="container p-6">
-                            {children}
-                        </div>
+                        <div className="container p-6">{children}</div>
                     </main>
                 </div>
                 <ToastContainer />

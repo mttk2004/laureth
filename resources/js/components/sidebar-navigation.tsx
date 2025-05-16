@@ -1,19 +1,7 @@
 import { cn } from '@/lib/utils';
 import { User, UserRole } from '@/types/user';
 import { Link, usePage } from '@inertiajs/react';
-import {
-    BarChart3,
-    Box,
-    Calendar,
-    ClipboardList,
-    Home,
-    Layers,
-    Package,
-    Package2,
-    ShoppingBag,
-    Store,
-    Users
-} from 'lucide-react';
+import { BarChart3, Box, Calendar, ClipboardList, Home, Layers, Package, Package2, ShoppingBag, Store, Users } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface SidebarLinkProps {
@@ -29,9 +17,7 @@ const SidebarLink = ({ href, label, icon, active = false }: SidebarLinkProps) =>
             href={href}
             className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-                active
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
+                active ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-primary/5 hover:text-primary',
             )}
         >
             <span className="h-5 w-5">{icon}</span>
@@ -42,36 +28,36 @@ const SidebarLink = ({ href, label, icon, active = false }: SidebarLinkProps) =>
 
 // Định nghĩa các liên kết cho từng vai trò
 const roleLinks: Record<UserRole, SidebarLinkProps[]> = {
-    'DM': [
-        { href: '/dashboard', label: 'Tổng quan', icon: <Home className="w-5 h-5" /> },
-        { href: '/stores', label: 'Cửa hàng', icon: <Store className="w-5 h-5" /> },
-        { href: '/users', label: 'Nhân viên', icon: <Users className="w-5 h-5" /> },
-        { href: '/products', label: 'Sản phẩm', icon: <Package className="w-5 h-5" /> },
-        { href: '/suppliers', label: 'Nhà cung cấp', icon: <Package2 className="w-5 h-5" /> },
-        { href: '/warehouses', label: 'Kho hàng', icon: <Box className="w-5 h-5" /> },
-        { href: '/transfers', label: 'Chuyển kho', icon: <Layers className="w-5 h-5" /> },
-        { href: '/reports', label: 'Báo cáo', icon: <BarChart3 className="w-5 h-5" /> },
+    DM: [
+        { href: '/dashboard', label: 'Tổng quan', icon: <Home className="h-5 w-5" /> },
+        { href: '/stores', label: 'Cửa hàng', icon: <Store className="h-5 w-5" /> },
+        { href: '/users', label: 'Nhân viên', icon: <Users className="h-5 w-5" /> },
+        { href: '/products', label: 'Sản phẩm', icon: <Package className="h-5 w-5" /> },
+        { href: '/suppliers', label: 'Nhà cung cấp', icon: <Package2 className="h-5 w-5" /> },
+        { href: '/warehouses', label: 'Kho hàng', icon: <Box className="h-5 w-5" /> },
+        { href: '/transfers', label: 'Chuyển kho', icon: <Layers className="h-5 w-5" /> },
+        { href: '/reports', label: 'Báo cáo', icon: <BarChart3 className="h-5 w-5" /> },
     ],
-    'SM': [
-        { href: '/dashboard', label: 'Tổng quan', icon: <Home className="w-5 h-5" /> },
-        { href: '/staff', label: 'Nhân viên', icon: <Users className="w-5 h-5" /> },
-        { href: '/inventory', label: 'Kho hàng', icon: <Box className="w-5 h-5" /> },
-        { href: '/orders', label: 'Đơn hàng', icon: <ShoppingBag className="w-5 h-5" /> },
-        { href: '/shifts', label: 'Ca làm việc', icon: <Calendar className="w-5 h-5" /> },
-        { href: '/store-reports', label: 'Báo cáo', icon: <BarChart3 className="w-5 h-5" /> },
+    SM: [
+        { href: '/dashboard', label: 'Tổng quan', icon: <Home className="h-5 w-5" /> },
+        { href: '/staff', label: 'Nhân viên', icon: <Users className="h-5 w-5" /> },
+        { href: '/inventory', label: 'Kho hàng', icon: <Box className="h-5 w-5" /> },
+        { href: '/orders', label: 'Đơn hàng', icon: <ShoppingBag className="h-5 w-5" /> },
+        { href: '/shifts', label: 'Ca làm việc', icon: <Calendar className="h-5 w-5" /> },
+        { href: '/store-reports', label: 'Báo cáo', icon: <BarChart3 className="h-5 w-5" /> },
     ],
-    'SL': [
-        { href: '/dashboard', label: 'Tổng quan', icon: <Home className="w-5 h-5" /> },
-        { href: '/pos', label: 'Bán hàng', icon: <ShoppingBag className="w-5 h-5" /> },
-        { href: '/attendance', label: 'Chấm công', icon: <Calendar className="w-5 h-5" /> },
-        { href: '/shift', label: 'Ca làm việc', icon: <Calendar className="w-5 h-5" /> },
-        { href: '/shift-reports', label: 'Báo cáo ca', icon: <ClipboardList className="w-5 h-5" /> },
+    SL: [
+        { href: '/dashboard', label: 'Tổng quan', icon: <Home className="h-5 w-5" /> },
+        { href: '/pos', label: 'Bán hàng', icon: <ShoppingBag className="h-5 w-5" /> },
+        { href: '/attendance', label: 'Chấm công', icon: <Calendar className="h-5 w-5" /> },
+        { href: '/shift', label: 'Ca làm việc', icon: <Calendar className="h-5 w-5" /> },
+        { href: '/shift-reports', label: 'Báo cáo ca', icon: <ClipboardList className="h-5 w-5" /> },
     ],
-    'SA': [
-        { href: '/dashboard', label: 'Tổng quan', icon: <Home className="w-5 h-5" /> },
-        { href: '/pos', label: 'Bán hàng', icon: <ShoppingBag className="w-5 h-5" /> },
-        { href: '/attendance', label: 'Chấm công', icon: <Calendar className="w-5 h-5" /> },
-        { href: '/shift', label: 'Ca làm việc', icon: <Calendar className="w-5 h-5" /> },
+    SA: [
+        { href: '/dashboard', label: 'Tổng quan', icon: <Home className="h-5 w-5" /> },
+        { href: '/pos', label: 'Bán hàng', icon: <ShoppingBag className="h-5 w-5" /> },
+        { href: '/attendance', label: 'Chấm công', icon: <Calendar className="h-5 w-5" /> },
+        { href: '/shift', label: 'Ca làm việc', icon: <Calendar className="h-5 w-5" /> },
     ],
 };
 
@@ -89,13 +75,7 @@ export default function SidebarNavigation({ user, className }: SidebarNavigation
     return (
         <div className={cn('flex flex-col gap-2', className)}>
             {links.map((link) => (
-                <SidebarLink
-                    key={link.href}
-                    href={link.href}
-                    label={link.label}
-                    icon={link.icon}
-                    active={url.startsWith(link.href)}
-                />
+                <SidebarLink key={link.href} href={link.href} label={link.label} icon={link.icon} active={url.startsWith(link.href)} />
             ))}
         </div>
     );
