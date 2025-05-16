@@ -6,6 +6,7 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WarehouseInventoryController;
 use App\Http\Controllers\WarehousePurchaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,9 @@ Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
   // Route cho warehouse purchase
   Route::get('/warehouses/{warehouse}/purchase', [WarehousePurchaseController::class, 'create'])->name('warehouses.purchase.create');
   Route::post('/warehouses/{warehouse}/purchase', [WarehousePurchaseController::class, 'store'])->name('warehouses.purchase.store');
+
+  // API route để lấy danh sách inventory items của warehouse
+  Route::get('/api/warehouses/{warehouse}/inventory', [WarehouseInventoryController::class, 'getInventory']);
 });
 
 require __DIR__ . '/settings.php';
