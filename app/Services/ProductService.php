@@ -3,144 +3,141 @@
 namespace App\Services;
 
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-class ProductService
+class ProductService extends BaseService
 {
-    /**
-     * Lấy danh sách sản phẩm với bộ lọc và sắp xếp
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function getProducts(array $filters = [], int $perPage = 10, string $sort = 'created_at_desc')
-    {
-        $query = Product::query()->with(['category']);
+  /**
+   * Lu1ea5y model class
+   *
+   * @return string
+   */
+  protected function getModelClass(): string
+  {
+    return Product::class;
+  }
 
-        // Lọc theo danh mục
-        if (isset($filters['category_id']) && $filters['category_id'] !== 'all') {
-            $query->where('category_id', $filters['category_id']);
-        }
+  /**
+   * Lu1ea5y danh su00e1ch cu00e1c tru01b0u1eddng hu1ee3p lu1ec7 u0111u1ec3 su1eafp xu1ebfp
+   *
+   * @return array
+   */
+  protected function getValidSortFields(): array
+  {
+    return ['created_at', 'name', 'price'];
+  }
 
-        // Lọc theo trạng thái
-        if (isset($filters['status']) && $filters['status'] !== 'all') {
-            $query->where('status', $filters['status']);
-        }
+  /**
+   * u00c1p du1ee5ng cu00e1c bu1ed9 lu1ecdc cho product
+   *
+   * @param Builder $query
+   * @param array $filters
+   * @return Builder
+   */
+  protected function applyFilters(Builder $query, array $filters): Builder
+  {
+    // Lu1ecdc theo danh mu1ee5c
+    $query = $this->applyRelationFilter($query, $filters, 'category_id');
 
-        // Lọc theo khoảng giá
-        if (isset($filters['price_min'])) {
-            $query->where('price', '>=', $filters['price_min']);
-        }
+    // Lu1ecdc theo tru1ea1ng thu00e1i
+    $query = $this->applyRelationFilter($query, $filters, 'status');
 
-        if (isset($filters['price_max'])) {
-            $query->where('price', '<=', $filters['price_max']);
-        }
+    // Lu1ecdc theo khou1ea3ng giu00e1
+    $query = $this->applyRangeFilter($query, $filters, 'price', 'price_min', 'price_max');
 
-        // Lọc theo tên
-        if (isset($filters['name']) && ! empty($filters['name'])) {
-            $query->where(function ($q) use ($filters) {
-                $q->where('name', 'like', '%'.$filters['name'].'%')
-                    ->orWhere('sku', 'like', '%'.$filters['name'].'%');
-            });
-        }
+    // Lu1ecdc theo tu00ean
+    $query = $this->applyNameFilter($query, $filters, 'name', ['name', 'sku']);
 
-        // Sắp xếp
-        if ($sort) {
-            // Phân tích tùy chọn sắp xếp (ví dụ: created_at_desc, name_asc)
-            $sortParts = explode('_', $sort);
-            if (count($sortParts) > 1) {
-                $sortDirection = end($sortParts);
-                $sortField = str_replace("_{$sortDirection}", '', $sort);
+    return $query;
+  }
 
-                // Đảm bảo chỉ áp dụng cho các trường sắp xếp hợp lệ
-                if (in_array($sortField, ['created_at', 'name', 'price'])) {
-                    $direction = $sortDirection === 'asc' ? 'asc' : 'desc';
-                    $query->orderBy($sortField, $direction);
-                }
-            }
-        } else {
-            // Mặc định sắp xếp theo thời gian tạo, mới nhất trước
-            $query->orderBy('created_at', 'desc');
-        }
+  /**
+   * Lu1ea5y danh su00e1ch su1ea3n phu1ea9m vu1edbi bu1ed9 lu1ecdc vu00e0 su1eafp xu1ebfp
+   *
+   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+   */
+  public function getProducts(array $filters = [], int $perPage = 10, string $sort = 'created_at_desc')
+  {
+    return $this->getDataWithFilters($filters, $perPage, $sort, ['category']);
+  }
 
-        return $query->paginate($perPage)->withQueryString();
+  /**
+   * Tu1ea1o su1ea3n phu1ea9m mu1edbi
+   *
+   * @return Product
+   */
+  public function createProduct(array $data)
+  {
+    // Xu1eed lu00fd upload u1ea3nh nu1ebfu cu00f3
+    if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
+      $data['image'] = $this->uploadImage($data['image']);
     }
 
-    /**
-     * Tạo sản phẩm mới
-     *
-     * @return Product
-     */
-    public function createProduct(array $data)
-    {
-        // Xử lý upload ảnh nếu có
-        if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
-            $data['image'] = $this->uploadImage($data['image']);
-        }
+    return Product::create($data);
+  }
 
-        return Product::create($data);
+  /**
+   * Cu1eadp nhu1eadt su1ea3n phu1ea9m
+   *
+   * @return Product
+   */
+  public function updateProduct(Product $product, array $data)
+  {
+    // Xu1eed lu00fd upload u1ea3nh mu1edbi nu1ebfu cu00f3
+    if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
+      // Xu00f3a u1ea3nh cu0169
+      if ($product->image) {
+        $this->deleteImage($product->image);
+      }
+
+      $data['image'] = $this->uploadImage($data['image']);
     }
 
-    /**
-     * Cập nhật sản phẩm
-     *
-     * @return Product
-     */
-    public function updateProduct(Product $product, array $data)
-    {
-        // Xử lý upload ảnh mới nếu có
-        if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
-            // Xóa ảnh cũ
-            if ($product->image) {
-                $this->deleteImage($product->image);
-            }
+    $product->update($data);
 
-            $data['image'] = $this->uploadImage($data['image']);
-        }
+    return $product;
+  }
 
-        $product->update($data);
-
-        return $product;
+  /**
+   * Xu00f3a su1ea3n phu1ea9m
+   *
+   * @return bool
+   */
+  public function deleteProduct(Product $product)
+  {
+    // Xu00f3a u1ea3nh tru01b0u1edbc khi xu00f3a su1ea3n phu1ea9m
+    if ($product->image) {
+      $this->deleteImage($product->image);
     }
 
-    /**
-     * Xóa sản phẩm
-     *
-     * @return bool
-     */
-    public function deleteProduct(Product $product)
-    {
-        // Xóa ảnh trước khi xóa sản phẩm
-        if ($product->image) {
-            $this->deleteImage($product->image);
-        }
+    return $product->delete();
+  }
 
-        return $product->delete();
+  /**
+   * Upload u1ea3nh su1ea3n phu1ea9m
+   *
+   * @return string
+   */
+  private function uploadImage(UploadedFile $image)
+  {
+    $path = Storage::disk('public')->put('products', $image);
+
+    return $path;
+  }
+
+  /**
+   * Xu00f3a u1ea3nh su1ea3n phu1ea9m
+   *
+   * @return bool
+   */
+  private function deleteImage(string $imagePath)
+  {
+    if (Storage::disk('public')->exists($imagePath)) {
+      return Storage::disk('public')->delete($imagePath);
     }
 
-    /**
-     * Upload ảnh sản phẩm
-     *
-     * @return string
-     */
-    private function uploadImage(UploadedFile $image)
-    {
-        $path = Storage::disk('public')->put('products', $image);
-
-        return $path;
-    }
-
-    /**
-     * Xóa ảnh sản phẩm
-     *
-     * @return bool
-     */
-    private function deleteImage(string $imagePath)
-    {
-        if (Storage::disk('public')->exists($imagePath)) {
-            return Storage::disk('public')->delete($imagePath);
-        }
-
-        return false;
-    }
+    return false;
+  }
 }

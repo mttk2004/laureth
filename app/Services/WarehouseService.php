@@ -5,28 +5,45 @@ namespace App\Services;
 use App\Models\Store;
 use App\Models\User;
 use App\Models\Warehouse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
-class WarehouseService
+class WarehouseService extends BaseService
 {
   /**
-   * Lấy danh sách kho với bộ lọc và sắp xếp
+   * Lấy model class
    *
-   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+   * @return string
    */
-  public function getWarehouses(array $filters = [], int $perPage = 10, string $sort = 'newest')
+  protected function getModelClass(): string
   {
-    $query = Warehouse::query()->with('store');
+    return Warehouse::class;
+  }
 
+  /**
+   * Lấy danh sách các trường hợp lệ để sắp xếp
+   *
+   * @return array
+   */
+  protected function getValidSortFields(): array
+  {
+    return ['created_at', 'name'];
+  }
+
+  /**
+   * Áp dụng các bộ lọc cho warehouse
+   *
+   * @param Builder $query
+   * @param array $filters
+   * @return Builder
+   */
+  protected function applyFilters(Builder $query, array $filters): Builder
+  {
     // Lọc theo tên
-    if (isset($filters['name']) && ! empty($filters['name'])) {
-      $query->where('name', 'like', '%' . $filters['name'] . '%');
-    }
+    $query = $this->applyNameFilter($query, $filters, 'name', ['name']);
 
     // Lọc theo cửa hàng
-    if (isset($filters['store_id']) && ! empty($filters['store_id'])) {
-      $query->where('store_id', $filters['store_id']);
-    }
+    $query = $this->applyRelationFilter($query, $filters, 'store_id');
 
     // Lọc kho chưa có cửa hàng
     if (isset($filters['no_store']) && $filters['no_store']) {
@@ -34,30 +51,22 @@ class WarehouseService
     }
 
     // Lọc kho chính
-    if (isset($filters['is_main']) && $filters['is_main']) {
-      $query->where('is_main', true);
-    }
+    $query = $this->applyBooleanFilter($query, $filters, 'is_main');
 
-    // Sắp xếp
-    switch ($sort) {
-      case 'newest':
-        $query->orderBy('created_at', 'desc');
-        break;
-      case 'oldest':
-        $query->orderBy('created_at', 'asc');
-        break;
-      case 'name_asc':
-        $query->orderBy('name', 'asc');
-        break;
-      case 'name_desc':
-        $query->orderBy('name', 'desc');
-        break;
-      default:
-        $query->orderBy('created_at', 'desc');
-        break;
-    }
+    return $query;
+  }
 
-    return $query->paginate($perPage)->withQueryString();
+  /**
+   * Lấy danh sách kho với bộ lọc và sắp xếp
+   *
+   * @param array $filters Các bộ lọc cần áp dụng
+   * @param int $perPage Số bản ghi mỗi trang
+   * @param string $sort Cách sắp xếp
+   * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+   */
+  public function getWarehouses(array $filters = [], int $perPage = 10, string $sort = 'newest')
+  {
+    return $this->getDataWithFilters($filters, $perPage, $sort, ['store']);
   }
 
   /**

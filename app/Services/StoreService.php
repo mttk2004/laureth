@@ -4,69 +4,73 @@ namespace App\Services;
 
 use App\Models\Store;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
-class StoreService
+class StoreService extends BaseService
 {
   /**
-   * Lấy danh sách cửa hàng với bộ lọc và sắp xếp
+   * Lu1ea5y model class
+   *
+   * @return string
+   */
+  protected function getModelClass(): string
+  {
+    return Store::class;
+  }
+
+  /**
+   * Lu1ea5y danh su00e1ch cu00e1c tru01b0u1eddng hu1ee3p lu1ec7 u0111u1ec3 su1eafp xu1ebfp
+   *
+   * @return array
+   */
+  protected function getValidSortFields(): array
+  {
+    return ['created_at', 'name', 'monthly_target'];
+  }
+
+  /**
+   * u00c1p du1ee5ng cu00e1c bu1ed9 lu1ecdc cho store
+   *
+   * @param Builder $query
+   * @param array $filters
+   * @return Builder
+   */
+  protected function applyFilters(Builder $query, array $filters): Builder
+  {
+    // Lu1ecdc theo quu1ea3n lu00fd
+    if (isset($filters['manager_id']) && ! empty($filters['manager_id'])) {
+      $query->where('manager_id', $filters['manager_id']);
+    }
+
+    // Lu1ecdc cu1eeda hu00e0ng u0111u00e3 cu00f3 quu1ea3n lu00fd
+    if (isset($filters['has_manager']) && $filters['has_manager']) {
+      $query->whereNotNull('manager_id');
+    }
+
+    // Lu1ecdc cu1eeda hu00e0ng chu01b0a cu00f3 quu1ea3n lu00fd
+    if (isset($filters['no_manager']) && $filters['no_manager']) {
+      $query->whereNull('manager_id');
+    }
+
+    // Lu1ecdc theo tu00ean
+    $query = $this->applyNameFilter($query, $filters, 'name', ['name']);
+
+    return $query;
+  }
+
+  /**
+   * Lu1ea5y danh su00e1ch cu1eeda hu00e0ng vu1edbi bu1ed9 lu1ecdc vu00e0 su1eafp xu1ebfp
    *
    * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
   public function getStores(array $filters = [], int $perPage = 10, string $sort = 'newest')
   {
-    $query = Store::query()->with('manager');
-
-    // Lọc theo quản lý
-    if (isset($filters['manager_id']) && ! empty($filters['manager_id'])) {
-      $query->where('manager_id', $filters['manager_id']);
-    }
-
-    // Lọc cửa hàng đã có quản lý
-    if (isset($filters['has_manager']) && $filters['has_manager']) {
-      $query->whereNotNull('manager_id');
-    }
-
-    // Lọc cửa hàng chưa có quản lý
-    if (isset($filters['no_manager']) && $filters['no_manager']) {
-      $query->whereNull('manager_id');
-    }
-
-    // Lọc theo tên
-    if (isset($filters['name']) && ! empty($filters['name'])) {
-      $query->where('name', 'like', '%' . $filters['name'] . '%');
-    }
-
-    // Sắp xếp
-    switch ($sort) {
-      case 'newest':
-        $query->orderBy('created_at', 'desc');
-        break;
-      case 'oldest':
-        $query->orderBy('created_at', 'asc');
-        break;
-      case 'name_asc':
-        $query->orderBy('name', 'asc');
-        break;
-      case 'name_desc':
-        $query->orderBy('name', 'desc');
-        break;
-      case 'target_asc':
-        $query->orderBy('monthly_target', 'asc');
-        break;
-      case 'target_desc':
-        $query->orderBy('monthly_target', 'desc');
-        break;
-      default:
-        $query->orderBy('created_at', 'desc');
-        break;
-    }
-
-    return $query->paginate($perPage)->withQueryString();
+    return $this->getDataWithFilters($filters, $perPage, $sort, ['manager']);
   }
 
   /**
-   * Tạo cửa hàng mới
+   * Tu1ea1o cu1eeda hu00e0ng mu1edbi
    *
    * @return Store
    */
@@ -75,9 +79,9 @@ class StoreService
     return DB::transaction(function () use ($data) {
       $store = Store::create($data);
 
-      // Nếu cửa hàng mới được chỉ định manager_id
+      // Nu1ebfu cu1eeda hu00e0ng mu1edbi u0111u01b0u1ee3c chu1ec9 u0111u1ecbnh manager_id
       if (!empty($data['manager_id'])) {
-        // Cập nhật store_id của manager
+        // Cu1eadp nhu1eadt store_id cu1ee7a manager
         User::where('id', $data['manager_id'])->update(['store_id' => $store->id]);
       }
 
@@ -86,7 +90,7 @@ class StoreService
   }
 
   /**
-   * Cập nhật thông tin cửa hàng
+   * Cu1eadp nhu1eadt thu00f4ng tin cu1eeda hu00e0ng
    *
    * @return Store
    */
@@ -96,9 +100,9 @@ class StoreService
       $oldManagerId = $store->manager_id;
       $newManagerId = $data['manager_id'] ?? null;
 
-      // Nếu có sự thay đổi quản lý
+      // Nu1ebfu cu00f3 su1ef1 thay u0111u1ed5i quu1ea3n lu00fd
       if ($oldManagerId !== $newManagerId) {
-        // 1. Nếu có manager cũ, cập nhật store_id = null
+        // 1. Nu1ebfu cu00f3 manager cu0169, cu1eadp nhu1eadt store_id = null
         if ($oldManagerId) {
           $oldManager = User::find($oldManagerId);
           if ($oldManager) {
@@ -106,21 +110,21 @@ class StoreService
           }
         }
 
-        // 2. Nếu có manager mới
+        // 2. Nu1ebfu cu00f3 manager mu1edbi
         if ($newManagerId) {
           $newManager = User::find($newManagerId);
 
           if ($newManager) {
-            // Nếu đó là nhân viên của cửa hàng (SL, SA) thì thăng cấp lên SM
+            // Nu1ebfu u0111u00f3 lu00e0 nhu00e2n viu00ean cu1ee7a cu1eeda hu00e0ng (SL, SA) thu00ec thu0103ng cu1ea5p lu00ean SM
             if (in_array($newManager->position, ['SL', 'SA'])) {
               $newManager->update([
                 'position' => 'SM',
                 'hourly_wage' => null,
-                'base_salary' => 10000000, // Lương cơ bản mặc định
+                'base_salary' => 10000000, // Lu01b0u01a1ng cu01a1 bu1ea3n mu1eb7c u0111u1ecbnh
                 'store_id' => $store->id
               ]);
             } else {
-              // Nếu đã là SM, cập nhật store_id
+              // Nu1ebfu u0111u00e3 lu00e0 SM, cu1eadp nhu1eadt store_id
               $newManager->update(['store_id' => $store->id]);
             }
           }
@@ -134,14 +138,14 @@ class StoreService
   }
 
   /**
-   * Xóa cửa hàng
+   * Xu00f3a cu1eeda hu00e0ng
    *
    * @return bool
    */
   public function deleteStore(Store $store)
   {
     return DB::transaction(function () use ($store) {
-      // Cập nhật nhân viên của cửa hàng này thành null (chờ phân công)
+      // Cu1eadp nhu1eadt nhu00e2n viu00ean cu1ee7a cu1eeda hu00e0ng nu00e0y thu00e0nh null (chu1edd phu00e2n cu00f4ng)
       User::where('store_id', $store->id)->update(['store_id' => null]);
 
       return $store->delete();
