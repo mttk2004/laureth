@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WarehouseInventoryController;
 use App\Http\Controllers\WarehousePurchaseController;
+use App\Http\Controllers\PurchaseOrderPdfController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,9 @@ Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
 
   // API route để lấy chi tiết các sản phẩm trong đơn nhập hàng
   Route::get('/api/purchase-orders/{purchaseOrder}/items', [PurchaseOrderController::class, 'getItems']);
+
+  // Route để download PDF đơn nhập hàng
+  Route::get('/purchase-orders/{purchaseOrder}/download', [PurchaseOrderPdfController::class, 'download'])->name('purchase-orders.download');
 });
 
 require __DIR__ . '/settings.php';

@@ -143,13 +143,6 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Quản lý đơn nhập hàng</h1>
                     <div className="flex space-x-2">
-                        <Button
-                            onClick={() => setWarehouseSelectDialogOpen(true)}
-                            className="bg-blue-600 hover:bg-blue-700"
-                        >
-                            <PlusIcon className="mr-2 h-4 w-4" />
-                            Nhập hàng
-                        </Button>
                         <PurchaseOrderSortSelect value={sort as PurchaseOrderSortOption} onChange={handleSortChange} />
                         <PurchaseOrderFilters
                             suppliers={suppliers}
@@ -157,6 +150,13 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
                             initialFilters={filters}
                             onApplyFilters={handleApplyFilters}
                         />
+                        <Button
+                            onClick={() => setWarehouseSelectDialogOpen(true)}
+                            className="bg-blue-600 hover:bg-blue-700"
+                        >
+                            <PlusIcon className="mr-2 h-4 w-4" />
+                            Nhập hàng
+                        </Button>
                     </div>
                 </div>
 

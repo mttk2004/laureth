@@ -48,7 +48,13 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
     }, [open, purchaseOrder]);
 
     const handlePrint = () => {
-        window.print();
+        if (!purchaseOrder) return;
+
+        // Sử dụng URL để tải xuống PDF
+        const downloadUrl = `/purchase-orders/${purchaseOrder.id}/download`;
+
+        // Mở URL trong tab mới (trình duyệt sẽ tự động tải xuống)
+        window.open(downloadUrl, '_blank');
     };
 
     if (!purchaseOrder) return null;
@@ -220,7 +226,7 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
                     </Button>
                     <Button onClick={handlePrint}>
                         <PrinterIcon className="mr-2 h-4 w-4" />
-                        In
+                        In PDF
                     </Button>
                 </DialogFooter>
             </DialogContent>

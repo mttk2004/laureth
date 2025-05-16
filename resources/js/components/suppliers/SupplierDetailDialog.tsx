@@ -89,7 +89,7 @@ export default function SupplierDetailDialog({ supplier, open, onOpenChange }: S
                                             <div key={order.id} className="rounded-md border p-3 text-sm">
                                                 <div className="mb-2 flex items-center justify-between">
                                                     <div className="font-medium">Đơn hàng #{order.id}</div>
-                                                    <Badge className="bg-green-500">Đã nhận</Badge>;
+                                                    <Badge className="bg-green-500">Đã nhận</Badge>
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-1">
                                                     <div className="text-muted-foreground">Ngày đặt:</div>
