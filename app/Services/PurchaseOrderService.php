@@ -79,4 +79,16 @@ class PurchaseOrderService extends BaseService
     // Lấy các mục trong đơn hàng kèm theo thông tin sản phẩm
     return $purchaseOrder->items()->with('product')->get();
   }
+
+  /**
+   * Lấy đơn nhập hàng với đầy đủ thông tin liên quan
+   *
+   * @param PurchaseOrder $purchaseOrder
+   * @return PurchaseOrder
+   */
+  public function getPurchaseOrderWithRelations(PurchaseOrder $purchaseOrder): PurchaseOrder
+  {
+    // Lấy đơn hàng với các mối quan hệ liên quan
+    return $purchaseOrder->load(['supplier', 'warehouse', 'user', 'items.product']);
+  }
 }

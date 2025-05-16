@@ -51,6 +51,9 @@ Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
   // API route để lấy chi tiết các sản phẩm trong đơn nhập hàng
   Route::get('/api/purchase-orders/{purchaseOrder}/items', [PurchaseOrderController::class, 'getItems']);
 
+  // API route để lấy thông tin đầy đủ của đơn nhập hàng
+  Route::get('/api/purchase-orders/{purchaseOrder}/details', [PurchaseOrderController::class, 'getDetails']);
+
   // Route để download PDF đơn nhập hàng
   Route::get('/purchase-orders/{purchaseOrder}/download', [PurchaseOrderPdfController::class, 'download'])->name('purchase-orders.download');
 });

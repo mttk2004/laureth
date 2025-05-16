@@ -29,21 +29,24 @@ interface PurchaseOrderDetailDialogProps {
 export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }: PurchaseOrderDetailDialogProps) {
     const [activeTab, setActiveTab] = useState('info');
     const [loading, setLoading] = useState(false);
-    const [orderItems, setOrderItems] = useState<PurchaseOrderItemWithProduct[]>([]);
+    const [orderDetails, setOrderDetails] = useState<PurchaseOrderWithRelations | null>(null);
 
     useEffect(() => {
         if (open && purchaseOrder) {
             setLoading(true);
-            axios.get(`/api/purchase-orders/${purchaseOrder.id}/items`)
+            // Lấy thông tin đầy đủ của đơn nhập hàng từ API
+            axios.get(`/api/purchase-orders/${purchaseOrder.id}/details`)
                 .then(response => {
-                    setOrderItems(response.data);
+                    setOrderDetails(response.data);
                 })
                 .catch(error => {
-                    console.error('Không thể tải dữ liệu chi tiết đơn hàng:', error);
+                    console.error('Không thể tải thông tin chi tiết đơn hàng:', error);
                 })
                 .finally(() => {
                     setLoading(false);
                 });
+        } else {
+            setOrderDetails(null);
         }
     }, [open, purchaseOrder]);
 
@@ -57,7 +60,10 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
         window.open(downloadUrl, '_blank');
     };
 
-    if (!purchaseOrder) return null;
+    // Sử dụng dữ liệu từ orderDetails nếu có, nếu không sử dụng purchaseOrder ban đầu
+    const displayOrder = orderDetails || purchaseOrder;
+
+    if (!displayOrder) return null;
 
     // Format ngày hiển thị
     const formatDate = (dateString: string) => {
@@ -74,151 +80,155 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold">Chi tiết đơn nhập hàng</DialogTitle>
                     <DialogDescription className="mt-2 text-sm text-gray-600">
-                        Đơn nhập hàng #{purchaseOrder.id.toString().slice(-6)} - Ngày {formatDate(purchaseOrder.order_date)}
+                        Đơn nhập hàng #{displayOrder.id.toString().slice(-6)} - Ngày {formatDate(displayOrder.order_date)}
                     </DialogDescription>
                 </DialogHeader>
 
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="mb-4 grid grid-cols-2">
-                        <TabsTrigger value="info">Thông tin đơn hàng</TabsTrigger>
-                        <TabsTrigger value="items">Chi tiết sản phẩm</TabsTrigger>
-                    </TabsList>
+                {loading ? (
+                    <div className="py-10 text-center">
+                        <div className="text-muted-foreground">Đang tải dữ liệu...</div>
+                    </div>
+                ) : (
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                        <TabsList className="mb-4 grid grid-cols-2">
+                            <TabsTrigger value="info">Thông tin đơn hàng</TabsTrigger>
+                            <TabsTrigger value="items">Chi tiết sản phẩm</TabsTrigger>
+                        </TabsList>
 
-                    <TabsContent value="info" className="max-h-[60vh] space-y-4 overflow-auto">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-md">Thông tin cơ bản</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6 text-sm">
-                                <div className="grid grid-cols-1 gap-2">
-                                    <div className="mb-2 text-xl font-medium">
-                                        Đơn nhập hàng #{purchaseOrder.id.toString().slice(-6)}
-                                    </div>
+                        <TabsContent value="info" className="max-h-[60vh] space-y-4 overflow-auto">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-md">Thông tin cơ bản</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-6 text-sm">
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <div className="mb-2 text-xl font-medium">
+                                            Đơn nhập hàng #{displayOrder.id.toString().slice(-6)}
+                                        </div>
 
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="font-semibold">Ngày đặt hàng:</div>
-                                        <div>{formatDate(purchaseOrder.order_date)}</div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="font-semibold">Tổng giá trị:</div>
-                                        <div className="font-medium text-green-600">{formatCurrency(purchaseOrder.total_amount)}</div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="font-semibold">Ngày tạo:</div>
-                                        <div>{formatDate(purchaseOrder.created_at)}</div>
-                                    </div>
-                                </div>
-
-                                <div className="border-t pt-4">
-                                    <h3 className="mb-2 font-medium">Thông tin nhà cung cấp</h3>
-                                    {purchaseOrder.supplier ? (
                                         <div className="grid grid-cols-2 gap-2">
-                                            <div className="font-semibold">Tên nhà cung cấp:</div>
-                                            <div>{purchaseOrder.supplier.name}</div>
-
-                                            <div className="font-semibold">Số điện thoại:</div>
-                                            <div>{formatPhoneNumber(purchaseOrder.supplier.phone)}</div>
-
-                                            <div className="font-semibold">Email:</div>
-                                            <div>{purchaseOrder.supplier.email}</div>
+                                            <div className="font-semibold">Ngày đặt hàng:</div>
+                                            <div>{formatDate(displayOrder.order_date)}</div>
                                         </div>
-                                    ) : (
-                                        <div className="text-muted-foreground italic">Không có thông tin nhà cung cấp</div>
-                                    )}
-                                </div>
 
-                                <div className="border-t pt-4">
-                                    <h3 className="mb-2 font-medium">Thông tin kho</h3>
-                                    {purchaseOrder.warehouse ? (
                                         <div className="grid grid-cols-2 gap-2">
-                                            <div className="font-semibold">Tên kho:</div>
-                                            <div>{purchaseOrder.warehouse.name}</div>
-
-                                            <div className="font-semibold">Địa chỉ:</div>
-                                            <div>{purchaseOrder.warehouse.address}</div>
-
-                                            <div className="font-semibold">Kho chính:</div>
-                                            <div>{purchaseOrder.warehouse.is_main ? 'Có' : 'Không'}</div>
+                                            <div className="font-semibold">Tổng giá trị:</div>
+                                            <div className="font-medium text-green-600">{formatCurrency(displayOrder.total_amount)}</div>
                                         </div>
-                                    ) : (
-                                        <div className="text-muted-foreground italic">Không có thông tin kho</div>
-                                    )}
-                                </div>
 
-                                <div className="border-t pt-4">
-                                    <h3 className="mb-2 font-medium">Thông tin người tạo</h3>
-                                    {purchaseOrder.user ? (
                                         <div className="grid grid-cols-2 gap-2">
-                                            <div className="font-semibold">Họ tên:</div>
-                                            <div>{purchaseOrder.user.full_name}</div>
-
-                                            <div className="font-semibold">Email:</div>
-                                            <div>{purchaseOrder.user.email}</div>
-
-                                            <div className="font-semibold">Số điện thoại:</div>
-                                            <div>{formatPhoneNumber(purchaseOrder.user.phone)}</div>
+                                            <div className="font-semibold">Ngày tạo:</div>
+                                            <div>{formatDate(displayOrder.created_at)}</div>
                                         </div>
-                                    ) : (
-                                        <div className="text-muted-foreground italic">Không có thông tin người tạo</div>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
+                                    </div>
 
-                    <TabsContent value="items" className="max-h-[60vh] space-y-4 overflow-auto">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-md">Danh sách sản phẩm</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {loading ? (
-                                    <div className="py-4 text-center italic text-muted-foreground">Đang tải dữ liệu...</div>
-                                ) : orderItems && orderItems.length > 0 ? (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-12 gap-2 rounded-md border bg-muted px-3 py-2 text-xs font-medium">
-                                            <div className="col-span-5">Sản phẩm</div>
-                                            <div className="col-span-2 text-center">Số lượng</div>
-                                            <div className="col-span-2 text-right">Giá mua</div>
-                                            <div className="col-span-3 text-right">Thành tiền</div>
-                                        </div>
-                                        {orderItems.map((item) => (
-                                            <div key={item.id} className="grid grid-cols-12 gap-2 rounded-md border p-3 text-sm">
-                                                <div className="col-span-5">
-                                                    <div className="font-medium">{item.product?.name || `Sản phẩm #${item.product_id}`}</div>
-                                                    <div className="text-xs text-muted-foreground">Giá bán: {formatCurrency(item.selling_price)}</div>
+                                    <div className="border-t pt-4">
+                                        <h3 className="mb-2 font-medium">Thông tin nhà cung cấp</h3>
+                                        {displayOrder.supplier ? (
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="font-semibold">Tên nhà cung cấp:</div>
+                                                <div>{displayOrder.supplier.name}</div>
+
+                                                <div className="font-semibold">Số điện thoại:</div>
+                                                <div>{formatPhoneNumber(displayOrder.supplier.phone)}</div>
+
+                                                <div className="font-semibold">Email:</div>
+                                                <div>{displayOrder.supplier.email}</div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-muted-foreground italic">Không có thông tin nhà cung cấp</div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t pt-4">
+                                        <h3 className="mb-2 font-medium">Thông tin kho</h3>
+                                        {displayOrder.warehouse ? (
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="font-semibold">Tên kho:</div>
+                                                <div>{displayOrder.warehouse.name}</div>
+
+                                                <div className="font-semibold">Địa chỉ:</div>
+                                                <div>{displayOrder.warehouse.address}</div>
+
+                                                <div className="font-semibold">Kho chính:</div>
+                                                <div>{displayOrder.warehouse.is_main ? 'Có' : 'Không'}</div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-muted-foreground italic">Không có thông tin kho</div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t pt-4">
+                                        <h3 className="mb-2 font-medium">Thông tin người tạo</h3>
+                                        {displayOrder.user ? (
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="font-semibold">Họ tên:</div>
+                                                <div>{displayOrder.user.full_name}</div>
+
+                                                <div className="font-semibold">Email:</div>
+                                                <div>{displayOrder.user.email}</div>
+
+                                                <div className="font-semibold">Số điện thoại:</div>
+                                                <div>{formatPhoneNumber(displayOrder.user.phone)}</div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-muted-foreground italic">Không có thông tin người tạo</div>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="items" className="max-h-[60vh] space-y-4 overflow-auto">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-md">Danh sách sản phẩm</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {orderDetails && orderDetails.items && orderDetails.items.length > 0 ? (
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-12 gap-2 rounded-md border bg-muted px-3 py-2 text-xs font-medium">
+                                                <div className="col-span-5">Sản phẩm</div>
+                                                <div className="col-span-2 text-center">Số lượng</div>
+                                                <div className="col-span-2 text-right">Giá mua</div>
+                                                <div className="col-span-3 text-right">Thành tiền</div>
+                                            </div>
+                                            {orderDetails.items.map((item) => (
+                                                <div key={item.id} className="grid grid-cols-12 gap-2 rounded-md border p-3 text-sm">
+                                                    <div className="col-span-5">
+                                                        <div className="font-medium">{item.product?.name || `Sản phẩm #${item.product_id}`}</div>
+                                                        <div className="text-xs text-muted-foreground">Giá bán: {formatCurrency(item.selling_price)}</div>
+                                                    </div>
+                                                    <div className="col-span-2 text-center">
+                                                        <Badge className="bg-blue-500">{item.quantity}</Badge>
+                                                    </div>
+                                                    <div className="col-span-2 text-right">{formatCurrency(item.purchase_price)}</div>
+                                                    <div className="col-span-3 text-right font-medium">
+                                                        {formatCurrency(item.purchase_price * item.quantity)}
+                                                    </div>
                                                 </div>
-                                                <div className="col-span-2 text-center">
-                                                    <Badge className="bg-blue-500">{item.quantity}</Badge>
-                                                </div>
-                                                <div className="col-span-2 text-right">{formatCurrency(item.purchase_price)}</div>
-                                                <div className="col-span-3 text-right font-medium">
-                                                    {formatCurrency(item.purchase_price * item.quantity)}
+                                            ))}
+                                            <div className="flex justify-end border-t pt-4">
+                                                <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
+                                                    <div className="text-right font-medium">Tổng số lượng:</div>
+                                                    <div className="text-right font-medium">
+                                                        {orderDetails.items.reduce((sum, item) => sum + item.quantity, 0)} sản phẩm
+                                                    </div>
+                                                    <div className="text-right font-semibold">Tổng giá trị:</div>
+                                                    <div className="text-right font-semibold text-green-600">
+                                                        {formatCurrency(displayOrder.total_amount)}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        ))}
-                                        <div className="flex justify-end border-t pt-4">
-                                            <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
-                                                <div className="text-right font-medium">Tổng số lượng:</div>
-                                                <div className="text-right font-medium">
-                                                    {orderItems.reduce((sum, item) => sum + item.quantity, 0)} sản phẩm
-                                                </div>
-                                                <div className="text-right font-semibold">Tổng giá trị:</div>
-                                                <div className="text-right font-semibold text-green-600">
-                                                    {formatCurrency(purchaseOrder.total_amount)}
-                                                </div>
-                                            </div>
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className="py-4 text-center italic text-muted-foreground">Không có sản phẩm nào trong đơn hàng</div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
+                                    ) : (
+                                        <div className="py-4 text-center italic text-muted-foreground">Không có sản phẩm nào trong đơn hàng</div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </Tabs>
+                )}
 
                 <DialogFooter className="flex space-x-2">
                     <Button variant="outline" onClick={() => onOpenChange(false)}>

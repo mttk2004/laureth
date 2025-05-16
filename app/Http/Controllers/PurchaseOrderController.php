@@ -67,4 +67,18 @@ class PurchaseOrderController extends Controller
 
     return response()->json($items);
   }
+
+  /**
+   * Lấy thông tin đầy đủ của đơn nhập hàng bao gồm các mối quan hệ
+   *
+   * @param PurchaseOrder $purchaseOrder
+   * @return JsonResponse
+   */
+  public function getDetails(PurchaseOrder $purchaseOrder): JsonResponse
+  {
+    // Lấy đơn hàng với đầy đủ thông tin liên quan
+    $purchaseOrder = $this->purchaseOrderService->getPurchaseOrderWithRelations($purchaseOrder);
+
+    return response()->json($purchaseOrder);
+  }
 }
