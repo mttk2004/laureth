@@ -33,7 +33,6 @@ Theo tài liệu thiết kế cơ sở dữ liệu, hệ thống có 4 vai trò 
   - Tạo yêu cầu chuyển kho
   - Quản lý ca làm việc của nhân viên
   - Xem báo cáo lương của nhân viên trong cửa hàng
-  - Bán hàng (khi cần)
 
 ### 3. SL (Shift Leader - Trưởng ca)
 - **Phạm vi quản lý**: Ca làm việc tại cửa hàng
