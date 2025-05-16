@@ -32,7 +32,7 @@ export default function WarehouseDetailDialog({ warehouse, open, onOpenChange }:
                                 <div className="col-span-2">{warehouse.address}</div>
                                 <div className="font-medium">Thuộc cửa hàng:</div>
                                 <div className="col-span-2">{warehouse.store?.name ?? 'Không có cửa hàng'}</div>
-                                <div className='font-medium'>Kho chính:</div>
+                                <div className="font-medium">Kho chính:</div>
                                 <div className="col-span-2">{warehouse.is_main ? 'Có' : 'Không'}</div>
                                 <div className="font-medium">Ngày tạo:</div>
                                 <div className="col-span-2">{new Date(warehouse.created_at).toLocaleDateString('vi-VN')}</div>

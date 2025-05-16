@@ -123,7 +123,7 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
             key: 'store_id',
             label: 'Thuộc cửa hàng',
             render: (warehouse: WarehouseWithStore) => <div className="max-w-md truncate text-sm">{warehouse.store?.name}</div>,
-        }
+        },
     ];
 
     return (
