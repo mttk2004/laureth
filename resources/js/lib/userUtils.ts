@@ -1,26 +1,6 @@
 import { UserRole, roleLabels } from '@/types/user';
 
 /**
- * Định dạng số điện thoại
- */
-export function formatPhoneNumber(phone: string): string {
-  if (!phone) return '';
-
-  // Xóa bỏ tất cả ký tự không phải số
-  const cleaned = phone.replace(/\D/g, '');
-
-  // Kiểm tra độ dài của số điện thoại
-  if (cleaned.length === 10) {
-    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
-  } else if (cleaned.length === 11) {
-    return `${cleaned.slice(0, 4)} ${cleaned.slice(4, 7)} ${cleaned.slice(7)}`;
-  }
-
-  // Nếu không đúng định dạng, trả về chuỗi ban đầu
-  return phone;
-}
-
-/**
  * Lấy tên hiển thị cho vai trò
  */
 export function getRoleName(role: UserRole): string {

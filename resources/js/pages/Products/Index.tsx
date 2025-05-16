@@ -6,7 +6,7 @@ import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
 import { useToast } from '@/hooks/use-toast';
 import { ProductImage, ProductStatusBadge, ProductDetailDialog, DeleteProductDialog, ProductFilters, ProductSortSelect } from '@/components/products';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib';
 
 interface Props {
   products: {

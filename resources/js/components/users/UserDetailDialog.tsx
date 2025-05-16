@@ -11,8 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { formatPhoneNumber, formatLastLogin } from '@/lib/userUtils';
-import { formatCurrency } from '@/lib/productUtils';
+import { formatPhoneNumber, formatLastLogin } from '@/lib/utils';
 
 interface UserDetailDialogProps {
   user: User | null;

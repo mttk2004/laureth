@@ -6,7 +6,7 @@ import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
 import { useToast } from '@/hooks/use-toast';
 import { UserRoleBadge, UserDetailDialog, DeleteUserDialog, UserFilters, UserSortSelect } from '@/components/users';
-import { formatPhoneNumber } from '@/lib/utils';
+import { formatPhoneNumber } from '@/lib';
 
 interface Props {
   users: {

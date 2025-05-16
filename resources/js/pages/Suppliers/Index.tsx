@@ -5,8 +5,8 @@ import { Supplier, SupplierSortOption, User } from '@/types';
 import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
 import { useToast } from '@/hooks/use-toast';
-import { formatPhoneNumber } from '@/lib/utils';
 import { DeleteSupplierDialog, SupplierDetailDialog, SupplierFilters, SupplierSortSelect } from '@/components/suppliers';
+import { formatPhoneNumber } from '@/lib';
 
 interface Props {
   suppliers: {

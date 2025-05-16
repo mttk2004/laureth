@@ -6,7 +6,7 @@ import { Button, DataTable } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
 import { useToast } from '@/hooks/use-toast';
 import { StoreDetailDialog, DeleteStoreDialog, StoreFilters, StoreSortSelect } from '@/components/stores';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib';
 
 interface StoreWithManager extends Store {
   manager?: User | null;
