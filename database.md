@@ -79,6 +79,7 @@ Quản lý thông tin về các kho hàng trong hệ thống.
 |--------|--------------|-------|
 | id | INT | Khóa chính, tự tăng |
 | name | VARCHAR(100) | Tên kho |
+| address | VARCHAR(255) | Địa chỉ của kho |
 | is_main | BOOLEAN | Đánh dấu kho tổng (true) hoặc kho cửa hàng (false) |
 | store_id | INT | Khóa ngoại tới bảng stores, NULL nếu là kho tổng |
 | created_at | TIMESTAMP | Thời gian tạo |

@@ -9,28 +9,29 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class WarehouseFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
-    {
-        return [
-            'name' => $this->faker->randomElement(['Kho chính', 'Kho phụ', 'Kho dự phòng']).' '.$this->faker->city(),
-            'is_main' => false,
-        ];
-    }
+  /**
+   * Define the model's default state.
+   *
+   * @return array<string, mixed>
+   */
+  public function definition(): array
+  {
+    return [
+      'name' => $this->faker->randomElement(['Kho chính', 'Kho phụ', 'Kho dự phòng']) . ' ' . $this->faker->city(),
+      'address' => $this->faker->address(),
+      'is_main' => false,
+    ];
+  }
 
-    /**
-     * Indicate that the warehouse is main
-     */
-    public function main(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'name' => 'Kho trung tâm',
-            'is_main' => true,
-            'store_id' => null,
-        ]);
-    }
+  /**
+   * Indicate that the warehouse is main
+   */
+  public function main(): static
+  {
+    return $this->state(fn(array $attributes) => [
+      'name' => 'Kho trung tâm',
+      'is_main' => true,
+      'store_id' => null,
+    ]);
+  }
 }
