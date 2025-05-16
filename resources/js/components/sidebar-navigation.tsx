@@ -35,6 +35,7 @@ const roleLinks: Record<UserRole, SidebarLinkProps[]> = {
         { href: '/products', label: 'Sản phẩm', icon: <Package className="h-5 w-5" /> },
         { href: '/suppliers', label: 'Nhà cung cấp', icon: <Package2 className="h-5 w-5" /> },
         { href: '/warehouses', label: 'Kho hàng', icon: <Box className="h-5 w-5" /> },
+        { href: '/purchase-orders', label: 'Đơn nhập hàng', icon: <ClipboardList className="h-5 w-5" /> },
         { href: '/transfers', label: 'Chuyển kho', icon: <Layers className="h-5 w-5" /> },
         { href: '/reports', label: 'Báo cáo', icon: <BarChart3 className="h-5 w-5" /> },
     ],
