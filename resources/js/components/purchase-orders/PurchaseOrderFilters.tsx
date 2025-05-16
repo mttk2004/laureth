@@ -82,6 +82,7 @@ export function PurchaseOrderFilters({ suppliers, warehouses, initialFilters, on
             onReset={handleReset}
             hasActiveFilters={hasActiveFilters}
             dialogWidth="sm:max-w-md"
+            triggerText="Lọc đơn nhập hàng"
         >
             <BaseFilterForm>
                 <BaseFilterRow label="Nhà cung cấp">
