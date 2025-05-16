@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { Store, User, WarehouseSortOption, WarehouseWithStore } from '@/types';
 import { router } from '@inertiajs/react';
-import { EyeIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { EyeIcon, PackageIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -153,6 +153,10 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
                             <Button variant="ghost" size="sm" onClick={() => handleEditWarehouse(warehouse)}>
                                 <PencilIcon className="h-4 w-4" />
                                 <span className="sr-only">Sửa</span>
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => router.visit(`/warehouses/${warehouse.id}/purchase`)}>
+                                <PackageIcon className="h-4 w-4 text-green-500" />
+                                <span className="sr-only">Nhập hàng</span>
                             </Button>
                             <Button variant="ghost" size="sm" onClick={() => openDeleteDialog(warehouse.id)}>
                                 <TrashIcon className="h-4 w-4 text-red-500" />
