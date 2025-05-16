@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductInventoryController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -40,6 +41,9 @@ Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
 
   // API route để lấy danh sách inventory items của warehouse
   Route::get('/api/warehouses/{warehouse}/inventory', [WarehouseInventoryController::class, 'getInventory']);
+
+  // API route để lấy tổng số lượng của một sản phẩm trong tất cả kho
+  Route::get('/api/products/{product}/total-inventory', [ProductInventoryController::class, 'getTotalInventory']);
 });
 
 require __DIR__ . '/settings.php';

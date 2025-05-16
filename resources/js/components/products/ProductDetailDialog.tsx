@@ -5,6 +5,8 @@ import { formatCurrency } from '@/lib';
 import { Product } from '@/types';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 interface ProductDetailDialogProps {
     product: Product | null;
@@ -12,7 +14,34 @@ interface ProductDetailDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
+interface ProductInventoryInfo {
+    product_id: string;
+    total_quantity: number;
+    warehouses_count: number;
+}
+
 export default function ProductDetailDialog({ product, open, onOpenChange }: ProductDetailDialogProps) {
+    const [inventoryInfo, setInventoryInfo] = useState<ProductInventoryInfo | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (open && product) {
+            setLoading(true);
+            axios.get(`/api/products/${product.id}/total-inventory`)
+                .then(response => {
+                    setInventoryInfo(response.data);
+                })
+                .catch(error => {
+                    console.error('Không thể tải thông tin tồn kho:', error);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } else {
+            setInventoryInfo(null);
+        }
+    }, [open, product]);
+
     if (!product) return null;
 
     return (
@@ -42,6 +71,20 @@ export default function ProductDetailDialog({ product, open, onOpenChange }: Pro
                             <div className="font-semibold">Trạng thái:</div>
                             <div className="col-span-2">
                                 <ProductStatusBadge status={product.status} />
+                            </div>
+
+                            <div className="font-semibold">Số lượng:</div>
+                            <div className="col-span-2">
+                                {loading ? (
+                                    <span className="text-muted-foreground italic">Đang tải...</span>
+                                ) : inventoryInfo ? (
+                                    <span className="col-span-2">
+                                        {inventoryInfo.total_quantity} sản phẩm
+                                        {inventoryInfo.warehouses_count > 0 && ` (trong ${inventoryInfo.warehouses_count} kho)`}
+                                    </span>
+                                ) : (
+                                    <span className="text-muted-foreground">Không có thông tin</span>
+                                )}
                             </div>
                         </div>
 
