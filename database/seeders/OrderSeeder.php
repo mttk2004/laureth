@@ -78,7 +78,7 @@ class OrderSeeder extends Seeder
       }
 
       // Cập nhật tổng tiền đơn hàng
-      $discountAmount = $order->discount_amount;
+      $discountAmount = $totalAmount * 0.01 * rand(0, 3);
       $finalAmount = $totalAmount - $discountAmount;
 
       $order->total_amount = $totalAmount;
