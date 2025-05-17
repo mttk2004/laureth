@@ -2,13 +2,14 @@ import { Head } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
-import { User } from '@/types/user';
+import { User, UserRole } from '@/types/user';
 import {
     ProductPerformanceCard,
     PieCharts,
     RevenueChart,
     StorePerformanceTable,
-    SummaryCards
+    SummaryCards,
+    EmployeePerformanceCard
 } from '@/components/reports';
 import { router } from '@inertiajs/react';
 
@@ -38,6 +39,16 @@ interface StorePerformance {
     revenueTarget: number;
     percentageComplete: number;
     manager: string;
+}
+
+interface EmployeePerformance {
+    id: string;
+    full_name: string;
+    position: UserRole;
+    orders_count: number;
+    total_sales: number;
+    avg_order_value?: number;
+    total_hours?: number;
 }
 
 interface ReportsIndexProps {
@@ -74,6 +85,13 @@ interface ReportsIndexProps {
         topCategories: TopCategory[];
         selectedYear: number;
     };
+    employeePerformance: {
+        topEmployeesBySales: EmployeePerformance[];
+        topEmployeesByCount: EmployeePerformance[];
+        topEmployeesByAvgOrder: EmployeePerformance[];
+        employeePerformance: EmployeePerformance[];
+        selectedYear: number;
+    };
     period: string;
     year: number;
     years: number[];
@@ -85,6 +103,7 @@ export default function ReportsIndex({
     expenseSummary,
     storePerformance,
     productPerformance,
+    employeePerformance,
     period,
     year,
     years,
@@ -98,7 +117,8 @@ export default function ReportsIndex({
             revenueSummary,
             expenseSummary,
             storePerformance,
-            productPerformance
+            productPerformance,
+            employeePerformance
         });
         console.log('Reports/Index - Các biểu đồ tròn:', {
             revenueByStore: revenueSummary.revenueByStore,
@@ -106,7 +126,7 @@ export default function ReportsIndex({
             revenueByCategory: revenueSummary.revenueByCategory,
             expenseDistribution: expenseSummary.expenseDistribution
         });
-    }, [revenueSummary, expenseSummary, storePerformance, productPerformance]);
+    }, [revenueSummary, expenseSummary, storePerformance, productPerformance, employeePerformance]);
 
     const handlePeriodChange = (newPeriod: string) => {
         setSelectedPeriod(newPeriod);
@@ -189,10 +209,15 @@ export default function ReportsIndex({
                         <StorePerformanceTable stores={storePerformance.stores} />
                     </div>
 
-                    {/* Sản phẩm bán chạy */}
+                    {/* Sản phẩm bán chạy và nhân viên năng suất */}
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                         <ProductPerformanceCard topProducts={productPerformance.topProducts} />
-                        <div></div> {/* Để đối xứng với ProductPerformanceCard */}
+                        <EmployeePerformanceCard
+                            topEmployeesBySales={employeePerformance.topEmployeesBySales}
+                            topEmployeesByCount={employeePerformance.topEmployeesByCount}
+                            topEmployeesByAvgOrder={employeePerformance.topEmployeesByAvgOrder}
+                            employeePerformance={employeePerformance.employeePerformance}
+                        />
                     </div>
                 </div>
             </div>

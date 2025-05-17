@@ -281,6 +281,104 @@ class ReportService
   }
 
   /**
+   * Lấy thông tin hiệu suất của các nhân viên
+   *
+   * @param int|null $year Năm của kỳ báo cáo
+   * @param int|null $limit Giới hạn số lượng nhân viên trả về
+   * @return array
+   */
+  public function getEmployeePerformance(?int $year = null, ?int $limit = 5): array
+  {
+    // Nếu không chỉ định năm thì lấy năm hiện tại
+    $year = $year ?? Carbon::now()->year;
+
+    // Lấy danh sách nhân viên có doanh số cao nhất
+    $topEmployeesBySales = DB::table('orders')
+      ->join('users', 'orders.user_id', '=', 'users.id')
+      ->selectRaw('
+          users.id,
+          users.full_name,
+          users.position,
+          COUNT(orders.id) as orders_count,
+          SUM(orders.final_amount) as total_sales
+      ')
+      ->whereYear('orders.order_date', $year)
+      ->where('orders.status', 'completed')
+      ->whereIn('users.position', ['SL', 'SA']) // Chỉ lấy nhân viên bán hàng và trưởng ca
+      ->groupBy('users.id', 'users.full_name', 'users.position')
+      ->orderByDesc('total_sales')
+      ->limit($limit)
+      ->get();
+
+    // Lấy danh sách nhân viên có số lượng đơn hàng cao nhất
+    $topEmployeesByCount = DB::table('orders')
+      ->join('users', 'orders.user_id', '=', 'users.id')
+      ->selectRaw('
+          users.id,
+          users.full_name,
+          users.position,
+          COUNT(orders.id) as orders_count,
+          SUM(orders.final_amount) as total_sales
+      ')
+      ->whereYear('orders.order_date', $year)
+      ->where('orders.status', 'completed')
+      ->whereIn('users.position', ['SL', 'SA']) // Chỉ lấy nhân viên bán hàng và trưởng ca
+      ->groupBy('users.id', 'users.full_name', 'users.position')
+      ->orderByDesc('orders_count')
+      ->limit($limit)
+      ->get();
+
+    // Lấy nhân viên với giá trị đơn hàng trung bình cao nhất
+    $topEmployeesByAvgOrder = DB::table('orders')
+      ->join('users', 'orders.user_id', '=', 'users.id')
+      ->selectRaw('
+          users.id,
+          users.full_name,
+          users.position,
+          COUNT(orders.id) as orders_count,
+          SUM(orders.final_amount) as total_sales,
+          AVG(orders.final_amount) as avg_order_value
+      ')
+      ->whereYear('orders.order_date', $year)
+      ->where('orders.status', 'completed')
+      ->whereIn('users.position', ['SL', 'SA'])
+      ->groupBy('users.id', 'users.full_name', 'users.position')
+      ->orderByDesc('avg_order_value')
+      ->limit($limit)
+      ->get();
+
+    // Tính hiệu suất cho mỗi nhân viên (doanh thu / số giờ làm việc)
+    $employeePerformance = DB::table('users')
+      ->leftJoin('attendance_records', 'users.id', '=', 'attendance_records.user_id')
+      ->leftJoin('orders', 'users.id', '=', 'orders.user_id')
+      ->selectRaw('
+          users.id,
+          users.full_name,
+          users.position,
+          users.store_id,
+          SUM(TIMESTAMPDIFF(HOUR, attendance_records.clock_in, attendance_records.clock_out)) as total_hours,
+          SUM(orders.final_amount) as total_sales
+      ')
+      ->whereIn('users.position', ['SL', 'SA'])
+      ->whereYear('attendance_records.date', $year)
+      ->whereYear('orders.order_date', $year)
+      ->where('orders.status', 'completed')
+      ->groupBy('users.id', 'users.full_name', 'users.position', 'users.store_id')
+      ->having('total_hours', '>', 0)
+      ->orderByRaw('SUM(orders.final_amount) / SUM(TIMESTAMPDIFF(HOUR, attendance_records.clock_in, attendance_records.clock_out)) DESC')
+      ->limit($limit)
+      ->get();
+
+    return [
+      'topEmployeesBySales' => $topEmployeesBySales,
+      'topEmployeesByCount' => $topEmployeesByCount,
+      'topEmployeesByAvgOrder' => $topEmployeesByAvgOrder,
+      'employeePerformance' => $employeePerformance,
+      'selectedYear' => $year,
+    ];
+  }
+
+  /**
    * Lấy doanh thu theo tháng
    */
   private function getMonthlyRevenue(int $year): array

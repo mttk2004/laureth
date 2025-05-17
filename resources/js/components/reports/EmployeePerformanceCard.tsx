@@ -1,0 +1,165 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/utils';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { BarChart, DollarSign, Presentation, ShoppingCart } from 'lucide-react';
+import { UserRole, roleLabels } from '@/types/user';
+
+interface EmployeePerformance {
+    id: string;
+    full_name: string;
+    position: UserRole;
+    orders_count: number;
+    total_sales: number;
+    avg_order_value?: number;
+    total_hours?: number;
+}
+
+interface EmployeePerformanceCardProps {
+    topEmployeesBySales: EmployeePerformance[];
+    topEmployeesByCount: EmployeePerformance[];
+    topEmployeesByAvgOrder: EmployeePerformance[];
+    employeePerformance: EmployeePerformance[];
+}
+
+export function EmployeePerformanceCard({
+    topEmployeesBySales,
+    topEmployeesByCount,
+    topEmployeesByAvgOrder,
+    employeePerformance,
+}: EmployeePerformanceCardProps) {
+    // Hàm chuyển đổi vai trò sang tiếng Việt sử dụng roleLabels từ types/user
+    const translatePosition = (position: UserRole) => {
+        return roleLabels[position] || position;
+    };
+
+    // Tạo chữ cái viết tắt từ tên nhân viên
+    const getInitials = (name: string) => {
+        return name
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .substring(0, 2);
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Nhân viên năng suất</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-6">
+                    {/* Nhân viên có doanh số cao nhất */}
+                    <div>
+                        <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            <BarChart className="h-4 w-4" />
+                            Doanh số cao nhất
+                        </h3>
+                        <ul className="space-y-3">
+                            {topEmployeesBySales.slice(0, 3).map((employee) => (
+                                <li key={employee.id} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarFallback>{getInitials(employee.full_name)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-medium">{employee.full_name}</p>
+                                            <p className="text-xs text-muted-foreground">{translatePosition(employee.position)}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-semibold">{formatCurrency(employee.total_sales)}</p>
+                                        <p className="text-xs text-muted-foreground">{employee.orders_count} đơn hàng</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Nhân viên có số đơn cao nhất */}
+                    <div>
+                        <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            <ShoppingCart className="h-4 w-4" />
+                            Số đơn cao nhất
+                        </h3>
+                        <ul className="space-y-3">
+                            {topEmployeesByCount.slice(0, 3).map((employee) => (
+                                <li key={employee.id} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarFallback>{getInitials(employee.full_name)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-medium">{employee.full_name}</p>
+                                            <p className="text-xs text-muted-foreground">{translatePosition(employee.position)}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-semibold">{employee.orders_count} đơn hàng</p>
+                                        <p className="text-xs text-muted-foreground">TB: {formatCurrency(employee.total_sales / employee.orders_count)}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Nhân viên có giá trị đơn hàng trung bình cao nhất */}
+                    <div>
+                        <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            <DollarSign className="h-4 w-4" />
+                            Giá trị đơn trung bình cao
+                        </h3>
+                        <ul className="space-y-3">
+                            {topEmployeesByAvgOrder.slice(0, 3).map((employee) => (
+                                <li key={employee.id} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarFallback>{getInitials(employee.full_name)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-medium">{employee.full_name}</p>
+                                            <p className="text-xs text-muted-foreground">{translatePosition(employee.position)}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-semibold">{formatCurrency(employee.avg_order_value || 0)}</p>
+                                        <p className="text-xs text-muted-foreground">{employee.orders_count} đơn hàng</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Nhân viên có hiệu suất cao nhất */}
+                    <div>
+                        <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            <Presentation className="h-4 w-4" />
+                            Hiệu suất cao nhất
+                        </h3>
+                        <ul className="space-y-3">
+                            {employeePerformance.slice(0, 3).map((employee) => (
+                                <li key={employee.id} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarFallback>{getInitials(employee.full_name)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-medium">{employee.full_name}</p>
+                                            <p className="text-xs text-muted-foreground">{translatePosition(employee.position)}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-semibold">
+                                            {formatCurrency(employee.total_sales / (employee.total_hours || 1))}/giờ
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">{employee.total_hours} giờ làm việc</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}

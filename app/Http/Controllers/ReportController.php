@@ -40,6 +40,9 @@ class ReportController extends Controller
     // Lấy hiệu suất sản phẩm (top 5)
     $productPerformance = $this->reportService->getProductPerformance($year, 5);
 
+    // Lấy hiệu suất nhân viên (top 5)
+    $employeePerformance = $this->reportService->getEmployeePerformance($year, 5);
+
     // Ghi log để kiểm tra dữ liệu biểu đồ
     Log::info('Report controller data check:', [
       'revenueByStore' => $revenueSummary['revenueByStore'],
@@ -60,6 +63,7 @@ class ReportController extends Controller
       'expenseSummary' => $expenseSummary,
       'storePerformance' => $storePerformance,
       'productPerformance' => $productPerformance,
+      'employeePerformance' => $employeePerformance,
       'period' => $period,
       'year' => (int)$year,
       'years' => $years,
@@ -121,6 +125,21 @@ class ReportController extends Controller
     $limit = $request->input('limit', 10);
 
     $data = $this->reportService->getProductPerformance($year, $limit);
+
+    return response()->json($data);
+  }
+
+  /**
+   * API: Lấy thông tin hiệu suất của các nhân viên
+   *
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function getEmployeePerformance(Request $request)
+  {
+    $year = $request->input('year', date('Y'));
+    $limit = $request->input('limit', 5);
+
+    $data = $this->reportService->getEmployeePerformance($year, $limit);
 
     return response()->json($data);
   }
