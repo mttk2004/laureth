@@ -12,64 +12,63 @@ use Inertia\Inertia;
 
 class PayrollController extends Controller
 {
-  private $payrollService;
+    private $payrollService;
 
-  public function __construct(PayrollService $payrollService)
-  {
-    $this->payrollService = $payrollService;
-  }
-
-  /**
-   * Hiển thị trang quản lý lương
-   *
-   * @return \Inertia\Response
-   */
-  public function index(Request $request)
-  {
-    // Lấy danh sách bảng lương đã lọc, sắp xếp và phân trang
-    $payrolls = $this->payrollService->getPayrolls(
-      $request->all(),
-      12,
-      $request->input('sort', 'created_at_desc')
-    );
-
-    // Lấy thông tin tổng quan về bảng lương
-    $summary = $this->payrollService->getPayrollSummary();
-
-    // Lấy danh sách cửa hàng để hiển thị trong filter
-    $stores = Store::all();
-
-    // Lấy tab đang được chọn từ request
-    $activeTab = $request->input('activeTab', 'byStore');
-
-    return Inertia::render('Payrolls/Index', [
-      'payrolls' => $payrolls,
-      'summary' => $summary,
-      'stores' => $stores,
-      'user' => Auth::user(),
-      'filters' => $request->only(['month', 'year', 'status', 'store_id', 'position', 'name']),
-      'sort' => $request->input('sort', 'created_at_desc'),
-      'activeTab' => $activeTab,
-    ]);
-  }
-
-  /**
-   * Duyệt bảng lương
-   *
-   * @param  \App\Models\Payroll  $payroll
-   * @return \Illuminate\Http\RedirectResponse
-   */
-  public function approve(ApprovePayrollRequest $request, Payroll $payroll)
-  {
-    // Chỉ DM mới có quyền duyệt lương
-    if (Auth::user()->position !== 'DM') {
-      abort(403, 'Bạn không có quyền thực hiện hành động này.');
+    public function __construct(PayrollService $payrollService)
+    {
+        $this->payrollService = $payrollService;
     }
 
-    $this->payrollService->approvePayroll($payroll);
+    /**
+     * Hiển thị trang quản lý lương
+     *
+     * @return \Inertia\Response
+     */
+    public function index(Request $request)
+    {
+        // Lấy danh sách bảng lương đã lọc, sắp xếp và phân trang
+        $payrolls = $this->payrollService->getPayrolls(
+            $request->all(),
+            12,
+            $request->input('sort', 'created_at_desc')
+        );
 
-    // Chuyển hướng về trang danh sách
-    return redirect()->route('payrolls.index')
-      ->with('success', 'Đã duyệt thanh toán lương thành công.');
-  }
+        // Lấy thông tin tổng quan về bảng lương
+        $summary = $this->payrollService->getPayrollSummary();
+
+        // Lấy danh sách cửa hàng để hiển thị trong filter
+        $stores = Store::all();
+
+        // Lấy tab đang được chọn từ request
+        $activeTab = $request->input('activeTab', 'byStore');
+
+        return Inertia::render('Payrolls/Index', [
+            'payrolls' => $payrolls,
+            'summary' => $summary,
+            'stores' => $stores,
+            'user' => Auth::user(),
+            'filters' => $request->only(['month', 'year', 'status', 'store_id', 'position', 'name']),
+            'sort' => $request->input('sort', 'created_at_desc'),
+            'activeTab' => $activeTab,
+        ]);
+    }
+
+    /**
+     * Duyệt bảng lương
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function approve(ApprovePayrollRequest $request, Payroll $payroll)
+    {
+        // Chỉ DM mới có quyền duyệt lương
+        if (Auth::user()->position !== 'DM') {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
+        $this->payrollService->approvePayroll($payroll);
+
+        // Chuyển hướng về trang danh sách
+        return redirect()->route('payrolls.index')
+            ->with('success', 'Đã duyệt thanh toán lương thành công.');
+    }
 }

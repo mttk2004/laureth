@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Warehouse } from '@/types';
 import { router } from '@inertiajs/react';
+import { useState } from 'react';
 
 interface WarehouseSelectDialogProps {
     warehouses: Warehouse[];
@@ -39,7 +39,9 @@ export function WarehouseSelectDialog({ warehouses, open, onOpenChange }: Wareho
                                         <div className="text-sm text-gray-500">{warehouse.address}</div>
                                         {warehouse.is_main && (
                                             <div className="mt-1">
-                                                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">Kho chính</span>
+                                                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+                                                    Kho chính
+                                                </span>
                                             </div>
                                         )}
                                     </Label>
@@ -53,10 +55,7 @@ export function WarehouseSelectDialog({ warehouses, open, onOpenChange }: Wareho
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Hủy
                     </Button>
-                    <Button
-                        onClick={handleSelectWarehouse}
-                        disabled={!selectedWarehouseId}
-                    >
+                    <Button onClick={handleSelectWarehouse} disabled={!selectedWarehouseId}>
                         Tiếp tục
                     </Button>
                 </DialogFooter>

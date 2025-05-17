@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatCurrency, formatPhoneNumber } from '@/lib';
-import { PurchaseOrder, PurchaseOrderItem, Product, Supplier, User, Warehouse } from '@/types';
-import { PrinterIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Product, PurchaseOrder, PurchaseOrderItem, Supplier, User, Warehouse } from '@/types';
 import axios from 'axios';
+import { PrinterIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface PurchaseOrderItemWithProduct extends PurchaseOrderItem {
     product?: Product;
@@ -35,11 +35,12 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
         if (open && purchaseOrder) {
             setLoading(true);
             // Lấy thông tin đầy đủ của đơn nhập hàng từ API
-            axios.get(`/api/purchase-orders/${purchaseOrder.id}/details`)
-                .then(response => {
+            axios
+                .get(`/api/purchase-orders/${purchaseOrder.id}/details`)
+                .then((response) => {
                     setOrderDetails(response.data);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Không thể tải thông tin chi tiết đơn hàng:', error);
                 })
                 .finally(() => {
@@ -102,9 +103,7 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
                                 </CardHeader>
                                 <CardContent className="space-y-6 text-sm">
                                     <div className="grid grid-cols-1 gap-2">
-                                        <div className="mb-2 text-xl font-medium">
-                                            Đơn nhập hàng #{displayOrder.id.toString().slice(-6)}
-                                        </div>
+                                        <div className="mb-2 text-xl font-medium">Đơn nhập hàng #{displayOrder.id.toString().slice(-6)}</div>
 
                                         <div className="grid grid-cols-2 gap-2">
                                             <div className="font-semibold">Ngày đặt hàng:</div>
@@ -187,7 +186,7 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
                                 <CardContent>
                                     {orderDetails && orderDetails.items && orderDetails.items.length > 0 ? (
                                         <div className="space-y-4">
-                                            <div className="grid grid-cols-12 gap-2 rounded-md border bg-muted px-3 py-2 text-xs font-medium">
+                                            <div className="bg-muted grid grid-cols-12 gap-2 rounded-md border px-3 py-2 text-xs font-medium">
                                                 <div className="col-span-5">Sản phẩm</div>
                                                 <div className="col-span-2 text-center">Số lượng</div>
                                                 <div className="col-span-2 text-right">Giá mua</div>
@@ -197,7 +196,9 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
                                                 <div key={item.id} className="grid grid-cols-12 gap-2 rounded-md border p-3 text-sm">
                                                     <div className="col-span-5">
                                                         <div className="font-medium">{item.product?.name || `Sản phẩm #${item.product_id}`}</div>
-                                                        <div className="text-xs text-muted-foreground">Giá bán: {formatCurrency(item.selling_price)}</div>
+                                                        <div className="text-muted-foreground text-xs">
+                                                            Giá bán: {formatCurrency(item.selling_price)}
+                                                        </div>
                                                     </div>
                                                     <div className="col-span-2 text-center">
                                                         <Badge className="bg-blue-500">{item.quantity}</Badge>
@@ -222,7 +223,7 @@ export function PurchaseOrderDetailDialog({ purchaseOrder, open, onOpenChange }:
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="py-4 text-center italic text-muted-foreground">Không có sản phẩm nào trong đơn hàng</div>
+                                        <div className="text-muted-foreground py-4 text-center italic">Không có sản phẩm nào trong đơn hàng</div>
                                     )}
                                 </CardContent>
                             </Card>

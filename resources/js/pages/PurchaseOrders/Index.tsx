@@ -1,12 +1,12 @@
-import { PurchaseOrderDetailDialog, PurchaseOrderFilters, PurchaseOrderSortSelect, PurchaseOrderPrintPreview } from '@/components/purchase-orders';
-import { WarehouseSelectDialog } from '@/components/warehouses';
-import { Button } from '@/components/ui/button';
+import { PurchaseOrderDetailDialog, PurchaseOrderFilters, PurchaseOrderPrintPreview, PurchaseOrderSortSelect } from '@/components/purchase-orders';
 import { DataTable } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { WarehouseSelectDialog } from '@/components/warehouses';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib';
 import { PurchaseOrder, PurchaseOrderSortOption, Supplier, User, Warehouse } from '@/types';
 import { router } from '@inertiajs/react';
-import { EyeIcon, PrinterIcon, PlusIcon } from 'lucide-react';
+import { EyeIcon, PlusIcon, PrinterIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface PurchaseOrderWithRelations extends PurchaseOrder {
@@ -41,7 +41,14 @@ interface Props {
     sort?: string;
 }
 
-export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = [], warehouses = [], filters = {}, sort = PurchaseOrderSortOption.NEWEST }: Props) {
+export default function PurchaseOrdersIndex({
+    purchaseOrders,
+    user,
+    suppliers = [],
+    warehouses = [],
+    filters = {},
+    sort = PurchaseOrderSortOption.NEWEST,
+}: Props) {
     const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [printDialogOpen, setPrintDialogOpen] = useState(false);
     const [warehouseSelectDialogOpen, setWarehouseSelectDialogOpen] = useState(false);
@@ -150,10 +157,7 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
                             initialFilters={filters}
                             onApplyFilters={handleApplyFilters}
                         />
-                        <Button
-                            onClick={() => setWarehouseSelectDialogOpen(true)}
-                            className="bg-blue-600 hover:bg-blue-700"
-                        >
+                        <Button onClick={() => setWarehouseSelectDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
                             <PlusIcon className="mr-2 h-4 w-4" />
                             Nhập hàng
                         </Button>
@@ -183,23 +187,11 @@ export default function PurchaseOrdersIndex({ purchaseOrders, user, suppliers = 
                     }}
                 />
 
-                <PurchaseOrderDetailDialog
-                    purchaseOrder={selectedPurchaseOrder}
-                    open={detailDialogOpen}
-                    onOpenChange={setDetailDialogOpen}
-                />
+                <PurchaseOrderDetailDialog purchaseOrder={selectedPurchaseOrder} open={detailDialogOpen} onOpenChange={setDetailDialogOpen} />
 
-                <PurchaseOrderPrintPreview
-                    purchaseOrder={selectedPurchaseOrder}
-                    open={printDialogOpen}
-                    onOpenChange={setPrintDialogOpen}
-                />
+                <PurchaseOrderPrintPreview purchaseOrder={selectedPurchaseOrder} open={printDialogOpen} onOpenChange={setPrintDialogOpen} />
 
-                <WarehouseSelectDialog
-                    warehouses={warehouses}
-                    open={warehouseSelectDialogOpen}
-                    onOpenChange={setWarehouseSelectDialogOpen}
-                />
+                <WarehouseSelectDialog warehouses={warehouses} open={warehouseSelectDialogOpen} onOpenChange={setWarehouseSelectDialogOpen} />
             </div>
         </AppLayout>
     );

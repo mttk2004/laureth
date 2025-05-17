@@ -1,3 +1,4 @@
+import { PurchaseOrderDetailDialog } from '@/components/purchase-orders';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +9,6 @@ import { PurchaseOrder, Supplier } from '@/types';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
 import { useState } from 'react';
-import { PurchaseOrderDetailDialog } from '@/components/purchase-orders';
 
 interface SupplierWithPurchaseOrders extends Supplier {
     purchase_orders?: PurchaseOrder[];

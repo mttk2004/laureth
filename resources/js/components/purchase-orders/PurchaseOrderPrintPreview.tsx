@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatCurrency, formatPhoneNumber } from '@/lib';
-import { PurchaseOrder, PurchaseOrderItem, Product, Supplier, User, Warehouse } from '@/types';
+import { Product, PurchaseOrder, PurchaseOrderItem, Supplier, User, Warehouse } from '@/types';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 interface PurchaseOrderItemWithProduct extends PurchaseOrderItem {
     product?: Product;
@@ -29,11 +29,12 @@ export function PurchaseOrderPrintPreview({ purchaseOrder, open, onOpenChange }:
     useEffect(() => {
         if (open && purchaseOrder) {
             setLoading(true);
-            axios.get(`/api/purchase-orders/${purchaseOrder.id}/items`)
-                .then(response => {
+            axios
+                .get(`/api/purchase-orders/${purchaseOrder.id}/items`)
+                .then((response) => {
                     setOrderItems(response.data);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Không thể tải dữ liệu chi tiết đơn hàng:', error);
                 })
                 .finally(() => {
@@ -99,7 +100,7 @@ export function PurchaseOrderPrintPreview({ purchaseOrder, open, onOpenChange }:
                                         <p>Email: {purchaseOrder.supplier.email}</p>
                                     </div>
                                 ) : (
-                                    <p className="text-sm italic text-gray-500">Không có thông tin nhà cung cấp</p>
+                                    <p className="text-sm text-gray-500 italic">Không có thông tin nhà cung cấp</p>
                                 )}
                             </div>
                             <div>
@@ -111,7 +112,7 @@ export function PurchaseOrderPrintPreview({ purchaseOrder, open, onOpenChange }:
                                         <p>Loại kho: {purchaseOrder.warehouse.is_main ? 'Kho chính' : 'Kho phụ'}</p>
                                     </div>
                                 ) : (
-                                    <p className="text-sm italic text-gray-500">Không có thông tin kho</p>
+                                    <p className="text-sm text-gray-500 italic">Không có thông tin kho</p>
                                 )}
                             </div>
                         </div>
@@ -120,7 +121,7 @@ export function PurchaseOrderPrintPreview({ purchaseOrder, open, onOpenChange }:
                         <div className="mb-6">
                             <h3 className="mb-3 text-sm font-semibold uppercase">Chi tiết đơn hàng</h3>
                             {loading ? (
-                                <p className="py-4 text-center text-sm italic text-gray-500">Đang tải dữ liệu...</p>
+                                <p className="py-4 text-center text-sm text-gray-500 italic">Đang tải dữ liệu...</p>
                             ) : orderItems && orderItems.length > 0 ? (
                                 <div>
                                     <table className="w-full border-collapse text-sm">
@@ -165,7 +166,7 @@ export function PurchaseOrderPrintPreview({ purchaseOrder, open, onOpenChange }:
                                     </div>
                                 </div>
                             ) : (
-                                <p className="py-4 text-center text-sm italic text-gray-500">Không có sản phẩm nào trong đơn hàng</p>
+                                <p className="py-4 text-center text-sm text-gray-500 italic">Không có sản phẩm nào trong đơn hàng</p>
                             )}
                         </div>
                     </div>
@@ -175,9 +176,7 @@ export function PurchaseOrderPrintPreview({ purchaseOrder, open, onOpenChange }:
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Đóng
                     </Button>
-                    <Button onClick={handlePrint}>
-                        In PDF
-                    </Button>
+                    <Button onClick={handlePrint}>In PDF</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

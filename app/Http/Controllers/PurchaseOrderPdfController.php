@@ -8,21 +8,20 @@ use Illuminate\Http\Response;
 
 class PurchaseOrderPdfController extends Controller
 {
-  protected $pdfService;
+    protected $pdfService;
 
-  public function __construct(PurchaseOrderPdfService $pdfService)
-  {
-    $this->pdfService = $pdfService;
-  }
+    public function __construct(PurchaseOrderPdfService $pdfService)
+    {
+        $this->pdfService = $pdfService;
+    }
 
-  /**
-   * Tạo và tải xuống file PDF đơn nhập hàng
-   *
-   * @param PurchaseOrder $purchaseOrder
-   * @return Response
-   */
-  public function download(PurchaseOrder $purchaseOrder)
-  {
-    return $this->pdfService->generatePdf($purchaseOrder);
-  }
+    /**
+     * Tạo và tải xuống file PDF đơn nhập hàng
+     *
+     * @return Response
+     */
+    public function download(PurchaseOrder $purchaseOrder)
+    {
+        return $this->pdfService->generatePdf($purchaseOrder);
+    }
 }

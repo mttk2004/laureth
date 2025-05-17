@@ -24,8 +24,8 @@ export interface Payroll {
         store?: {
             id: string;
             name: string;
-        }
-    }
+        };
+    };
 }
 
 export interface PayrollSummary {

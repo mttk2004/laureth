@@ -13,12 +13,7 @@ interface PurchaseOrderFiltersProps {
         date_from?: string;
         date_to?: string;
     };
-    onApplyFilters: (filters: {
-        supplier_id?: string;
-        warehouse_id?: string;
-        date_from?: string;
-        date_to?: string;
-    }) => void;
+    onApplyFilters: (filters: { supplier_id?: string; warehouse_id?: string; date_from?: string; date_to?: string }) => void;
 }
 
 export function PurchaseOrderFilters({ suppliers, warehouses, initialFilters, onApplyFilters }: PurchaseOrderFiltersProps) {
@@ -36,11 +31,7 @@ export function PurchaseOrderFilters({ suppliers, warehouses, initialFilters, on
         });
     };
 
-    const hasActiveFilters =
-        filters.supplier_id !== 'all' ||
-        filters.warehouse_id !== 'all' ||
-        !!filters.date_from ||
-        !!filters.date_to;
+    const hasActiveFilters = filters.supplier_id !== 'all' || filters.warehouse_id !== 'all' || !!filters.date_from || !!filters.date_to;
 
     const handleReset = () => {
         setFilters({
@@ -86,10 +77,7 @@ export function PurchaseOrderFilters({ suppliers, warehouses, initialFilters, on
         >
             <BaseFilterForm>
                 <BaseFilterRow label="Nhà cung cấp">
-                    <Select
-                        value={filters.supplier_id}
-                        onValueChange={(value) => handleChange('supplier_id', value)}
-                    >
+                    <Select value={filters.supplier_id} onValueChange={(value) => handleChange('supplier_id', value)}>
                         <SelectTrigger>
                             <SelectValue placeholder="Tất cả nhà cung cấp" />
                         </SelectTrigger>
@@ -105,10 +93,7 @@ export function PurchaseOrderFilters({ suppliers, warehouses, initialFilters, on
                 </BaseFilterRow>
 
                 <BaseFilterRow label="Kho">
-                    <Select
-                        value={filters.warehouse_id}
-                        onValueChange={(value) => handleChange('warehouse_id', value)}
-                    >
+                    <Select value={filters.warehouse_id} onValueChange={(value) => handleChange('warehouse_id', value)}>
                         <SelectTrigger>
                             <SelectValue placeholder="Tất cả kho" />
                         </SelectTrigger>
@@ -124,19 +109,11 @@ export function PurchaseOrderFilters({ suppliers, warehouses, initialFilters, on
                 </BaseFilterRow>
 
                 <BaseFilterRow label="Từ ngày">
-                    <Input
-                        type="date"
-                        value={filters.date_from}
-                        onChange={(e) => handleChange('date_from', e.target.value)}
-                    />
+                    <Input type="date" value={filters.date_from} onChange={(e) => handleChange('date_from', e.target.value)} />
                 </BaseFilterRow>
 
                 <BaseFilterRow label="Đến ngày">
-                    <Input
-                        type="date"
-                        value={filters.date_to}
-                        onChange={(e) => handleChange('date_to', e.target.value)}
-                    />
+                    <Input type="date" value={filters.date_to} onChange={(e) => handleChange('date_to', e.target.value)} />
                 </BaseFilterRow>
             </BaseFilterForm>
         </BaseFilterDialog>
