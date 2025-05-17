@@ -1,16 +1,9 @@
 import { Head } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
+import { EmployeePerformanceCard, PieCharts, ProductPerformanceCard, RevenueChart, StorePerformanceTable, SummaryCards } from '@/components/reports';
 import AppLayout from '@/layouts/app-layout';
 import { User, UserRole } from '@/types/user';
-import {
-    ProductPerformanceCard,
-    PieCharts,
-    RevenueChart,
-    StorePerformanceTable,
-    SummaryCards,
-    EmployeePerformanceCard
-} from '@/components/reports';
 import { router } from '@inertiajs/react';
 
 interface TopProduct {
@@ -118,13 +111,13 @@ export default function ReportsIndex({
             expenseSummary,
             storePerformance,
             productPerformance,
-            employeePerformance
+            employeePerformance,
         });
         console.log('Reports/Index - Các biểu đồ tròn:', {
             revenueByStore: revenueSummary.revenueByStore,
             revenueByPaymentMethod: revenueSummary.revenueByPaymentMethod,
             revenueByCategory: revenueSummary.revenueByCategory,
-            expenseDistribution: expenseSummary.expenseDistribution
+            expenseDistribution: expenseSummary.expenseDistribution,
         });
     }, [revenueSummary, expenseSummary, storePerformance, productPerformance, employeePerformance]);
 
@@ -146,7 +139,7 @@ export default function ReportsIndex({
         }
 
         // Kiểm tra xem mỗi phần tử có đúng cấu trúc không
-        return data.filter(item => {
+        return data.filter((item) => {
             if (!item || typeof item !== 'object' || !('name' in item) || !('value' in item)) {
                 console.error('Phần tử biểu đồ không đúng cấu trúc:', item);
                 return false;
@@ -160,7 +153,7 @@ export default function ReportsIndex({
         revenueByStore: validatePieData(revenueSummary.revenueByStore),
         revenueByPaymentMethod: validatePieData(revenueSummary.revenueByPaymentMethod),
         revenueByCategory: validatePieData(revenueSummary.revenueByCategory),
-        expenseDistribution: validatePieData(expenseSummary.expenseDistribution)
+        expenseDistribution: validatePieData(expenseSummary.expenseDistribution),
     };
 
     return (

@@ -1,8 +1,8 @@
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { BarChart, DollarSign, Presentation, ShoppingCart } from 'lucide-react';
 import { UserRole, roleLabels } from '@/types/user';
+import { BarChart, DollarSign, Presentation, ShoppingCart } from 'lucide-react';
 
 interface EmployeePerformance {
     id: string;
@@ -51,10 +51,8 @@ export function EmployeePerformanceCard({
     // Component hiển thị khi không có dữ liệu
     const EmptySection = ({ title }: { title: string }) => (
         <div>
-            <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">{title}</h3>
-            <div className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">
-                Không có dữ liệu
-            </div>
+            <h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-sm font-medium">{title}</h3>
+            <div className="text-muted-foreground rounded-md border border-dashed p-4 text-center text-sm">Không có dữ liệu</div>
         </div>
     );
 
@@ -70,7 +68,7 @@ export function EmployeePerformanceCard({
                         <EmptySection title="Doanh số cao nhất" />
                     ) : (
                         <div>
-                            <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            <h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-sm font-medium">
                                 <BarChart className="h-4 w-4" />
                                 Doanh số cao nhất
                             </h3>
@@ -83,12 +81,12 @@ export function EmployeePerformanceCard({
                                             </Avatar>
                                             <div>
                                                 <p className="text-sm font-medium">{employee.full_name}</p>
-                                                <p className="text-xs text-muted-foreground">{translatePosition(employee.position)}</p>
+                                                <p className="text-muted-foreground text-xs">{translatePosition(employee.position)}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-semibold">{formatCurrency(employee.total_sales)}</p>
-                                            <p className="text-xs text-muted-foreground">{employee.orders_count} đơn hàng</p>
+                                            <p className="text-muted-foreground text-xs">{employee.orders_count} đơn hàng</p>
                                         </div>
                                     </li>
                                 ))}
@@ -101,7 +99,7 @@ export function EmployeePerformanceCard({
                         <EmptySection title="Số đơn cao nhất" />
                     ) : (
                         <div>
-                            <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            <h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-sm font-medium">
                                 <ShoppingCart className="h-4 w-4" />
                                 Số đơn cao nhất
                             </h3>
@@ -114,12 +112,12 @@ export function EmployeePerformanceCard({
                                             </Avatar>
                                             <div>
                                                 <p className="text-sm font-medium">{employee.full_name}</p>
-                                                <p className="text-xs text-muted-foreground">{translatePosition(employee.position)}</p>
+                                                <p className="text-muted-foreground text-xs">{translatePosition(employee.position)}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-semibold">{employee.orders_count} đơn hàng</p>
-                                            <p className="text-xs text-muted-foreground">
+                                            <p className="text-muted-foreground text-xs">
                                                 TB: {formatCurrency(employee.total_sales / (employee.orders_count || 1))}
                                             </p>
                                         </div>
@@ -134,7 +132,7 @@ export function EmployeePerformanceCard({
                         <EmptySection title="Giá trị đơn trung bình cao" />
                     ) : (
                         <div>
-                            <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            <h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-sm font-medium">
                                 <DollarSign className="h-4 w-4" />
                                 Giá trị đơn trung bình cao
                             </h3>
@@ -147,12 +145,12 @@ export function EmployeePerformanceCard({
                                             </Avatar>
                                             <div>
                                                 <p className="text-sm font-medium">{employee.full_name}</p>
-                                                <p className="text-xs text-muted-foreground">{translatePosition(employee.position)}</p>
+                                                <p className="text-muted-foreground text-xs">{translatePosition(employee.position)}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-semibold">{formatCurrency(employee.avg_order_value || 0)}</p>
-                                            <p className="text-xs text-muted-foreground">{employee.orders_count} đơn hàng</p>
+                                            <p className="text-muted-foreground text-xs">{employee.orders_count} đơn hàng</p>
                                         </div>
                                     </li>
                                 ))}
@@ -165,7 +163,7 @@ export function EmployeePerformanceCard({
                         <EmptySection title="Hiệu suất cao nhất" />
                     ) : (
                         <div>
-                            <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            <h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-sm font-medium">
                                 <Presentation className="h-4 w-4" />
                                 Hiệu suất cao nhất
                             </h3>
@@ -178,14 +176,14 @@ export function EmployeePerformanceCard({
                                             </Avatar>
                                             <div>
                                                 <p className="text-sm font-medium">{employee.full_name}</p>
-                                                <p className="text-xs text-muted-foreground">{translatePosition(employee.position)}</p>
+                                                <p className="text-muted-foreground text-xs">{translatePosition(employee.position)}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-semibold">
                                                 {formatCurrency(employee.total_sales / (employee.total_hours || 1))}/giờ
                                             </p>
-                                            <p className="text-xs text-muted-foreground">{employee.total_hours || 0} giờ làm việc</p>
+                                            <p className="text-muted-foreground text-xs">{employee.total_hours || 0} giờ làm việc</p>
                                         </div>
                                     </li>
                                 ))}

@@ -35,10 +35,7 @@ export function RevenueChart({ periodLabels, revenueByPeriod, expenseByPeriod }:
                     <p className="font-medium">{label}</p>
                     {payload.map((entry, index) => (
                         <div key={`item-${index}`} className="flex items-center gap-2">
-                            <div
-                                className="h-3 w-3 rounded-full"
-                                style={{ backgroundColor: entry.color }}
-                            />
+                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
                             <p>
                                 {entry.name}: {formatCurrency(entry.value)}
                             </p>
@@ -60,13 +57,7 @@ export function RevenueChart({ periodLabels, revenueByPeriod, expenseByPeriod }:
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} margin={{ top: 10, right: 30, left: 30, bottom: 40 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis
-                                dataKey="name"
-                                angle={-45}
-                                textAnchor="end"
-                                height={70}
-                                tick={{ fontSize: 12 }}
-                            />
+                            <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} tick={{ fontSize: 12 }} />
                             <YAxis
                                 tickFormatter={(value) => {
                                     if (value >= 1000000) {
@@ -79,21 +70,9 @@ export function RevenueChart({ periodLabels, revenueByPeriod, expenseByPeriod }:
                             />
                             <Tooltip content={<CustomTooltip />} />
                             <Legend verticalAlign="top" height={36} />
-                            <Bar
-                                dataKey="Doanh thu"
-                                fill="rgba(59, 130, 246, 0.8)"
-                                radius={[4, 4, 0, 0]}
-                            />
-                            <Bar
-                                dataKey="Chi phí"
-                                fill="rgba(239, 68, 68, 0.8)"
-                                radius={[4, 4, 0, 0]}
-                            />
-                            <Bar
-                                dataKey="Lợi nhuận"
-                                fill="rgba(16, 185, 129, 0.8)"
-                                radius={[4, 4, 0, 0]}
-                            />
+                            <Bar dataKey="Doanh thu" fill="rgba(59, 130, 246, 0.8)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="Chi phí" fill="rgba(239, 68, 68, 0.8)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="Lợi nhuận" fill="rgba(16, 185, 129, 0.8)" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

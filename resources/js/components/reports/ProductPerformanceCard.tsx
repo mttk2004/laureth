@@ -26,20 +26,17 @@ export function ProductPerformanceCard({ topProducts }: ProductPerformanceCardPr
                 {hasProducts ? (
                     <div className="space-y-4">
                         {topProducts.map((product) => (
-                            <div
-                                key={product.id}
-                                className="flex flex-col sm:flex-row items-start justify-between gap-4 rounded-lg border p-4"
-                            >
+                            <div key={product.id} className="flex flex-col items-start justify-between gap-4 rounded-lg border p-4 sm:flex-row">
                                 <div className="flex items-start gap-4">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                        <Package className="h-5 w-5 text-primary" />
+                                    <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
+                                        <Package className="text-primary h-5 w-5" />
                                     </div>
                                     <div>
                                         <p className="font-medium">{product.name}</p>
                                         <p className="text-muted-foreground text-sm">{product.category_name}</p>
                                     </div>
                                 </div>
-                                <div className="mt-2 sm:mt-0 sm:text-right w-full sm:w-auto">
+                                <div className="mt-2 w-full sm:mt-0 sm:w-auto sm:text-right">
                                     <p className="font-medium">{formatCurrency(product.total_sales)}</p>
                                     <p className="text-muted-foreground text-sm">{product.total_quantity} sản phẩm</p>
                                 </div>
@@ -47,9 +44,7 @@ export function ProductPerformanceCard({ topProducts }: ProductPerformanceCardPr
                         ))}
                     </div>
                 ) : (
-                    <div className="py-8 text-center text-muted-foreground">
-                        Không có dữ liệu sản phẩm
-                    </div>
+                    <div className="text-muted-foreground py-8 text-center">Không có dữ liệu sản phẩm</div>
                 )}
             </CardContent>
         </Card>

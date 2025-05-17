@@ -13,15 +13,7 @@ interface SummaryCardsProps {
     years: number[];
 }
 
-export function SummaryCards({
-    totalRevenue,
-    totalExpenses,
-    selectedYear,
-    selectedPeriod,
-    onPeriodChange,
-    onYearChange,
-    years,
-}: SummaryCardsProps) {
+export function SummaryCards({ totalRevenue, totalExpenses, selectedYear, selectedPeriod, onPeriodChange, onYearChange, years }: SummaryCardsProps) {
     const profit = totalRevenue - totalExpenses;
     const profitMargin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
 
@@ -77,7 +69,7 @@ export function SummaryCards({
                 <CardContent>
                     <div className="flex flex-col gap-2">
                         <select
-                            className="w-full rounded-md border border-border p-2 text-sm"
+                            className="border-border w-full rounded-md border p-2 text-sm"
                             value={selectedPeriod}
                             onChange={(e) => onPeriodChange(e.target.value)}
                         >
@@ -86,7 +78,7 @@ export function SummaryCards({
                             <option value="year">Theo năm</option>
                         </select>
                         <select
-                            className="w-full rounded-md border border-border p-2 text-sm"
+                            className="border-border w-full rounded-md border p-2 text-sm"
                             value={selectedYear}
                             onChange={(e) => onYearChange(Number(e.target.value))}
                         >

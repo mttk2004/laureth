@@ -24,12 +24,7 @@ interface CustomTooltipProps {
     }>;
 }
 
-export function PieCharts({
-    revenueByStore,
-    revenueByPaymentMethod,
-    revenueByCategory,
-    expenseDistribution
-}: PieChartsProps) {
+export function PieCharts({ revenueByStore, revenueByPaymentMethod, revenueByCategory, expenseDistribution }: PieChartsProps) {
     // Ghi log dữ liệu nhận được từ backend
     console.log('PieCharts - revenueByStore:', revenueByStore);
     console.log('PieCharts - revenueByPaymentMethod:', revenueByPaymentMethod);
@@ -38,16 +33,16 @@ export function PieCharts({
 
     // Sử dụng mã màu HEX rõ ràng thay vì CSS vars để đảm bảo hiển thị đúng
     const COLORS = [
-        '#4B7BEC',  // Xanh dương
-        '#26DE81',  // Xanh lá
-        '#FD9644',  // Cam
-        '#EB3B5A',  // Đỏ
-        '#A55EEA',  // Tím
-        '#FFC312',  // Vàng
-        '#2C3E50',  // Xanh đen
-        '#3498DB',  // Xanh dương nhạt
-        '#E74C3C',  // Đỏ nhạt
-        '#1ABC9C',  // Ngọc
+        '#4B7BEC', // Xanh dương
+        '#26DE81', // Xanh lá
+        '#FD9644', // Cam
+        '#EB3B5A', // Đỏ
+        '#A55EEA', // Tím
+        '#FFC312', // Vàng
+        '#2C3E50', // Xanh đen
+        '#3498DB', // Xanh dương nhạt
+        '#E74C3C', // Đỏ nhạt
+        '#1ABC9C', // Ngọc
     ];
 
     const renderPieChart = (data: PieChartDataItem[], title: string) => {
@@ -72,7 +67,7 @@ export function PieCharts({
         }
 
         // Thêm kiểm tra dữ liệu trống
-        const hasData = chartData.some(item => item.value > 0);
+        const hasData = chartData.some((item) => item.value > 0);
         console.log(`renderPieChart - ${title} hasData:`, hasData);
 
         // Nếu không có dữ liệu, hiển thị thông báo
@@ -90,13 +85,11 @@ export function PieCharts({
                     return null;
                 }
                 return (
-                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-sm shadow-sm">
+                    <div className="rounded-md border border-gray-200 bg-white p-2 text-sm shadow-sm dark:border-gray-700 dark:bg-gray-800">
                         <p className="font-medium">{payload[0].name}</p>
                         <p>{formatCurrency(payload[0].value)}</p>
-                        <p className="text-gray-500 dark:text-gray-400 text-xs">
-                            {hasData
-                                ? `${Math.round((payload[0].value / data.reduce((sum, item) => sum + item.value, 0)) * 100)}%`
-                                : '0%'}
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {hasData ? `${Math.round((payload[0].value / data.reduce((sum, item) => sum + item.value, 0)) * 100)}%` : '0%'}
                         </p>
                     </div>
                 );
@@ -119,14 +112,7 @@ export function PieCharts({
             // Nếu là nội dung "Không có dữ liệu", chỉ hiển thị text
             if (name === 'Không có dữ liệu') {
                 return (
-                    <text
-                        x={cx}
-                        y={cy}
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        fill="#888"
-                        fontSize={14}
-                    >
+                    <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fill="#888" fontSize={14}>
                         {name}
                     </text>
                 );
@@ -142,14 +128,7 @@ export function PieCharts({
             if (percent < 0.05) return null;
 
             return (
-                <text
-                    x={x}
-                    y={y}
-                    fill="#333"
-                    textAnchor={x > cx ? 'start' : 'end'}
-                    dominantBaseline="central"
-                    fontSize={11}
-                >
+                <text x={x} y={y} fill="#333" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={11}>
                     {`${name}: ${(percent * 100).toFixed(0)}%`}
                 </text>
             );
@@ -193,9 +172,7 @@ export function PieCharts({
                                         verticalAlign="bottom"
                                         align="center"
                                         height={36}
-                                        formatter={(value) => (
-                                            <span style={{ color: '#666', fontSize: '12px' }}>{value}</span>
-                                        )}
+                                        formatter={(value) => <span style={{ color: '#666', fontSize: '12px' }}>{value}</span>}
                                     />
                                 )}
                             </PieChart>
@@ -216,7 +193,7 @@ export function PieCharts({
                     <CardTitle>{title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="h-[300px] w-full flex flex-col items-center justify-center">
+                    <div className="flex h-[300px] w-full flex-col items-center justify-center">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
                                 <Pie
@@ -231,14 +208,7 @@ export function PieCharts({
                                 >
                                     <Cell fill="#e5e7eb" stroke="transparent" />
                                 </Pie>
-                                <text
-                                    x="50%"
-                                    y="50%"
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    fill="#888"
-                                    fontSize={14}
-                                >
+                                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="#888" fontSize={14}>
                                     Không có dữ liệu
                                 </text>
                             </PieChart>

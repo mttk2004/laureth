@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
-import { Progress } from '@/components/ui/progress';
 
 interface StorePerformance {
     id: string;
@@ -42,18 +42,12 @@ export function StorePerformanceTable({ stores }: StorePerformanceTableProps) {
                                     <TableRow key={store.id}>
                                         <TableCell className="font-medium">{store.name}</TableCell>
                                         <TableCell>{store.manager}</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            {formatCurrency(store.actualRevenue)}
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            {formatCurrency(store.revenueTarget)}
-                                        </TableCell>
+                                        <TableCell className="hidden md:table-cell">{formatCurrency(store.actualRevenue)}</TableCell>
+                                        <TableCell className="hidden md:table-cell">{formatCurrency(store.revenueTarget)}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col gap-1">
                                                 <div className="flex items-center justify-between text-xs">
-                                                    <span className="font-medium">
-                                                        {store.percentageComplete.toFixed(0)}%
-                                                    </span>
+                                                    <span className="font-medium">{store.percentageComplete.toFixed(0)}%</span>
                                                     <span className="text-muted-foreground">
                                                         {formatCurrency(store.actualRevenue)} / {formatCurrency(store.revenueTarget)}
                                                     </span>
@@ -71,9 +65,7 @@ export function StorePerformanceTable({ stores }: StorePerformanceTableProps) {
                         </Table>
                     </div>
                 ) : (
-                    <div className="py-8 text-center text-muted-foreground">
-                        Không có dữ liệu cửa hàng
-                    </div>
+                    <div className="text-muted-foreground py-8 text-center">Không có dữ liệu cửa hàng</div>
                 )}
             </CardContent>
         </Card>
