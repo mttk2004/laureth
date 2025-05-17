@@ -8,6 +8,17 @@ interface RevenueChartProps {
     expenseByPeriod: number[];
 }
 
+// Định nghĩa kiểu cho tooltip
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+        name: string;
+        value: number;
+        color: string;
+    }>;
+    label?: string;
+}
+
 export function RevenueChart({ periodLabels, revenueByPeriod, expenseByPeriod }: RevenueChartProps) {
     // Chuẩn bị dữ liệu cho biểu đồ
     const chartData = periodLabels.map((label, index) => ({
@@ -17,12 +28,12 @@ export function RevenueChart({ periodLabels, revenueByPeriod, expenseByPeriod }:
         'Lợi nhuận': (revenueByPeriod[index] || 0) - (expenseByPeriod[index] || 0),
     }));
 
-    const CustomTooltip = ({ active, payload, label }: any) => {
+    const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-card border-border rounded-md border p-2 text-sm shadow-sm">
                     <p className="font-medium">{label}</p>
-                    {payload.map((entry: any, index: number) => (
+                    {payload.map((entry, index) => (
                         <div key={`item-${index}`} className="flex items-center gap-2">
                             <div
                                 className="h-3 w-3 rounded-full"
@@ -40,16 +51,22 @@ export function RevenueChart({ periodLabels, revenueByPeriod, expenseByPeriod }:
     };
 
     return (
-        <Card className="col-span-1 md:col-span-2">
+        <Card>
             <CardHeader>
                 <CardTitle>Doanh thu và chi phí</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="h-[300px] w-full">
+                <div className="h-[400px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                        <BarChart data={chartData} margin={{ top: 10, right: 30, left: 30, bottom: 40 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" />
+                            <XAxis
+                                dataKey="name"
+                                angle={-45}
+                                textAnchor="end"
+                                height={70}
+                                tick={{ fontSize: 12 }}
+                            />
                             <YAxis
                                 tickFormatter={(value) => {
                                     if (value >= 1000000) {
@@ -64,17 +81,17 @@ export function RevenueChart({ periodLabels, revenueByPeriod, expenseByPeriod }:
                             <Legend verticalAlign="top" height={36} />
                             <Bar
                                 dataKey="Doanh thu"
-                                fill="var(--chart-1)"
+                                fill="rgba(59, 130, 246, 0.8)"
                                 radius={[4, 4, 0, 0]}
                             />
                             <Bar
                                 dataKey="Chi phí"
-                                fill="var(--chart-2)"
+                                fill="rgba(239, 68, 68, 0.8)"
                                 radius={[4, 4, 0, 0]}
                             />
                             <Bar
                                 dataKey="Lợi nhuận"
-                                fill="var(--chart-3)"
+                                fill="rgba(16, 185, 129, 0.8)"
                                 radius={[4, 4, 0, 0]}
                             />
                         </BarChart>

@@ -27,10 +27,10 @@ export function SummaryCards({
 
     return (
         <>
-            <Card className="col-span-1">
+            <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Tổng doanh thu</CardTitle>
-                    <DollarSign className="h-4 w-4 text-primary" />
+                    <DollarSign className="h-4 w-4 text-blue-500" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
@@ -41,10 +41,10 @@ export function SummaryCards({
                 </CardContent>
             </Card>
 
-            <Card className="col-span-1">
+            <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Tổng chi phí</CardTitle>
-                    <ArrowUpDown className="h-4 w-4 text-primary" />
+                    <ArrowUpDown className="h-4 w-4 text-red-500" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
@@ -55,10 +55,10 @@ export function SummaryCards({
                 </CardContent>
             </Card>
 
-            <Card className="col-span-1">
+            <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Lợi nhuận</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <TrendingUp className="h-4 w-4 text-green-500" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{formatCurrency(profit)}</div>
@@ -69,15 +69,15 @@ export function SummaryCards({
                 </CardContent>
             </Card>
 
-            <Card className="col-span-1">
+            <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Thời gian</CardTitle>
-                    <Calendar className="h-4 w-4 text-primary" />
+                    <Calendar className="h-4 w-4 text-blue-500" />
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-col gap-2">
                         <select
-                            className="w-full rounded-md border p-2 text-sm"
+                            className="w-full rounded-md border border-border p-2 text-sm"
                             value={selectedPeriod}
                             onChange={(e) => onPeriodChange(e.target.value)}
                         >
@@ -86,7 +86,7 @@ export function SummaryCards({
                             <option value="year">Theo năm</option>
                         </select>
                         <select
-                            className="w-full rounded-md border p-2 text-sm"
+                            className="w-full rounded-md border border-border p-2 text-sm"
                             value={selectedYear}
                             onChange={(e) => onYearChange(Number(e.target.value))}
                         >

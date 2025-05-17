@@ -107,10 +107,11 @@ export default function ReportsIndex({
             <Head title="Báo cáo thống kê" />
 
             <div className="py-6">
-                <div className="mx-auto">
+                <div className="mx-auto max-w-full">
                     <h1 className="mb-6 text-2xl font-bold">Báo cáo thống kê</h1>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                    {/* Thẻ tổng quan */}
+                    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                         <SummaryCards
                             totalRevenue={revenueSummary.totalRevenue}
                             totalExpenses={expenseSummary.totalExpenses}
@@ -121,23 +122,36 @@ export default function ReportsIndex({
                             onYearChange={handleYearChange}
                             years={years}
                         />
+                    </div>
 
+                    {/* Biểu đồ chính */}
+                    <div className="mb-6">
                         <RevenueChart
                             periodLabels={revenueSummary.periodLabels}
                             revenueByPeriod={revenueSummary.revenueByPeriod}
                             expenseByPeriod={expenseSummary.expenseByPeriod}
                         />
+                    </div>
 
+                    {/* Biểu đồ tròn */}
+                    <div className="mb-6">
                         <PieCharts
                             revenueByStore={revenueSummary.revenueByStore}
                             revenueByPaymentMethod={revenueSummary.revenueByPaymentMethod}
                             revenueByCategory={revenueSummary.revenueByCategory}
                             expenseDistribution={expenseSummary.expenseDistribution}
                         />
+                    </div>
 
+                    {/* Bảng hiệu suất cửa hàng */}
+                    <div className="mb-6">
                         <StorePerformanceTable stores={storePerformance.stores} />
+                    </div>
 
+                    {/* Sản phẩm bán chạy */}
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                         <ProductPerformanceCard topProducts={productPerformance.topProducts} />
+                        <div></div> {/* Để đối xứng với ProductPerformanceCard */}
                     </div>
                 </div>
             </div>

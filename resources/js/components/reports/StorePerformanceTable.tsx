@@ -17,49 +17,64 @@ interface StorePerformanceTableProps {
 }
 
 export function StorePerformanceTable({ stores }: StorePerformanceTableProps) {
+    const hasStores = stores && stores.length > 0;
+
     return (
-        <Card className="col-span-1 md:col-span-2">
+        <Card>
             <CardHeader>
                 <CardTitle>Hiệu suất cửa hàng</CardTitle>
             </CardHeader>
             <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Cửa hàng</TableHead>
-                            <TableHead>Quản lý</TableHead>
-                            <TableHead className="hidden md:table-cell">Doanh thu</TableHead>
-                            <TableHead className="hidden md:table-cell">Chỉ tiêu</TableHead>
-                            <TableHead>Tiến độ</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {stores.map((store) => (
-                            <TableRow key={store.id}>
-                                <TableCell className="font-medium">{store.name}</TableCell>
-                                <TableCell>{store.manager}</TableCell>
-                                <TableCell className="hidden md:table-cell">
-                                    {formatCurrency(store.actualRevenue)}
-                                </TableCell>
-                                <TableCell className="hidden md:table-cell">
-                                    {formatCurrency(store.revenueTarget)}
-                                </TableCell>
-                                <TableCell>
-                                    <div className="flex items-center gap-2">
-                                        <Progress
-                                            value={store.percentageComplete > 100 ? 100 : store.percentageComplete}
-                                            className="h-2 w-full"
-                                            indicatorColor={getIndicatorColor(store.percentageComplete)}
-                                        />
-                                        <span className="text-xs font-medium">
-                                            {store.percentageComplete.toFixed(0)}%
-                                        </span>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                {hasStores ? (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Cửa hàng</TableHead>
+                                    <TableHead>Quản lý</TableHead>
+                                    <TableHead className="hidden md:table-cell">Doanh thu</TableHead>
+                                    <TableHead className="hidden md:table-cell">Chỉ tiêu</TableHead>
+                                    <TableHead>Tiến độ</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {stores.map((store) => (
+                                    <TableRow key={store.id}>
+                                        <TableCell className="font-medium">{store.name}</TableCell>
+                                        <TableCell>{store.manager}</TableCell>
+                                        <TableCell className="hidden md:table-cell">
+                                            {formatCurrency(store.actualRevenue)}
+                                        </TableCell>
+                                        <TableCell className="hidden md:table-cell">
+                                            {formatCurrency(store.revenueTarget)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <span className="font-medium">
+                                                        {store.percentageComplete.toFixed(0)}%
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                        {formatCurrency(store.actualRevenue)} / {formatCurrency(store.revenueTarget)}
+                                                    </span>
+                                                </div>
+                                                <Progress
+                                                    value={store.percentageComplete > 100 ? 100 : store.percentageComplete}
+                                                    className="h-2 w-full"
+                                                    indicatorColor={getIndicatorColor(store.percentageComplete)}
+                                                />
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                ) : (
+                    <div className="py-8 text-center text-muted-foreground">
+                        Không có dữ liệu cửa hàng
+                    </div>
+                )}
             </CardContent>
         </Card>
     );
