@@ -39,7 +39,7 @@ class UserSeeder extends Seeder
       User::factory()->create([
         'position' => 'SL',
         'base_salary' => null,
-        'hourly_wage' => rand(35000, 45000),
+        'hourly_wage' => rand(35000, 40000),
         'commission_rate' => rand(1, 10) / 10,
       ]);
     }
@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
       User::factory()->create([
         'position' => 'SA',
         'base_salary' => null,
-        'hourly_wage' => rand(30000, 40000),
+        'hourly_wage' => rand(30000, 35000),
         'commission_rate' => rand(1, 10) / 10,
       ]);
     }
