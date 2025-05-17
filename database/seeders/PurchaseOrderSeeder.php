@@ -22,8 +22,8 @@ class PurchaseOrderSeeder extends Seeder
     $mainWarehouse = Warehouse::where('is_main', true)->first();
     $products = Product::all();
 
-    // Tạo 10 đơn nhập hàng
-    for ($i = 0; $i < 10; $i++) {
+    // Tạo 7 đơn nhập hàng
+    for ($i = 0; $i < 7; $i++) {
       $manager = $managers->random();
       $supplier = $suppliers->random();
 
