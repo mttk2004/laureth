@@ -53,10 +53,12 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
     router.post(route('attendance.check-in'), {
       shift_id: currentShift.id,
     }, {
-      preserveScroll: true,
       onSuccess: () => {
         addToast('Chấm công vào ca làm việc thành công', 'success');
         setProcessing(false);
+
+        // Tải lại trang để cập nhật dữ liệu
+        router.reload();
       },
       onError: (errors) => {
         console.error(errors);
@@ -75,10 +77,12 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
     router.post(route('attendance.check-out'), {
       shift_id: currentShift.id,
     }, {
-      preserveScroll: true,
       onSuccess: () => {
         addToast('Chấm công ra ca làm việc thành công', 'success');
         setProcessing(false);
+
+        // Tải lại trang để cập nhật dữ liệu
+        router.reload();
       },
       onError: (errors) => {
         console.error(errors);

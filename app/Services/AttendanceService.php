@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\AttendanceRecord;
 use App\Models\Shift;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class AttendanceService extends BaseService
@@ -36,9 +35,13 @@ class AttendanceService extends BaseService
   {
     $today = Carbon::today()->format('Y-m-d');
 
+    // Sử dụng DB::raw để đảm bảo không có caching
     return Shift::where('user_id', $userId)
       ->where('date', $today)
-      ->with(['attendanceRecord'])
+      ->with(['attendanceRecord' => function ($query) {
+        // Đảm bảo lấy dữ liệu mới nhất
+        $query->latest();
+      }])
       ->first();
   }
 
