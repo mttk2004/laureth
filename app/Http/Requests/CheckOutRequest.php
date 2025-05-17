@@ -29,10 +29,10 @@ class CheckOutRequest extends FormRequest
         'required',
         'integer',
         'exists:shifts,id',
-        Rule::exists('shifts')->where(function ($query) {
+        Rule::exists('shifts', 'id')->where(function ($query) {
           $query->where('user_id', Auth::id());
         }),
-        Rule::exists('attendance_records')->where(function ($query) {
+        Rule::exists('attendance_records', 'shift_id')->where(function ($query) {
           $query->where('user_id', Auth::id())
             ->whereNotNull('check_in')
             ->whereNull('check_out');
