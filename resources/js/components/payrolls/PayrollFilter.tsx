@@ -61,7 +61,7 @@ export function PayrollFilter({
             placeholder="Tìm theo tên nhân viên"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="w-80"
+            className="w-48"
           />
           <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2">
             <Search className="h-4 w-4 text-muted-foreground" />
@@ -71,7 +71,7 @@ export function PayrollFilter({
 
       <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2" size="sm">
+          <Button variant="outline" className="flex items-center gap-2 h-10 px-4" size="default">
             <Filter className="h-4 w-4" />
             <span>Lọc lương</span>
             {hasActiveFilters && (
@@ -183,7 +183,7 @@ export function PayrollFilter({
       </Dialog>
 
       <Select value={sort} onValueChange={handleSortChange}>
-        <SelectTrigger className="w-48 flex items-center">
+        <SelectTrigger className="w-48 h-10 flex items-center">
           <div className="flex items-center gap-2">
             <ArrowUpDown className="h-4 w-4" />
             <SelectValue placeholder="Sắp xếp" />
