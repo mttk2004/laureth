@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { Product, Supplier, User, WarehouseWithStore } from '@/types';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import React, { FormEvent, useState } from 'react';
@@ -168,6 +168,8 @@ export default function WarehousePurchase({ user, warehouse, suppliers, products
 
     return (
         <AppLayout user={user}>
+            <Head title="Nhập hàng cho kho" />
+
             <div className="mx-auto max-w-5xl py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Nhập hàng cho kho: {warehouse.name}</h1>

@@ -5,7 +5,7 @@ import { WarehouseSelectDialog } from '@/components/warehouses';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib';
 import { PurchaseOrder, PurchaseOrderSortOption, Supplier, User, Warehouse } from '@/types';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { EyeIcon, PlusIcon, PrinterIcon } from 'lucide-react';
 import { useState } from 'react';
 
@@ -146,6 +146,8 @@ export default function PurchaseOrdersIndex({
 
     return (
         <AppLayout user={user}>
+            <Head title="Quản lý đơn nhập hàng" />
+
             <div>
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Quản lý đơn nhập hàng</h1>

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { Store, User, WarehouseWithStore } from '@/types';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import React, { FormEvent, useState } from 'react';
 
 interface Props {
@@ -68,6 +68,8 @@ export default function WarehouseEdit({ user, stores, warehouse }: Props) {
 
     return (
         <AppLayout user={user}>
+            <Head title="Chỉnh sửa kho" />
+
             <div className="mx-auto max-w-4xl py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Chỉnh sửa kho</h1>

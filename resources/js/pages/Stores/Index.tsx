@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib';
 import { Store, StoreSortOption, User } from '@/types';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { EyeIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 
@@ -136,6 +136,8 @@ export default function StoresIndex({ stores, user, managers = [], filters = {},
 
     return (
         <AppLayout user={user}>
+            <Head title="Quản lý cửa hàng" />
+
             <div>
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Quản lý cửa hàng</h1>

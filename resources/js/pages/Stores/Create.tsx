@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { User } from '@/types/user';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import React, { FormEvent, useState } from 'react';
 
 interface Props {
@@ -67,6 +67,8 @@ export default function StoreCreate({ user, managers }: Props) {
 
     return (
         <AppLayout user={user}>
+            <Head title="Thêm cửa hàng mới" />
+
             <div className="mx-auto max-w-4xl py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Thêm cửa hàng mới</h1>

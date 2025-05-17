@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { Store } from '@/types/store';
 import { User, UserRole, roleLabels } from '@/types/user';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import React, { useMemo, useState } from 'react';
 
 interface Props {
@@ -116,6 +116,8 @@ export default function UserEdit({ editUser, stores, user }: Props) {
 
     return (
         <AppLayout user={user}>
+            <Head title="Chỉnh sửa thông tin nhân viên" />
+
             <div className="mx-auto max-w-4xl">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Chỉnh sửa thông tin nhân viên</h1>

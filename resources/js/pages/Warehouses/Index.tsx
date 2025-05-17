@@ -3,7 +3,7 @@ import { DeleteWarehouseDialog, WarehouseDetailDialog, WarehouseFilters, Warehou
 import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { Store, User, WarehouseSortOption, WarehouseWithStore } from '@/types';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { EyeIcon, PackageIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 
@@ -128,6 +128,8 @@ export default function WarehousesIndex({ warehouses, user, stores = [], filters
 
     return (
         <AppLayout user={user}>
+            <Head title="Quản lý kho" />
+
             <div>
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Quản lý kho</h1>

@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { Supplier } from '@/types/supplier';
 import { User } from '@/types/user';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import React, { useState } from 'react';
 
 interface Props {
@@ -54,6 +54,8 @@ export default function SupplierEdit({ supplier, user }: Props) {
 
     return (
         <AppLayout user={user}>
+            <Head title="Chỉnh sửa nhà cung cấp" />
+
             <div className="mx-auto max-w-4xl">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Chỉnh sửa nhà cung cấp</h1>

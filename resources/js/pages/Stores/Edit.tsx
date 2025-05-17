@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { Store } from '@/types/store';
 import { User } from '@/types/user';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { AlertCircle } from 'lucide-react';
 import React, { FormEvent, useMemo, useState } from 'react';
 
@@ -119,6 +119,8 @@ export default function StoreEdit({ user, managers, editStore }: Props) {
 
     return (
         <AppLayout user={user}>
+            <Head title="Chỉnh sửa cửa hàng" />
+
             <div className="mx-auto max-w-4xl py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Chỉnh sửa cửa hàng</h1>

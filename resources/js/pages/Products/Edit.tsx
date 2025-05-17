@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { Category, Product } from '@/types/product';
 import { User } from '@/types/user';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
 
 interface Props {
@@ -94,6 +94,8 @@ export default function ProductEdit({ product, categories, user }: Props) {
 
     return (
         <AppLayout user={user}>
+            <Head title="Chỉnh sửa sản phẩm" />
+
             <div className="mx-auto max-w-4xl">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Chỉnh sửa sản phẩm</h1>
