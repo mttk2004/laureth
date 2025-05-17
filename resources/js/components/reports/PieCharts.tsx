@@ -30,7 +30,7 @@ export function PieCharts({
     revenueByCategory,
     expenseDistribution
 }: PieChartsProps) {
-    // Màu sắc cố định RGB để đảm bảo hiển thị đúng
+    // Sử dụng mã màu HEX rõ ràng thay vì CSS vars để đảm bảo hiển thị đúng
     const COLORS = [
         '#4B7BEC',  // Xanh dương
         '#26DE81',  // Xanh lá
@@ -38,6 +38,10 @@ export function PieCharts({
         '#EB3B5A',  // Đỏ
         '#A55EEA',  // Tím
         '#FFC312',  // Vàng
+        '#2C3E50',  // Xanh đen
+        '#3498DB',  // Xanh dương nhạt
+        '#E74C3C',  // Đỏ nhạt
+        '#1ABC9C',  // Ngọc
     ];
 
     const renderPieChart = (data: PieChartDataItem[], title: string) => {
@@ -70,10 +74,10 @@ export function PieCharts({
                     return null;
                 }
                 return (
-                    <div className="bg-card border-border rounded-md border p-2 text-sm shadow-sm">
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-sm shadow-sm">
                         <p className="font-medium">{payload[0].name}</p>
                         <p>{formatCurrency(payload[0].value)}</p>
-                        <p className="text-muted-foreground text-xs">
+                        <p className="text-gray-500 dark:text-gray-400 text-xs">
                             {hasData
                                 ? `${Math.round((payload[0].value / data.reduce((sum, item) => sum + item.value, 0)) * 100)}%`
                                 : '0%'}
@@ -136,21 +140,21 @@ export function PieCharts({
         };
 
         return (
-            <Card className="w-full">
+            <Card className="w-full overflow-hidden">
                 <CardHeader>
                     <CardTitle>{title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="h-[280px] w-full">
+                    <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
+                            <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
                                 <Pie
                                     data={chartData}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={hasData ? 40 : 0}
-                                    outerRadius={hasData ? 80 : 60}
-                                    paddingAngle={hasData ? 3 : 0}
+                                    innerRadius={hasData ? 45 : 0}
+                                    outerRadius={hasData ? 90 : 60}
+                                    paddingAngle={hasData ? 2 : 0}
                                     dataKey="value"
                                     label={renderCustomizedLabel}
                                     labelLine={hasData}
@@ -161,11 +165,23 @@ export function PieCharts({
                                         <Cell
                                             key={`cell-${index}`}
                                             fill={hasData ? COLORS[index % COLORS.length] : '#e5e7eb'}
+                                            stroke={hasData ? '#fff' : 'transparent'}
+                                            strokeWidth={1}
                                         />
                                     ))}
                                 </Pie>
                                 <Tooltip content={<CustomTooltip />} />
-                                {hasData && <Legend verticalAlign="bottom" height={36} />}
+                                {hasData && (
+                                    <Legend
+                                        layout="horizontal"
+                                        verticalAlign="bottom"
+                                        align="center"
+                                        height={36}
+                                        formatter={(value) => (
+                                            <span style={{ color: '#666', fontSize: '12px' }}>{value}</span>
+                                        )}
+                                    />
+                                )}
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
@@ -175,7 +191,7 @@ export function PieCharts({
     };
 
     return (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {renderPieChart(revenueByStore, 'Doanh thu theo cửa hàng')}
             {renderPieChart(expenseDistribution, 'Chi phí theo loại')}
             {renderPieChart(revenueByPaymentMethod, 'Doanh thu theo phương thức thanh toán')}
