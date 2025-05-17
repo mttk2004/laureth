@@ -54,8 +54,14 @@ class AttendanceController extends Controller
     $result = $this->attendanceService->checkIn($user->id, $shiftId);
 
     if ($result) {
+      // Lấy thông tin mới nhất sau khi check-in
+      $currentShift = $this->attendanceService->getCurrentShift($user->id);
+      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
+
       return redirect()->route('attendance.index')
-        ->with('success', 'Chấm công vào ca làm việc thành công.');
+        ->with('success', 'Chấm công vào ca làm việc thành công.')
+        ->with('currentShift', $currentShift)
+        ->with('attendanceHistory', $attendanceHistory);
     } else {
       return redirect()->route('attendance.index')
         ->with('error', 'Không thể chấm công vào. Vui lòng thử lại sau.');
@@ -77,8 +83,14 @@ class AttendanceController extends Controller
     $result = $this->attendanceService->checkOut($user->id, $shiftId);
 
     if ($result) {
+      // Lấy thông tin mới nhất sau khi check-out
+      $currentShift = $this->attendanceService->getCurrentShift($user->id);
+      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
+
       return redirect()->route('attendance.index')
-        ->with('success', 'Chấm công ra ca làm việc thành công.');
+        ->with('success', 'Chấm công ra ca làm việc thành công.')
+        ->with('currentShift', $currentShift)
+        ->with('attendanceHistory', $attendanceHistory);
     } else {
       return redirect()->route('attendance.index')
         ->with('error', 'Không thể chấm công ra. Vui lòng thử lại sau.');

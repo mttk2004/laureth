@@ -51,9 +51,12 @@ class AttendanceService extends BaseService
    */
   public function getAttendanceHistory(string $userId, int $limit = 10)
   {
-    return AttendanceRecord::where('user_id', $userId)
+    return AttendanceRecord::where('attendance_records.user_id', $userId)
       ->with(['shift'])
-      ->orderBy('created_at', 'desc')
+      ->join('shifts', 'attendance_records.shift_id', '=', 'shifts.id')
+      ->select('attendance_records.*')
+      ->orderBy('shifts.date', 'desc')
+      ->orderBy('attendance_records.created_at', 'desc')
       ->paginate($limit);
   }
 

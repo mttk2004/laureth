@@ -3,12 +3,13 @@ import { AttendanceRecord } from '@/types/attendance_record';
 import { Shift, ShiftType } from '@/types/shift';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { formatTime } from '@/lib/format';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ClockIcon } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface AttendancePageProps {
   user: User;
@@ -27,6 +28,9 @@ interface AttendancePageProps {
 }
 
 export default function AttendanceIndex({ user, currentShift, attendanceHistory }: AttendancePageProps) {
+  const [processing, setProcessing] = useState(false);
+  const { addToast } = useToast();
+
   // Kiểm tra trạng thái check-in/check-out của ca làm việc hiện tại
   const canCheckIn = useMemo(() => {
     if (!currentShift) return false;
@@ -42,19 +46,45 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
 
   // Xử lý sự kiện check-in
   const handleCheckIn = () => {
-    if (!currentShift) return;
+    if (!currentShift || processing) return;
+
+    setProcessing(true);
 
     router.post(route('attendance.check-in'), {
       shift_id: currentShift.id,
+    }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        addToast('Chấm công vào ca làm việc thành công', 'success');
+        setProcessing(false);
+      },
+      onError: (errors) => {
+        console.error(errors);
+        addToast('Không thể chấm công vào. Vui lòng thử lại sau.', 'error');
+        setProcessing(false);
+      }
     });
   };
 
   // Xử lý sự kiện check-out
   const handleCheckOut = () => {
-    if (!currentShift) return;
+    if (!currentShift || processing) return;
+
+    setProcessing(true);
 
     router.post(route('attendance.check-out'), {
       shift_id: currentShift.id,
+    }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        addToast('Chấm công ra ca làm việc thành công', 'success');
+        setProcessing(false);
+      },
+      onError: (errors) => {
+        console.error(errors);
+        addToast('Không thể chấm công ra. Vui lòng thử lại sau.', 'error');
+        setProcessing(false);
+      }
     });
   };
 
@@ -115,17 +145,17 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
                 <div className="flex justify-center gap-4">
                   <Button
                     onClick={handleCheckIn}
-                    disabled={!canCheckIn}
+                    disabled={!canCheckIn || processing}
                     className="bg-green-600 hover:bg-green-700"
                   >
-                    Chấm công vào
+                    {processing && canCheckIn ? 'Đang xử lý...' : 'Chấm công vào'}
                   </Button>
                   <Button
                     onClick={handleCheckOut}
-                    disabled={!canCheckOut}
+                    disabled={!canCheckOut || processing}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
-                    Chấm công ra
+                    {processing && canCheckOut ? 'Đang xử lý...' : 'Chấm công ra'}
                   </Button>
                 </div>
               </div>
