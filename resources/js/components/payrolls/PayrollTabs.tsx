@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Building, User as UserIcon } from 'lucide-react';
@@ -25,6 +25,8 @@ interface PayrollTabsProps {
     }[];
   };
   handlePageChange: (page: number) => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
 export function PayrollTabs({
@@ -35,13 +37,36 @@ export function PayrollTabs({
   handleApprovePayroll,
   payrolls,
   handlePageChange,
+  activeTab = "byStore",
+  onTabChange,
 }: PayrollTabsProps) {
+  // State để lưu trữ tab hiện tại
+  const [currentTab, setCurrentTab] = useState(activeTab);
+
+  // Cập nhật tab khi prop activeTab thay đổi
+  useEffect(() => {
+    setCurrentTab(activeTab);
+  }, [activeTab]);
+
   // Kiểm tra xem links có tồn tại và có đủ phần tử không
   const hasPageLinks = payrolls.links && payrolls.links.length > 3;
 
+  // Xử lý khi tab thay đổi
+  const handleTabChange = (tab: string) => {
+    setCurrentTab(tab);
+    if (onTabChange) {
+      onTabChange(tab);
+    }
+  };
+
   return (
     <>
-      <Tabs defaultValue="byStore" className="w-full">
+      <Tabs
+        defaultValue="byStore"
+        value={currentTab}
+        onValueChange={handleTabChange}
+        className="w-full"
+      >
         <TabsList className="mb-4">
           <TabsTrigger value="byStore">Theo cửa hàng</TabsTrigger>
           <TabsTrigger value="byRole">Theo vai trò</TabsTrigger>
@@ -145,6 +170,13 @@ export function PayrollTabs({
                 ? null
                 : parseInt(link.label);
 
+              // Sửa lại hàm xử lý khi nhấn nút phân trang để giữ nguyên tab hiện tại
+              const handlePageClick = () => {
+                if (page) {
+                  handlePageChange(page);
+                }
+              };
+
               return (
                 <Button
                   key={i}
@@ -152,7 +184,7 @@ export function PayrollTabs({
                   size="sm"
                   className="w-9 h-9"
                   disabled={!page}
-                  onClick={() => page && handlePageChange(page)}
+                  onClick={handlePageClick}
                 >
                   {link.label}
                 </Button>

@@ -39,6 +39,9 @@ class PayrollController extends Controller
     // Lấy danh sách cửa hàng để hiển thị trong filter
     $stores = Store::all();
 
+    // Lấy tab đang được chọn từ request
+    $activeTab = $request->input('activeTab', 'byStore');
+
     return Inertia::render('Payrolls/Index', [
       'payrolls' => $payrolls,
       'summary' => $summary,
@@ -46,6 +49,7 @@ class PayrollController extends Controller
       'user' => Auth::user(),
       'filters' => $request->only(['month', 'year', 'status', 'store_id', 'position', 'name']),
       'sort' => $request->input('sort', 'created_at_desc'),
+      'activeTab' => $activeTab,
     ]);
   }
 
@@ -64,6 +68,7 @@ class PayrollController extends Controller
 
     $this->payrollService->approvePayroll($payroll);
 
+    // Chuyển hướng về trang danh sách
     return redirect()->route('payrolls.index')
       ->with('success', 'Đã duyệt thanh toán lương thành công.');
   }

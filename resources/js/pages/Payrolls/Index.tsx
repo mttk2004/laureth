@@ -32,6 +32,7 @@ interface PageProps {
     name?: string;
   };
   sort: string;
+  activeTab?: string;
 }
 
 interface PayrollsPageProps extends PageProps {
@@ -58,9 +59,10 @@ interface PayrollsPageProps extends PageProps {
     name?: string;
   };
   sort: string;
+  activeTab?: string;
 }
 
-export default function Index({ payrolls, summary, stores, user, filters, sort }: PayrollsPageProps) {
+export default function Index({ payrolls, summary, stores, user, filters, sort, activeTab = 'byStore' }: PayrollsPageProps) {
   const { addToast } = useToast();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState(filters.name || '');
@@ -71,6 +73,9 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
     store_id: filters.store_id || 'all',
     position: filters.position || 'all',
   });
+
+  // State để lưu trữ tab hiện tại
+  const [currentTab, setCurrentTab] = useState(activeTab);
 
   // State cho chọn tháng/năm hiện tại
   const [selectedPeriod, setSelectedPeriod] = useState(
@@ -88,6 +93,7 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
       ...filterData,
       name: searchFilter,
       sort,
+      activeTab: currentTab,
     });
     setIsFilterOpen(false);
   };
@@ -108,6 +114,7 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
       ...resetData,
       name: '',
       sort,
+      activeTab: currentTab,
     });
     setIsFilterOpen(false);
   };
@@ -119,6 +126,7 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
       ...filters,
       name: searchFilter,
       sort,
+      activeTab: currentTab,
     });
   };
 
@@ -127,6 +135,7 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
     router.get('/payrolls', {
       ...filters,
       sort: value,
+      activeTab: currentTab,
     });
   };
 
@@ -136,7 +145,13 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
       ...filters,
       sort,
       page,
+      activeTab: currentTab,
     });
+  };
+
+  // Xử lý khi thay đổi tab
+  const handleTabChange = (tab: string) => {
+    setCurrentTab(tab);
   };
 
   // Xử lý duyệt lương
@@ -230,6 +245,8 @@ export default function Index({ payrolls, summary, stores, user, filters, sort }
             handleApprovePayroll={handleApprovePayroll}
             payrolls={payrolls}
             handlePageChange={handlePageChange}
+            activeTab={currentTab}
+            onTabChange={handleTabChange}
           />
         </div>
       </div>
