@@ -85,10 +85,10 @@ export function PieCharts({ revenueByStore, revenueByPaymentMethod, revenueByCat
                     return null;
                 }
                 return (
-                    <div className="rounded-md border border-gray-200 bg-white p-2 text-sm shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                    <div className="rounded-md border border-gray-200 bg-white p-2 text-sm shadow-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
                         <p className="font-medium">{payload[0].name}</p>
                         <p>{formatCurrency(payload[0].value)}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-500 dark:text-gray-300">
                             {hasData ? `${Math.round((payload[0].value / data.reduce((sum, item) => sum + item.value, 0)) * 100)}%` : '0%'}
                         </p>
                     </div>
