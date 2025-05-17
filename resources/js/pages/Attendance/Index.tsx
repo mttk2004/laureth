@@ -2,21 +2,24 @@ import { User } from '@/types/user';
 import { AttendanceRecord } from '@/types/attendance_record';
 import { Shift, ShiftType } from '@/types/shift';
 import { Button } from '@/components/ui/button';
-import { PageProps } from '@inertiajs/react';
 import { DataTable } from '@/components/ui/data-table';
 import { useMemo } from 'react';
-import { router } from '@inertiajs/react';
-import { formatDateTime, formatTime } from '@/lib/format';
-import { StaffLayout } from '@/layouts/staff-layout';
+import { Head, router } from '@inertiajs/react';
+import { formatTime } from '@/lib/format';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ClockIcon } from 'lucide-react';
 
-interface AttendancePageProps extends PageProps {
+interface AttendancePageProps {
   user: User;
   currentShift: Shift & { attendanceRecord?: AttendanceRecord | null };
   attendanceHistory: {
     data: (AttendanceRecord & { shift: Shift })[];
-    links: any[];
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
     from: number;
     to: number;
     total: number;
@@ -61,8 +64,10 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
   };
 
   return (
-    <StaffLayout user={user}>
-      <div className="container py-6 space-y-6">
+    <AppLayout user={user}>
+      <Head title="Chấm công" />
+
+      <div className="space-y-6">
         <h1 className="text-2xl font-bold">Chấm công</h1>
 
         {/* Thông tin ca làm việc hiện tại */}
@@ -178,6 +183,6 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
           />
         </div>
       </div>
-    </StaffLayout>
+    </AppLayout>
   );
 }
