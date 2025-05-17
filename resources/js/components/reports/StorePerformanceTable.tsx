@@ -10,6 +10,7 @@ interface StorePerformance {
     revenueTarget: number;
     percentageComplete: number;
     manager: string;
+    monthlyTarget?: number;
 }
 
 interface StorePerformanceTableProps {
@@ -18,6 +19,9 @@ interface StorePerformanceTableProps {
 
 export function StorePerformanceTable({ stores }: StorePerformanceTableProps) {
     const hasStores = stores && stores.length > 0;
+
+    // Debug thông tin
+    console.log('Store performance data:', stores);
 
     return (
         <Card>

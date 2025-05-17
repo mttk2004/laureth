@@ -12,6 +12,7 @@ interface EmployeePerformance {
     total_sales: number;
     avg_order_value?: number;
     total_hours?: number;
+    performance?: number;
 }
 
 interface EmployeePerformanceCardProps {
@@ -181,7 +182,7 @@ export function EmployeePerformanceCard({
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-semibold">
-                                                {formatCurrency(employee.total_sales / (employee.total_hours || 1))}/giờ
+                                                {formatCurrency(employee.performance || (employee.total_sales / (employee.total_hours || 1)))}/giờ
                                             </p>
                                             <p className="text-muted-foreground text-xs">{employee.total_hours || 0} giờ làm việc</p>
                                         </div>

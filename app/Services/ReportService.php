@@ -183,51 +183,76 @@ class ReportService
     // Nếu không chỉ định năm thì lấy năm hiện tại
     $year = $year ?? Carbon::now()->year;
 
-    // Sử dụng Query Builder để lấy dữ liệu từ database một cách chính xác
-    $storePerformance = DB::table('stores as s')
-      ->leftJoin('users as u', function ($join) {
-        $join->on('s.manager_id', '=', 'u.id')
-          ->where('u.position', '=', 'SM');
-      })
-      ->leftJoin('orders as o', function ($join) use ($year) {
-        $join->on('s.id', '=', 'o.store_id')
-          ->whereYear('o.order_date', $year)
-          ->where('o.status', '=', 'completed');
-      })
+    // Lấy thông tin cơ bản của các cửa hàng
+    $storeData = DB::table('stores as s')
       ->select([
         's.id',
         's.name',
         's.monthly_target',
-        DB::raw('u.full_name as manager'),
-        DB::raw('SUM(o.final_amount) as actualRevenue')
+        DB::raw('u.full_name as manager_name')
       ])
-      ->groupBy('s.id', 's.name', 's.monthly_target', 'u.full_name')
-      ->get()
-      ->map(function ($store) {
-        // Đảm bảo actualRevenue không null
-        $actualRevenue = $store->actualRevenue ?? 0;
-
-        // Tính chỉ tiêu doanh thu cả năm (monthly_target * 12)
-        $revenueTarget = $store->monthly_target * 12;
-
-        // Tính phần trăm hoàn thành chỉ tiêu
-        $percentageComplete = $revenueTarget > 0 ? round(($actualRevenue / $revenueTarget) * 100, 2) : 0;
-
-        return [
-          'id' => $store->id,
-          'name' => $store->name,
-          'actualRevenue' => (float) $actualRevenue,
-          'revenueTarget' => (float) $revenueTarget,
-          'percentageComplete' => $percentageComplete,
-          'manager' => $store->manager ?? 'Chưa có quản lý',
-        ];
+      ->leftJoin('users as u', function ($join) {
+        $join->on('s.manager_id', '=', 'u.id')
+          ->where('u.position', '=', 'SM');
       })
+      ->orderBy('s.name')
+      ->get();
+
+    // Lấy doanh thu thực tế của mỗi cửa hàng
+    $storeRevenue = DB::table('orders')
+      ->select('store_id', DB::raw('SUM(final_amount) as revenue'))
+      ->whereYear('order_date', $year)
+      ->where('status', 'completed')
+      ->groupBy('store_id')
+      ->pluck('revenue', 'store_id')
       ->toArray();
+
+    // Xử lý dữ liệu cho từng cửa hàng
+    $storePerformance = [];
+    foreach ($storeData as $store) {
+      // Lấy chỉ tiêu hàng tháng từ CSDL
+      $monthlyTarget = (float) $store->monthly_target;
+
+      // Chỉ tiêu cả năm = chỉ tiêu tháng * 12 tháng
+      $annualTarget = $monthlyTarget * 12;
+
+      // Doanh thu thực tế (0 nếu không có dữ liệu)
+      $actualRevenue = isset($storeRevenue[$store->id]) ? (float) $storeRevenue[$store->id] : 0;
+
+      // Tính phần trăm hoàn thành
+      $percentComplete = $annualTarget > 0 ? round(($actualRevenue / $annualTarget) * 100, 2) : 0;
+
+      // Thêm vào danh sách kết quả
+      $storePerformance[] = [
+        'id' => $store->id,
+        'name' => $store->name,
+        'actualRevenue' => $actualRevenue,
+        'revenueTarget' => $annualTarget,
+        'percentageComplete' => $percentComplete,
+        'manager' => $store->manager_name ?? 'Chưa có quản lý',
+      ];
+    }
 
     // Sắp xếp theo phần trăm hoàn thành giảm dần
     usort($storePerformance, function ($a, $b) {
       return $b['percentageComplete'] <=> $a['percentageComplete'];
     });
+
+    // Ghi log cho việc debug
+    Log::debug('Store Performance Data', [
+      'year' => $year,
+      'store_targets' => $storeData->pluck('monthly_target', 'id'),
+      'store_revenues' => $storeRevenue,
+      'processed_data' => array_map(function ($store) {
+        return [
+          'id' => $store['id'],
+          'name' => $store['name'],
+          'revenue' => $store['actualRevenue'],
+          'target' => $store['revenueTarget'],
+          'percent' => $store['percentageComplete'],
+        ];
+      }, $storePerformance)
+    ]);
 
     return [
       'stores' => $storePerformance,
@@ -313,11 +338,7 @@ class ReportService
 
     // Lấy danh sách nhân viên có doanh số cao nhất
     $topEmployeesBySales = DB::table('users as u')
-      ->leftJoin('orders as o', function ($join) use ($year) {
-        $join->on('u.id', '=', 'o.user_id')
-          ->whereYear('o.order_date', $year)
-          ->where('o.status', '=', 'completed');
-      })
+      ->join('orders as o', 'u.id', '=', 'o.user_id')
       ->selectRaw('
           u.id,
           u.full_name,
@@ -325,8 +346,9 @@ class ReportService
           COUNT(o.id) as orders_count,
           SUM(o.final_amount) as total_sales
       ')
+      ->whereYear('o.order_date', $year)
+      ->where('o.status', '=', 'completed')
       ->whereIn('u.position', ['SL', 'SA']) // Chỉ lấy nhân viên bán hàng và trưởng ca
-      ->whereNotNull('o.id') // Chỉ lấy nhân viên có đơn hàng
       ->groupBy('u.id', 'u.full_name', 'u.position')
       ->orderByDesc('total_sales')
       ->limit($limit)
@@ -334,11 +356,7 @@ class ReportService
 
     // Lấy danh sách nhân viên có số lượng đơn hàng cao nhất
     $topEmployeesByCount = DB::table('users as u')
-      ->leftJoin('orders as o', function ($join) use ($year) {
-        $join->on('u.id', '=', 'o.user_id')
-          ->whereYear('o.order_date', $year)
-          ->where('o.status', '=', 'completed');
-      })
+      ->join('orders as o', 'u.id', '=', 'o.user_id')
       ->selectRaw('
           u.id,
           u.full_name,
@@ -346,8 +364,9 @@ class ReportService
           COUNT(o.id) as orders_count,
           SUM(o.final_amount) as total_sales
       ')
+      ->whereYear('o.order_date', $year)
+      ->where('o.status', '=', 'completed')
       ->whereIn('u.position', ['SL', 'SA']) // Chỉ lấy nhân viên bán hàng và trưởng ca
-      ->whereNotNull('o.id') // Chỉ lấy nhân viên có đơn hàng
       ->groupBy('u.id', 'u.full_name', 'u.position')
       ->orderByDesc('orders_count')
       ->limit($limit)
@@ -355,59 +374,100 @@ class ReportService
 
     // Lấy nhân viên với giá trị đơn hàng trung bình cao nhất
     $topEmployeesByAvgOrder = DB::table('users as u')
-      ->leftJoin('orders as o', function ($join) use ($year) {
-        $join->on('u.id', '=', 'o.user_id')
-          ->whereYear('o.order_date', $year)
-          ->where('o.status', '=', 'completed');
-      })
+      ->join('orders as o', 'u.id', '=', 'o.user_id')
       ->selectRaw('
           u.id,
           u.full_name,
           u.position,
           COUNT(o.id) as orders_count,
           SUM(o.final_amount) as total_sales,
-          CASE WHEN COUNT(o.id) > 0 THEN SUM(o.final_amount) / COUNT(o.id) ELSE 0 END as avg_order_value
+          SUM(o.final_amount) / COUNT(o.id) as avg_order_value
       ')
+      ->whereYear('o.order_date', $year)
+      ->where('o.status', '=', 'completed')
       ->whereIn('u.position', ['SL', 'SA'])
-      ->whereNotNull('o.id') // Chỉ lấy nhân viên có đơn hàng
       ->groupBy('u.id', 'u.full_name', 'u.position')
       ->orderByDesc('avg_order_value')
       ->limit($limit)
       ->get();
 
-    // Cải thiện tính hiệu suất cho mỗi nhân viên (doanh thu / số giờ làm việc)
-    $employeePerformance = DB::table('users as u')
+    // Lấy dữ liệu số giờ làm việc
+    $workingHours = DB::table('attendance_records as ar')
+      ->join('shifts as s', 'ar.shift_id', '=', 's.id')
+      ->join('users as u', 'ar.user_id', '=', 'u.id')
       ->selectRaw('
-          u.id,
-          u.full_name,
-          u.position,
-          u.store_id,
-          (SELECT SUM(ar.total_hours)
-           FROM attendance_records ar
-           JOIN shifts s ON ar.shift_id = s.id
-           WHERE ar.user_id = u.id
-           AND YEAR(s.date) = ?
-           AND s.status = "completed"
-           AND ar.total_hours IS NOT NULL) as total_hours,
-          (SELECT SUM(o.final_amount)
-           FROM orders o
-           WHERE o.user_id = u.id
-           AND YEAR(o.order_date) = ?
-           AND o.status = "completed") as total_sales
+          ar.user_id,
+          SUM(ar.total_hours) as total_hours
       ')
+      ->whereYear('s.date', $year)
+      ->where('s.status', '=', 'completed')
+      ->whereNotNull('ar.check_in')
+      ->whereNotNull('ar.check_out')
+      ->whereNotNull('ar.total_hours')
       ->whereIn('u.position', ['SL', 'SA'])
-      ->addBinding([$year, $year], 'select')
-      ->havingRaw('total_hours > 0 AND total_sales > 0')
-      ->orderByRaw('total_sales / total_hours DESC')
-      ->limit($limit)
-      ->get();
+      ->groupBy('ar.user_id')
+      ->pluck('total_hours', 'user_id');
 
-    // Chuyển đổi các giá trị số sang đúng kiểu dữ liệu
-    $employeePerformance = collect($employeePerformance)->map(function ($employee) {
-      $employee->total_hours = (float) $employee->total_hours;
-      $employee->total_sales = (float) $employee->total_sales;
-      return $employee;
+    // Lấy doanh số bán hàng
+    $salesData = DB::table('orders as o')
+      ->join('users as u', 'o.user_id', '=', 'u.id')
+      ->selectRaw('
+          o.user_id,
+          SUM(o.final_amount) as total_sales
+      ')
+      ->whereYear('o.order_date', $year)
+      ->where('o.status', '=', 'completed')
+      ->whereIn('u.position', ['SL', 'SA'])
+      ->groupBy('o.user_id')
+      ->pluck('total_sales', 'user_id');
+
+    // Lấy thông tin cơ bản về nhân viên
+    $employeesInfo = DB::table('users')
+      ->select('id', 'full_name', 'position', 'store_id')
+      ->whereIn('position', ['SL', 'SA'])
+      ->get()
+      ->keyBy('id');
+
+    // Tính hiệu suất nhân viên (doanh thu / số giờ làm việc)
+    $employeePerformance = [];
+    foreach ($workingHours as $userId => $hours) {
+      // Chỉ xét nhân viên có cả giờ làm và doanh số
+      if (isset($salesData[$userId]) && isset($employeesInfo[$userId])) {
+        $sales = (float) $salesData[$userId];
+        $hours = (float) $hours;
+
+        // Kiểm tra để tránh chia cho 0
+        if ($hours > 0 && $sales > 0) {
+          $performance = $sales / $hours;
+          $employee = $employeesInfo[$userId];
+
+          $employeePerformance[] = [
+            'id' => $userId,
+            'full_name' => $employee->full_name,
+            'position' => $employee->position,
+            'store_id' => $employee->store_id,
+            'total_hours' => $hours,
+            'total_sales' => $sales,
+            'performance' => $performance
+          ];
+        }
+      }
+    }
+
+    // Sắp xếp theo hiệu suất giảm dần
+    usort($employeePerformance, function ($a, $b) {
+      return $b['performance'] <=> $a['performance'];
     });
+
+    // Giới hạn số lượng kết quả
+    $employeePerformance = array_slice($employeePerformance, 0, $limit);
+
+    // Ghi log dữ liệu để debug
+    Log::debug('Employee Performance Data:', [
+      'working_hours' => $workingHours,
+      'sales_data' => $salesData,
+      'top_performance' => $employeePerformance
+    ]);
 
     return [
       'topEmployeesBySales' => $topEmployeesBySales,
@@ -482,32 +542,35 @@ class ReportService
    */
   private function getRevenueByStore(int $year): array
   {
-    // Sử dụng Query Builder để lấy dữ liệu từ database một cách chính xác
-    $results = DB::table('stores as s')
-      ->leftJoin('orders as o', function ($join) use ($year) {
-        $join->on('s.id', '=', 'o.store_id')
-          ->whereYear('o.order_date', $year)
-          ->where('o.status', '=', 'completed');
-      })
+    // Lấy dữ liệu doanh thu theo cửa hàng trực tiếp từ database
+    $result = DB::table('orders as o')
+      ->join('stores as s', 'o.store_id', '=', 's.id')
       ->select([
         's.id',
         's.name',
         DB::raw('SUM(o.final_amount) as revenue')
       ])
+      ->whereYear('o.order_date', $year)
+      ->where('o.status', 'completed')
       ->groupBy('s.id', 's.name')
       ->having('revenue', '>', 0)
       ->orderBy('revenue', 'desc')
       ->get();
 
-    // Chuyển đổi từ collection sang mảng với đúng cấu trúc
-    $revenueData = $results->map(function ($item) {
-      return [
+    // Chuyển đổi dữ liệu sang đúng định dạng
+    $revenueData = [];
+    foreach ($result as $item) {
+      $revenueData[] = [
         'name' => $item->name,
         'value' => (float) $item->revenue,
       ];
-    })->toArray();
+    }
 
-    Log::debug('getRevenueByStore detail: ' . json_encode($revenueData));
+    // Ghi log dữ liệu để debug
+    Log::debug('getRevenueByStore detail:', [
+      'raw_data' => $result,
+      'formatted_data' => $revenueData
+    ]);
 
     return $revenueData;
   }
@@ -557,7 +620,8 @@ class ReportService
    */
   private function getRevenueByCategory(int $year): array
   {
-    $results = DB::table('order_items as oi')
+    // Lấy dữ liệu doanh thu theo danh mục sản phẩm trực tiếp từ database
+    $result = DB::table('order_items as oi')
       ->join('orders as o', 'oi.order_id', '=', 'o.id')
       ->join('products as p', 'oi.product_id', '=', 'p.id')
       ->join('categories as c', 'p.category_id', '=', 'c.id')
@@ -572,17 +636,22 @@ class ReportService
       ->orderByDesc('revenue')
       ->get();
 
-    // Chuyển đổi từ collection sang mảng với đúng cấu trúc
-    $data = $results->map(function ($item) {
-      return [
+    // Chuyển đổi dữ liệu sang đúng định dạng
+    $revenueData = [];
+    foreach ($result as $item) {
+      $revenueData[] = [
         'name' => $item->name,
         'value' => (float) $item->revenue,
       ];
-    })->toArray();
+    }
 
-    Log::debug('getRevenueByCategory detail: ' . json_encode($data));
+    // Ghi log dữ liệu để debug
+    Log::debug('getRevenueByCategory detail:', [
+      'raw_data' => $result,
+      'formatted_data' => $revenueData
+    ]);
 
-    return $data;
+    return $revenueData;
   }
 
   /**
