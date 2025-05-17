@@ -16,8 +16,8 @@ class OrderFactory extends Factory
    */
   public function definition(): array
   {
-    $totalAmount = $this->faker->numberBetween(500, 10000) * 1000; // Tổng tiền đơn hàng từ 500k đến 10M
-    $discountAmount = $this->faker->numberBetween(0, 5) * $totalAmount / 100; // Số tiền giảm giá từ 0-5% tổng tiền
+    $totalAmount = $this->faker->numberBetween(500, 20000) * 1000; // Tổng tiền đơn hàng từ 500k đến 20M
+    $discountAmount = $this->faker->numberBetween(0, 3) * $totalAmount / 100; // Số tiền giảm giá từ 0-3% tổng tiền
     $finalAmount = $totalAmount - $discountAmount;
 
     return [

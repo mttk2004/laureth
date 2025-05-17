@@ -20,8 +20,8 @@ class OrderSeeder extends Seeder
     $stores = Store::all();
     $salesPeople = User::whereIn('position', ['SA', 'SL'])->whereNotNull('store_id')->get();
 
-    // Tạo 240 đơn hàng
-    for ($i = 0; $i < 240; $i++) {
+    // Tạo 360 đơn hàng
+    for ($i = 0; $i < 360; $i++) {
       $user = $salesPeople->random();
       $store = Store::find($user->store_id);
 
