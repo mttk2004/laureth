@@ -30,6 +30,12 @@ export function PieCharts({
     revenueByCategory,
     expenseDistribution
 }: PieChartsProps) {
+    // Ghi log dữ liệu nhận được từ backend
+    console.log('PieCharts - revenueByStore:', revenueByStore);
+    console.log('PieCharts - revenueByPaymentMethod:', revenueByPaymentMethod);
+    console.log('PieCharts - revenueByCategory:', revenueByCategory);
+    console.log('PieCharts - expenseDistribution:', expenseDistribution);
+
     // Sử dụng mã màu HEX rõ ràng thay vì CSS vars để đảm bảo hiển thị đúng
     const COLORS = [
         '#4B7BEC',  // Xanh dương
@@ -45,6 +51,14 @@ export function PieCharts({
     ];
 
     const renderPieChart = (data: PieChartDataItem[], title: string) => {
+        console.log(`renderPieChart - ${title} data:`, data);
+
+        // Kiểm tra nếu data là null, undefined hoặc mảng rỗng
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            console.log(`renderPieChart - ${title} dữ liệu không hợp lệ:`, data);
+            return renderEmptyChart(title);
+        }
+
         // Giới hạn chỉ hiển thị top 5 phần tử, và gộp các phần tử còn lại vào "Khác"
         let chartData = [...data];
         if (chartData.length > 5) {
@@ -59,13 +73,15 @@ export function PieCharts({
 
         // Thêm kiểm tra dữ liệu trống
         const hasData = chartData.some(item => item.value > 0);
+        console.log(`renderPieChart - ${title} hasData:`, hasData);
 
         // Nếu không có dữ liệu, hiển thị thông báo
         if (!hasData) {
-            chartData = [
-                { name: 'Không có dữ liệu', value: 1 }
-            ];
+            console.log(`renderPieChart - ${title} không có dữ liệu`);
+            return renderEmptyChart(title);
         }
+
+        console.log(`renderPieChart - ${title} chartData final:`, chartData);
 
         const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
             if (active && payload && payload.length) {
@@ -190,12 +206,55 @@ export function PieCharts({
         );
     };
 
+    // Hàm hiển thị biểu đồ trống khi không có dữ liệu
+    const renderEmptyChart = (title: string) => {
+        const emptyData = [{ name: 'Không có dữ liệu', value: 1 }];
+
+        return (
+            <Card className="w-full overflow-hidden">
+                <CardHeader>
+                    <CardTitle>{title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="h-[300px] w-full flex flex-col items-center justify-center">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                                <Pie
+                                    data={emptyData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={0}
+                                    outerRadius={60}
+                                    paddingAngle={0}
+                                    dataKey="value"
+                                    isAnimationActive={false}
+                                >
+                                    <Cell fill="#e5e7eb" stroke="transparent" />
+                                </Pie>
+                                <text
+                                    x="50%"
+                                    y="50%"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    fill="#888"
+                                    fontSize={14}
+                                >
+                                    Không có dữ liệu
+                                </text>
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    };
+
     return (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {renderPieChart(revenueByStore, 'Doanh thu theo cửa hàng')}
-            {renderPieChart(expenseDistribution, 'Chi phí theo loại')}
-            {renderPieChart(revenueByPaymentMethod, 'Doanh thu theo phương thức thanh toán')}
-            {renderPieChart(revenueByCategory, 'Doanh thu theo danh mục')}
+            {renderPieChart(revenueByStore || [], 'Doanh thu theo cửa hàng')}
+            {renderPieChart(expenseDistribution || [], 'Chi phí theo loại')}
+            {renderPieChart(revenueByPaymentMethod || [], 'Doanh thu theo phương thức thanh toán')}
+            {renderPieChart(revenueByCategory || [], 'Doanh thu theo danh mục')}
         </div>
     );
 }

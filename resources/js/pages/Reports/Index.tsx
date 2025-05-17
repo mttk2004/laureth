@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
 import { User } from '@/types/user';
@@ -92,6 +92,22 @@ export default function ReportsIndex({
     const [selectedPeriod, setSelectedPeriod] = useState(period);
     const [selectedYear, setSelectedYear] = useState(year);
 
+    // Log dữ liệu khi component render
+    useEffect(() => {
+        console.log('Reports/Index - Props:', {
+            revenueSummary,
+            expenseSummary,
+            storePerformance,
+            productPerformance
+        });
+        console.log('Reports/Index - Các biểu đồ tròn:', {
+            revenueByStore: revenueSummary.revenueByStore,
+            revenueByPaymentMethod: revenueSummary.revenueByPaymentMethod,
+            revenueByCategory: revenueSummary.revenueByCategory,
+            expenseDistribution: expenseSummary.expenseDistribution
+        });
+    }, [revenueSummary, expenseSummary, storePerformance, productPerformance]);
+
     const handlePeriodChange = (newPeriod: string) => {
         setSelectedPeriod(newPeriod);
         router.get('/reports', { period: newPeriod, year: selectedYear }, { preserveState: true });
@@ -100,6 +116,31 @@ export default function ReportsIndex({
     const handleYearChange = (newYear: number) => {
         setSelectedYear(newYear);
         router.get('/reports', { period: selectedPeriod, year: newYear }, { preserveState: true });
+    };
+
+    // Kiểm tra xem dữ liệu biểu đồ có đúng định dạng không
+    const validatePieData = (data: unknown): PieChartDataItem[] => {
+        if (!data || !Array.isArray(data)) {
+            console.error('Dữ liệu biểu đồ không phải là mảng:', data);
+            return [];
+        }
+
+        // Kiểm tra xem mỗi phần tử có đúng cấu trúc không
+        return data.filter(item => {
+            if (!item || typeof item !== 'object' || !('name' in item) || !('value' in item)) {
+                console.error('Phần tử biểu đồ không đúng cấu trúc:', item);
+                return false;
+            }
+            return true;
+        }) as PieChartDataItem[];
+    };
+
+    // Xử lý dữ liệu biểu đồ
+    const pieChartData = {
+        revenueByStore: validatePieData(revenueSummary.revenueByStore),
+        revenueByPaymentMethod: validatePieData(revenueSummary.revenueByPaymentMethod),
+        revenueByCategory: validatePieData(revenueSummary.revenueByCategory),
+        expenseDistribution: validatePieData(expenseSummary.expenseDistribution)
     };
 
     return (
@@ -136,10 +177,10 @@ export default function ReportsIndex({
                     {/* Biểu đồ tròn */}
                     <div className="mb-6">
                         <PieCharts
-                            revenueByStore={revenueSummary.revenueByStore}
-                            revenueByPaymentMethod={revenueSummary.revenueByPaymentMethod}
-                            revenueByCategory={revenueSummary.revenueByCategory}
-                            expenseDistribution={expenseSummary.expenseDistribution}
+                            revenueByStore={pieChartData.revenueByStore}
+                            revenueByPaymentMethod={pieChartData.revenueByPaymentMethod}
+                            revenueByCategory={pieChartData.revenueByCategory}
+                            expenseDistribution={pieChartData.expenseDistribution}
                         />
                     </div>
 

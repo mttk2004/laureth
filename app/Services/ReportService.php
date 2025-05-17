@@ -8,6 +8,7 @@ use App\Models\PurchaseOrder;
 use App\Models\Store;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReportService
 {
@@ -64,12 +65,15 @@ class ReportService
 
     // Tổng doanh thu theo cửa hàng
     $revenueByStore = $this->getRevenueByStore($year);
+    Log::info('revenueByStore: ' . json_encode($revenueByStore));
 
     // Tổng doanh thu theo phương thức thanh toán
     $revenueByPaymentMethod = $this->getRevenueByPaymentMethod($year);
+    Log::info('revenueByPaymentMethod: ' . json_encode($revenueByPaymentMethod));
 
     // Tổng doanh thu theo danh mục sản phẩm
     $revenueByCategory = $this->getRevenueByCategory($year);
+    Log::info('revenueByCategory: ' . json_encode($revenueByCategory));
 
     return [
       'periodLabels' => $periodLabels,
@@ -142,11 +146,21 @@ class ReportService
     // Tính tổng chi phí
     $totalExpenses = array_sum($expenseByPeriod);
 
-    // Phân bổ chi phí
+    // Phân bổ chi phí - đảm bảo giá trị là số với ít nhất 0
     $expenseDistribution = [
-      ['name' => 'Nhập hàng', 'value' => $purchaseExpenses],
-      ['name' => 'Lương', 'value' => $payrollExpenses],
+      ['name' => 'Nhập hàng', 'value' => max((float)$purchaseExpenses, 0)],
+      ['name' => 'Lương', 'value' => max((float)$payrollExpenses, 0)],
     ];
+
+    // Loại bỏ các mục có giá trị bằng 0
+    $expenseDistribution = array_filter($expenseDistribution, function ($item) {
+      return $item['value'] > 0;
+    });
+
+    // Chuyển lại thành mảng tuần tự (indexed array)
+    $expenseDistribution = array_values($expenseDistribution);
+
+    Log::info('expenseDistribution: ' . json_encode($expenseDistribution));
 
     return [
       'periodLabels' => $periodLabels,
@@ -339,10 +353,13 @@ class ReportService
         ->where('status', 'completed')
         ->sum('final_amount');
 
-      $revenueData[] = [
-        'name' => $store->name,
-        'value' => $revenue,
-      ];
+      // Chỉ thêm vào nếu có doanh thu
+      if ($revenue > 0) {
+        $revenueData[] = [
+          'name' => $store->name,
+          'value' => (float)$revenue,
+        ];
+      }
     }
 
     // Sắp xếp theo doanh thu giảm dần
@@ -350,6 +367,10 @@ class ReportService
       return $b['value'] <=> $a['value'];
     });
 
+    // Chuyển lại thành mảng tuần tự (indexed array)
+    $revenueData = array_values($revenueData);
+
+    Log::debug('getRevenueByStore detail: ' . json_encode($revenueData));
     return $revenueData;
   }
 
@@ -374,12 +395,19 @@ class ReportService
         default => $method,
       };
 
-      $revenueData[] = [
-        'name' => $methodName,
-        'value' => $revenue,
-      ];
+      // Chỉ thêm vào nếu có doanh thu
+      if ($revenue > 0) {
+        $revenueData[] = [
+          'name' => $methodName,
+          'value' => (float)$revenue,
+        ];
+      }
     }
 
+    // Chuyển lại thành mảng tuần tự (indexed array)
+    $revenueData = array_values($revenueData);
+
+    Log::debug('getRevenueByPaymentMethod detail: ' . json_encode($revenueData));
     return $revenueData;
   }
 
@@ -388,7 +416,7 @@ class ReportService
    */
   private function getRevenueByCategory(int $year): array
   {
-    return DB::table('order_items')
+    $results = DB::table('order_items')
       ->join('orders', 'order_items.order_id', '=', 'orders.id')
       ->join('products', 'order_items.product_id', '=', 'products.id')
       ->join('categories', 'products.category_id', '=', 'categories.id')
@@ -397,8 +425,19 @@ class ReportService
       ->where('orders.status', 'completed')
       ->groupBy('categories.name')
       ->orderByDesc('value')
-      ->get()
-      ->toArray();
+      ->get();
+
+    // Chuyển đổi từ collection sang mảng với đúng cấu trúc
+    $data = [];
+    foreach ($results as $item) {
+      $data[] = [
+        'name' => $item->name,
+        'value' => (float) $item->value,
+      ];
+    }
+
+    Log::debug('getRevenueByCategory detail: ' . json_encode($data));
+    return $data;
   }
 
   /**

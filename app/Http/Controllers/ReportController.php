@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ReportController extends Controller
@@ -38,6 +39,14 @@ class ReportController extends Controller
 
     // Lấy hiệu suất sản phẩm (top 5)
     $productPerformance = $this->reportService->getProductPerformance($year, 5);
+
+    // Ghi log để kiểm tra dữ liệu biểu đồ
+    Log::info('Report controller data check:', [
+      'revenueByStore' => $revenueSummary['revenueByStore'],
+      'revenueByPaymentMethod' => $revenueSummary['revenueByPaymentMethod'],
+      'revenueByCategory' => $revenueSummary['revenueByCategory'],
+      'expenseDistribution' => $expenseSummary['expenseDistribution']
+    ]);
 
     // Lấy thông tin user
     $user = Auth::user();
