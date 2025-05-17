@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface PieChartDataItem {
     name: string;
@@ -30,13 +30,14 @@ export function PieCharts({
     revenueByCategory,
     expenseDistribution
 }: PieChartsProps) {
-    // Màu sắc sử dụng RGB để đảm bảo hiển thị đúng
+    // Màu sắc cố định RGB để đảm bảo hiển thị đúng
     const COLORS = [
-        'rgba(59, 130, 246, 0.8)',   // Xanh dương
-        'rgba(16, 185, 129, 0.8)',   // Xanh lá
-        'rgba(239, 68, 68, 0.8)',    // Đỏ
-        'rgba(245, 158, 11, 0.8)',   // Cam
-        'rgba(139, 92, 246, 0.8)'    // Tím
+        '#4B7BEC',  // Xanh dương
+        '#26DE81',  // Xanh lá
+        '#FD9644',  // Cam
+        '#EB3B5A',  // Đỏ
+        '#A55EEA',  // Tím
+        '#FFC312',  // Vàng
     ];
 
     const renderPieChart = (data: PieChartDataItem[], title: string) => {
@@ -45,7 +46,11 @@ export function PieCharts({
         if (chartData.length > 5) {
             const top5 = chartData.slice(0, 5);
             const otherSum = chartData.slice(5).reduce((sum, item) => sum + item.value, 0);
-            chartData = [...top5, { name: 'Khác', value: otherSum }];
+            if (otherSum > 0) {
+                chartData = [...top5, { name: 'Khác', value: otherSum }];
+            } else {
+                chartData = top5;
+            }
         }
 
         // Thêm kiểm tra dữ liệu trống
@@ -53,11 +58,17 @@ export function PieCharts({
 
         // Nếu không có dữ liệu, hiển thị thông báo
         if (!hasData) {
-            chartData = [{ name: 'Không có dữ liệu', value: 1 }];
+            chartData = [
+                { name: 'Không có dữ liệu', value: 1 }
+            ];
         }
 
         const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
             if (active && payload && payload.length) {
+                // Nếu là dữ liệu "Không có dữ liệu" thì không hiển thị tooltip
+                if (payload[0].name === 'Không có dữ liệu') {
+                    return null;
+                }
                 return (
                     <div className="bg-card border-border rounded-md border p-2 text-sm shadow-sm">
                         <p className="font-medium">{payload[0].name}</p>
@@ -73,36 +84,88 @@ export function PieCharts({
             return null;
         };
 
+        // Hàm tùy chỉnh để render nhãn
+        const renderCustomizedLabel = (props: {
+            cx: number;
+            cy: number;
+            midAngle: number;
+            innerRadius: number;
+            outerRadius: number;
+            percent: number;
+            name: string;
+        }) => {
+            const { cx, cy, midAngle, innerRadius, outerRadius, percent, name } = props;
+
+            // Nếu là nội dung "Không có dữ liệu", chỉ hiển thị text
+            if (name === 'Không có dữ liệu') {
+                return (
+                    <text
+                        x={cx}
+                        y={cy}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill="#888"
+                        fontSize={14}
+                    >
+                        {name}
+                    </text>
+                );
+            }
+
+            // Tính toán vị trí nhãn
+            const RADIAN = Math.PI / 180;
+            const radius = innerRadius + (outerRadius - innerRadius) * 1.1;
+            const x = cx + radius * Math.cos(-midAngle * RADIAN);
+            const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+            // Chỉ hiển thị nhãn khi phần trăm đủ lớn
+            if (percent < 0.05) return null;
+
+            return (
+                <text
+                    x={x}
+                    y={y}
+                    fill="#333"
+                    textAnchor={x > cx ? 'start' : 'end'}
+                    dominantBaseline="central"
+                    fontSize={11}
+                >
+                    {`${name}: ${(percent * 100).toFixed(0)}%`}
+                </text>
+            );
+        };
+
         return (
             <Card className="w-full">
                 <CardHeader>
                     <CardTitle>{title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="h-[250px] w-full">
+                    <div className="h-[280px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
                                     data={chartData}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={40}
-                                    outerRadius={80}
-                                    paddingAngle={3}
+                                    innerRadius={hasData ? 40 : 0}
+                                    outerRadius={hasData ? 80 : 60}
+                                    paddingAngle={hasData ? 3 : 0}
                                     dataKey="value"
-                                    label={({ name, percent }) =>
-                                        hasData ? `${name} ${(percent * 100).toFixed(0)}%` : name
-                                    }
-                                    labelLine={false}
+                                    label={renderCustomizedLabel}
+                                    labelLine={hasData}
+                                    isAnimationActive={true}
+                                    animationDuration={800}
                                 >
                                     {chartData.map((entry, index) => (
                                         <Cell
                                             key={`cell-${index}`}
-                                            fill={hasData ? COLORS[index % COLORS.length] : '#ccc'}
+                                            fill={hasData ? COLORS[index % COLORS.length] : '#e5e7eb'}
                                         />
                                     ))}
                                 </Pie>
                                 <Tooltip content={<CustomTooltip />} />
+                                {hasData && <Legend verticalAlign="bottom" height={36} />}
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
