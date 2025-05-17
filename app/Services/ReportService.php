@@ -303,7 +303,7 @@ class ReportService
           SUM(orders.final_amount) as total_sales
       ')
       ->whereYear('orders.order_date', $year)
-      ->where('orders.status', 'completed')
+      ->where('orders.status', '=', 'completed')
       ->whereIn('users.position', ['SL', 'SA']) // Chỉ lấy nhân viên bán hàng và trưởng ca
       ->groupBy('users.id', 'users.full_name', 'users.position')
       ->orderByDesc('total_sales')
@@ -321,7 +321,7 @@ class ReportService
           SUM(orders.final_amount) as total_sales
       ')
       ->whereYear('orders.order_date', $year)
-      ->where('orders.status', 'completed')
+      ->where('orders.status', '=', 'completed')
       ->whereIn('users.position', ['SL', 'SA']) // Chỉ lấy nhân viên bán hàng và trưởng ca
       ->groupBy('users.id', 'users.full_name', 'users.position')
       ->orderByDesc('orders_count')
@@ -340,7 +340,7 @@ class ReportService
           AVG(orders.final_amount) as avg_order_value
       ')
       ->whereYear('orders.order_date', $year)
-      ->where('orders.status', 'completed')
+      ->where('orders.status', '=', 'completed')
       ->whereIn('users.position', ['SL', 'SA'])
       ->groupBy('users.id', 'users.full_name', 'users.position')
       ->orderByDesc('avg_order_value')
@@ -349,23 +349,27 @@ class ReportService
 
     // Tính hiệu suất cho mỗi nhân viên (doanh thu / số giờ làm việc)
     $employeePerformance = DB::table('users')
-      ->leftJoin('attendance_records', 'users.id', '=', 'attendance_records.user_id')
-      ->leftJoin('orders', 'users.id', '=', 'orders.user_id')
       ->selectRaw('
           users.id,
           users.full_name,
           users.position,
           users.store_id,
-          SUM(TIMESTAMPDIFF(HOUR, attendance_records.clock_in, attendance_records.clock_out)) as total_hours,
-          SUM(orders.final_amount) as total_sales
+          (SELECT SUM(TIMESTAMPDIFF(HOUR, ar.check_in, ar.check_out))
+           FROM attendance_records ar
+           WHERE ar.user_id = users.id
+           AND YEAR(ar.check_in) = ?
+           AND ar.check_in IS NOT NULL
+           AND ar.check_out IS NOT NULL) as total_hours,
+          (SELECT SUM(o.final_amount)
+           FROM orders o
+           WHERE o.user_id = users.id
+           AND YEAR(o.order_date) = ?
+           AND o.status = \'completed\') as total_sales
       ')
       ->whereIn('users.position', ['SL', 'SA'])
-      ->whereYear('attendance_records.date', $year)
-      ->whereYear('orders.order_date', $year)
-      ->where('orders.status', 'completed')
-      ->groupBy('users.id', 'users.full_name', 'users.position', 'users.store_id')
-      ->having('total_hours', '>', 0)
-      ->orderByRaw('SUM(orders.final_amount) / SUM(TIMESTAMPDIFF(HOUR, attendance_records.clock_in, attendance_records.clock_out)) DESC')
+      ->addBinding([$year, $year], 'select')
+      ->havingRaw('total_hours > 0 AND total_sales > 0')
+      ->orderByRaw('total_sales / total_hours DESC')
       ->limit($limit)
       ->get();
 
