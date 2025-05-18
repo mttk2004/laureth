@@ -18,67 +18,67 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-  return Auth::check()
-    ? redirect()->route('dashboard')
-    : redirect()->route('login');
+    return Auth::check()
+      ? redirect()->route('dashboard')
+      : redirect()->route('login');
 })->name('home');
 
 // Route cho tất cả user đã đăng nhập
 Route::middleware(['web', 'auth', 'verified'])->group(function () {
-  Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 // Route cho DM (District Manager)
 Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
-  Route::resources([
-    'products' => ProductController::class,
-    'users' => UserController::class,
-    'stores' => StoreController::class,
-    'suppliers' => SupplierController::class,
-    'warehouses' => WarehouseController::class,
-    'purchase-orders' => PurchaseOrderController::class,
-  ], [
-    'except' => ['show'],
-  ]);
+    Route::resources([
+        'products' => ProductController::class,
+        'users' => UserController::class,
+        'stores' => StoreController::class,
+        'suppliers' => SupplierController::class,
+        'warehouses' => WarehouseController::class,
+        'purchase-orders' => PurchaseOrderController::class,
+    ], [
+        'except' => ['show'],
+    ]);
 
-  // Route cho payrolls
-  Route::get('/payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
-  Route::put('/payrolls/{payroll}/approve', [PayrollController::class, 'approve'])->name('payrolls.approve');
+    // Route cho payrolls
+    Route::get('/payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
+    Route::put('/payrolls/{payroll}/approve', [PayrollController::class, 'approve'])->name('payrolls.approve');
 
-  // Route cho warehouse purchase
-  Route::get('/warehouses/{warehouse}/purchase', [WarehousePurchaseController::class, 'create'])->name('warehouses.purchase.create');
-  Route::post('/warehouses/{warehouse}/purchase', [WarehousePurchaseController::class, 'store'])->name('warehouses.purchase.store');
+    // Route cho warehouse purchase
+    Route::get('/warehouses/{warehouse}/purchase', [WarehousePurchaseController::class, 'create'])->name('warehouses.purchase.create');
+    Route::post('/warehouses/{warehouse}/purchase', [WarehousePurchaseController::class, 'store'])->name('warehouses.purchase.store');
 
-  // API route để lấy danh sách inventory items của warehouse
-  Route::get('/api/warehouses/{warehouse}/inventory', [WarehouseInventoryController::class, 'getInventory']);
+    // API route để lấy danh sách inventory items của warehouse
+    Route::get('/api/warehouses/{warehouse}/inventory', [WarehouseInventoryController::class, 'getInventory']);
 
-  // API route để lấy tổng số lượng của một sản phẩm trong tất cả kho
-  Route::get('/api/products/{product}/total-inventory', [ProductInventoryController::class, 'getTotalInventory']);
+    // API route để lấy tổng số lượng của một sản phẩm trong tất cả kho
+    Route::get('/api/products/{product}/total-inventory', [ProductInventoryController::class, 'getTotalInventory']);
 
-  // API route để lấy chi tiết các sản phẩm trong đơn nhập hàng
-  Route::get('/api/purchase-orders/{purchaseOrder}/items', [PurchaseOrderController::class, 'getItems']);
+    // API route để lấy chi tiết các sản phẩm trong đơn nhập hàng
+    Route::get('/api/purchase-orders/{purchaseOrder}/items', [PurchaseOrderController::class, 'getItems']);
 
-  // API route để lấy thông tin đầy đủ của đơn nhập hàng
-  Route::get('/api/purchase-orders/{purchaseOrder}/details', [PurchaseOrderController::class, 'getDetails']);
+    // API route để lấy thông tin đầy đủ của đơn nhập hàng
+    Route::get('/api/purchase-orders/{purchaseOrder}/details', [PurchaseOrderController::class, 'getDetails']);
 
-  // Route để download PDF đơn nhập hàng
-  Route::get('/purchase-orders/{purchaseOrder}/download', [PurchaseOrderPdfController::class, 'download'])->name('purchase-orders.download');
+    // Route để download PDF đơn nhập hàng
+    Route::get('/purchase-orders/{purchaseOrder}/download', [PurchaseOrderPdfController::class, 'download'])->name('purchase-orders.download');
 
-  // Routes cho reports (chỉ DM có quyền xem)
-  Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-  Route::get('/api/reports/revenue-summary', [ReportController::class, 'getRevenueSummary']);
-  Route::get('/api/reports/expense-summary', [ReportController::class, 'getExpenseSummary']);
-  Route::get('/api/reports/store-performance', [ReportController::class, 'getStorePerformance']);
-  Route::get('/api/reports/product-performance', [ReportController::class, 'getProductPerformance']);
+    // Routes cho reports (chỉ DM có quyền xem)
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/api/reports/revenue-summary', [ReportController::class, 'getRevenueSummary']);
+    Route::get('/api/reports/expense-summary', [ReportController::class, 'getExpenseSummary']);
+    Route::get('/api/reports/store-performance', [ReportController::class, 'getStorePerformance']);
+    Route::get('/api/reports/product-performance', [ReportController::class, 'getProductPerformance']);
 });
 
 // Route cho nhân viên (SL và SA)
 Route::middleware(['web', 'auth', 'verified', 'staff'])->group(function () {
-  // Routes cho chức năng chấm công
-  Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-  Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
-  Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
+    // Routes cho chức năng chấm công
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
+    Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';
