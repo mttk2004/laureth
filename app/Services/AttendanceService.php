@@ -235,8 +235,51 @@ class AttendanceService extends BaseService
       // Thời gian hiện tại
       $checkOut = Carbon::now();
 
+      // Lấy thời gian check-in
+      $checkIn = Carbon::parse($attendance->check_in);
+
+      // Log để debug
+      Log::info('Check-out time calculation', [
+        'check_in' => $checkIn->toDateTimeString(),
+        'check_out' => $checkOut->toDateTimeString(),
+        'check_in_timestamp' => $checkIn->timestamp,
+        'check_out_timestamp' => $checkOut->timestamp
+      ]);
+
       // Tính tổng thời gian làm việc (giờ)
-      $totalHours = $checkOut->diffInMinutes($attendance->check_in) / 60;
+      // Đảm bảo luôn lấy giá trị dương bằng cách dùng abs() hoặc sắp xếp lại thứ tự
+      if ($checkOut->gt($checkIn)) {
+        // Nếu check-out sau check-in (bình thường)
+        $totalHours = $checkOut->diffInMinutes($checkIn) / 60;
+      } else {
+        // Nếu check-out trước check-in (bất thường, có thể do lỗi múi giờ)
+        $totalHours = $checkIn->diffInMinutes($checkOut) / 60;
+        Log::warning('Check-out time is earlier than check-in time', [
+          'user_id' => $userId,
+          'shift_id' => $shiftId,
+          'check_in' => $checkIn->toDateTimeString(),
+          'check_out' => $checkOut->toDateTimeString()
+        ]);
+      }
+
+      // Đảm bảo totalHours luôn là giá trị dương và làm tròn đến 1 chữ số thập phân
+      $totalHours = round(abs($totalHours), 1);
+
+      // Đảm bảo không vượt quá giới hạn của cột decimal(5, 1)
+      if ($totalHours > 999.9) {
+        $totalHours = 999.9;
+        Log::warning('Total hours exceeded maximum value and was capped', [
+          'user_id' => $userId,
+          'shift_id' => $shiftId,
+          'original_total_hours' => $totalHours,
+          'capped_total_hours' => 999.9
+        ]);
+      }
+
+      // Log để debug
+      Log::info('Total hours calculated', [
+        'total_hours' => $totalHours
+      ]);
 
       // Cập nhật giờ ra và tổng thời gian
       $result = $attendance->update([
