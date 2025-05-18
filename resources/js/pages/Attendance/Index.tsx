@@ -29,6 +29,8 @@ interface AttendancePageProps {
     checkInTime: string | null;
     checkOutTime: string | null;
     error?: string;
+    success?: boolean;
+    message?: string;
 }
 
 export default function AttendanceIndex({
@@ -39,6 +41,8 @@ export default function AttendanceIndex({
     checkInTime: initialCheckInTime,
     checkOutTime: initialCheckOutTime,
     error,
+    success,
+    message,
 }: AttendancePageProps) {
     const [processing, setProcessing] = useState(false);
     const [currentShift, setCurrentShift] = useState(initialShift);
@@ -56,13 +60,15 @@ export default function AttendanceIndex({
             initialHasAttendanceRecord,
             initialCheckInTime,
             initialCheckOutTime,
+            success,
+            message,
         });
         setCurrentShift(initialShift);
         setAttendanceHistory(initialHistory);
         setHasAttendanceRecord(initialHasAttendanceRecord);
         setCheckInTime(initialCheckInTime);
         setCheckOutTime(initialCheckOutTime);
-    }, [initialShift, initialHistory, initialHasAttendanceRecord, initialCheckInTime, initialCheckOutTime]);
+    }, [initialShift, initialHistory, initialHasAttendanceRecord, initialCheckInTime, initialCheckOutTime, success, message]);
 
     // Log khi component được mount
     useEffect(() => {
@@ -164,12 +170,19 @@ export default function AttendanceIndex({
         }
     }, [currentShift]);
 
-    // Hiển thị lỗi nếu có
+    // Hiển thị thông báo lỗi nếu có
     useEffect(() => {
         if (error) {
             addToast(error, 'error');
         }
-    }, [error]);
+    }, [error, addToast]);
+
+    // Hiển thị thông báo thành công nếu có
+    useEffect(() => {
+        if (success && message) {
+            addToast(message, 'success');
+        }
+    }, [success, message, addToast]);
 
     // Xử lý sự kiện check-in
     const handleCheckIn = () => {
@@ -184,32 +197,10 @@ export default function AttendanceIndex({
                 shift_id: currentShift.id,
             },
             {
-                preserveState: true,
-                onSuccess: (response) => {
-                    const data = response.props as { success?: boolean; message?: string };
-                    if (data.success === false) {
-                        // Xử lý lỗi từ server trả về
-                        addToast(data.message || 'Không thể chấm công vào. Vui lòng thử lại sau.', 'error');
-                        setProcessing(false);
-                        return;
-                    }
-
-                    addToast('Chấm công vào ca làm việc thành công', 'success');
-                    console.log('Check-in successful, updating local state');
-
-                    // Cập nhật state sau khi check-in thành công
-                    setCheckInTime(new Date().toISOString());
-
-                    // Tải lại trang sau một khoảng thời gian ngắn để cập nhật dữ liệu từ server
-                    console.log('Will reload page in 500ms');
-                    setTimeout(() => {
-                        console.log('Reloading page now');
-                        router.visit(route('attendance.index'), {
-                            preserveScroll: true,
-                            replace: true,
-                        });
-                    }, 500);
-
+                preserveState: false,
+                onSuccess: () => {
+                    // Không cần xử lý gì thêm vì trang đã được render lại với dữ liệu mới
+                    console.log('Check-in successful, page has been re-rendered');
                     setProcessing(false);
                 },
                 onError: (errors) => {
@@ -238,32 +229,10 @@ export default function AttendanceIndex({
                 shift_id: currentShift.id,
             },
             {
-                preserveState: true,
-                onSuccess: (response) => {
-                    const data = response.props as { success?: boolean; message?: string };
-                    if (data.success === false) {
-                        // Xử lý lỗi từ server trả về
-                        addToast(data.message || 'Không thể chấm công ra. Vui lòng thử lại sau.', 'error');
-                        setProcessing(false);
-                        return;
-                    }
-
-                    addToast('Chấm công ra ca làm việc thành công', 'success');
-                    console.log('Check-out successful, updating local state');
-
-                    // Cập nhật state sau khi check-out thành công
-                    setCheckOutTime(new Date().toISOString());
-
-                    // Tải lại trang sau một khoảng thời gian ngắn để cập nhật dữ liệu từ server
-                    console.log('Will reload page in 500ms');
-                    setTimeout(() => {
-                        console.log('Reloading page now');
-                        router.visit(route('attendance.index'), {
-                            preserveScroll: true,
-                            replace: true,
-                        });
-                    }, 500);
-
+                preserveState: false,
+                onSuccess: () => {
+                    // Không cần xử lý gì thêm vì trang đã được render lại với dữ liệu mới
+                    console.log('Check-out successful, page has been re-rendered');
                     setProcessing(false);
                 },
                 onError: (errors) => {

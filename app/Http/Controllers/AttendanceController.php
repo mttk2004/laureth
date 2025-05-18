@@ -71,7 +71,7 @@ class AttendanceController extends Controller
    * Chấm công giờ vào
    *
    * @param CheckInRequest $request
-   * @return \Illuminate\Http\JsonResponse
+   * @return \Inertia\Response
    */
   public function checkIn(CheckInRequest $request)
   {
@@ -94,28 +94,37 @@ class AttendanceController extends Controller
 
       // Lấy thông tin mới nhất sau khi check-in để trả về
       $currentShift = $this->attendanceService->getCurrentShift($user->id);
+      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
 
       // Kiểm tra dữ liệu trước khi trả về
       $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord !== null;
-      $checkIn = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_in : null;
-      $checkOut = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_out : null;
+      $checkInTime = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_in : null;
+      $checkOutTime = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_out : null;
 
       Log::info('Check-in response data', [
         'has_current_shift' => $currentShift ? 'yes' : 'no',
         'has_attendance_record' => $hasAttendanceRecord ? 'yes' : 'no',
-        'check_in' => $checkIn,
-        'check_out' => $checkOut
+        'check_in' => $checkInTime,
+        'check_out' => $checkOutTime
       ]);
 
-      return response()->json([
+      // Đảm bảo dữ liệu attendanceRecord được chuyển đổi đúng cách
+      if ($currentShift && $currentShift->attendanceRecord) {
+        // Chuyển đổi attendanceRecord thành mảng để tránh mất dữ liệu khi serialize
+        $attendanceRecord = $currentShift->attendanceRecord->toArray();
+        // Gán lại attendanceRecord đã chuyển đổi
+        $currentShift->attendanceRecord = $attendanceRecord;
+      }
+
+      return Inertia::render('Attendance/Index', [
+        'user' => $user,
+        'currentShift' => $currentShift,
+        'attendanceHistory' => $attendanceHistory,
+        'hasAttendanceRecord' => $hasAttendanceRecord,
+        'checkInTime' => $checkInTime,
+        'checkOutTime' => $checkOutTime,
         'success' => true,
-        'message' => 'Chấm công vào ca làm việc thành công.',
-        'data' => [
-          'currentShift' => $currentShift,
-          'has_attendance_record' => $hasAttendanceRecord,
-          'check_in' => $checkIn,
-          'check_out' => $checkOut,
-        ]
+        'message' => 'Chấm công vào ca làm việc thành công.'
       ]);
     } else {
       // Kiểm tra log để xác định lỗi cụ thể
@@ -135,11 +144,30 @@ class AttendanceController extends Controller
         'error_message' => $errorMessage
       ]);
 
-      // Trả về response JSON với thông báo lỗi
-      return response()->json([
-        'success' => false,
-        'message' => $errorMessage
-      ], 400);
+      // Lấy dữ liệu mới nhất và trả về view Inertia với thông báo lỗi
+      $currentShift = $this->attendanceService->getCurrentShift($user->id);
+      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
+      $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord ? true : false;
+      $checkInTime = $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_in : null;
+      $checkOutTime = $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_out : null;
+
+      // Đảm bảo dữ liệu attendanceRecord được chuyển đổi đúng cách
+      if ($currentShift && $currentShift->attendanceRecord) {
+        // Chuyển đổi attendanceRecord thành mảng để tránh mất dữ liệu khi serialize
+        $attendanceRecord = $currentShift->attendanceRecord->toArray();
+        // Gán lại attendanceRecord đã chuyển đổi
+        $currentShift->attendanceRecord = $attendanceRecord;
+      }
+
+      return Inertia::render('Attendance/Index', [
+        'user' => $user,
+        'currentShift' => $currentShift,
+        'attendanceHistory' => $attendanceHistory,
+        'hasAttendanceRecord' => $hasAttendanceRecord,
+        'checkInTime' => $checkInTime,
+        'checkOutTime' => $checkOutTime,
+        'error' => $errorMessage
+      ]);
     }
   }
 
@@ -147,7 +175,7 @@ class AttendanceController extends Controller
    * Chấm công giờ ra
    *
    * @param CheckOutRequest $request
-   * @return \Illuminate\Http\JsonResponse
+   * @return \Inertia\Response
    */
   public function checkOut(CheckOutRequest $request)
   {
@@ -170,28 +198,37 @@ class AttendanceController extends Controller
 
       // Lấy thông tin mới nhất sau khi check-out để trả về
       $currentShift = $this->attendanceService->getCurrentShift($user->id);
+      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
 
       // Kiểm tra dữ liệu trước khi trả về
       $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord !== null;
-      $checkIn = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_in : null;
-      $checkOut = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_out : null;
+      $checkInTime = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_in : null;
+      $checkOutTime = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_out : null;
 
       Log::info('Check-out response data', [
         'has_current_shift' => $currentShift ? 'yes' : 'no',
         'has_attendance_record' => $hasAttendanceRecord ? 'yes' : 'no',
-        'check_in' => $checkIn,
-        'check_out' => $checkOut
+        'check_in' => $checkInTime,
+        'check_out' => $checkOutTime
       ]);
 
-      return response()->json([
+      // Đảm bảo dữ liệu attendanceRecord được chuyển đổi đúng cách
+      if ($currentShift && $currentShift->attendanceRecord) {
+        // Chuyển đổi attendanceRecord thành mảng để tránh mất dữ liệu khi serialize
+        $attendanceRecord = $currentShift->attendanceRecord->toArray();
+        // Gán lại attendanceRecord đã chuyển đổi
+        $currentShift->attendanceRecord = $attendanceRecord;
+      }
+
+      return Inertia::render('Attendance/Index', [
+        'user' => $user,
+        'currentShift' => $currentShift,
+        'attendanceHistory' => $attendanceHistory,
+        'hasAttendanceRecord' => $hasAttendanceRecord,
+        'checkInTime' => $checkInTime,
+        'checkOutTime' => $checkOutTime,
         'success' => true,
-        'message' => 'Chấm công ra ca làm việc thành công.',
-        'data' => [
-          'currentShift' => $currentShift,
-          'has_attendance_record' => $hasAttendanceRecord,
-          'check_in' => $checkIn,
-          'check_out' => $checkOut,
-        ]
+        'message' => 'Chấm công ra ca làm việc thành công.'
       ]);
     } else {
       // Kiểm tra log để xác định lỗi cụ thể
@@ -213,11 +250,30 @@ class AttendanceController extends Controller
         'error_message' => $errorMessage
       ]);
 
-      // Trả về response JSON với thông báo lỗi
-      return response()->json([
-        'success' => false,
-        'message' => $errorMessage
-      ], 400);
+      // Lấy dữ liệu mới nhất và trả về view Inertia với thông báo lỗi
+      $currentShift = $this->attendanceService->getCurrentShift($user->id);
+      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
+      $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord ? true : false;
+      $checkInTime = $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_in : null;
+      $checkOutTime = $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_out : null;
+
+      // Đảm bảo dữ liệu attendanceRecord được chuyển đổi đúng cách
+      if ($currentShift && $currentShift->attendanceRecord) {
+        // Chuyển đổi attendanceRecord thành mảng để tránh mất dữ liệu khi serialize
+        $attendanceRecord = $currentShift->attendanceRecord->toArray();
+        // Gán lại attendanceRecord đã chuyển đổi
+        $currentShift->attendanceRecord = $attendanceRecord;
+      }
+
+      return Inertia::render('Attendance/Index', [
+        'user' => $user,
+        'currentShift' => $currentShift,
+        'attendanceHistory' => $attendanceHistory,
+        'hasAttendanceRecord' => $hasAttendanceRecord,
+        'checkInTime' => $checkInTime,
+        'checkOutTime' => $checkOutTime,
+        'error' => $errorMessage
+      ]);
     }
   }
 
