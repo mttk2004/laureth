@@ -272,17 +272,17 @@ export default function AttendanceIndex({
                             <div className="space-y-6">
                                 <div className="grid gap-4 md:grid-cols-2">
                                     <div>
-                                        <div className="text-muted-foreground text-sm">Ca làm việc:</div>
+                                        <div className="text-sm text-muted-foreground">Ca làm việc:</div>
                                         <div className="font-medium">{getShiftTypeLabel(currentShift.shift_type)}</div>
                                     </div>
                                     <div>
-                                        <div className="text-muted-foreground text-sm">Ngày:</div>
+                                        <div className="text-sm text-muted-foreground">Ngày:</div>
                                         <div className="font-medium">{new Date(currentShift.date).toLocaleDateString('vi-VN')}</div>
                                     </div>
                                     {currentShift.attendanceRecord && (
                                         <>
                                             <div>
-                                                <div className="text-muted-foreground text-sm">Giờ vào:</div>
+                                                <div className="text-sm text-muted-foreground">Giờ vào:</div>
                                                 <div className="font-medium">
                                                     {currentShift.attendanceRecord.check_in
                                                         ? formatTime(currentShift.attendanceRecord.check_in)
@@ -290,7 +290,7 @@ export default function AttendanceIndex({
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-muted-foreground text-sm">Giờ ra:</div>
+                                                <div className="text-sm text-muted-foreground">Giờ ra:</div>
                                                 <div className="font-medium">
                                                     {currentShift.attendanceRecord.check_out
                                                         ? formatTime(currentShift.attendanceRecord.check_out)
@@ -301,14 +301,34 @@ export default function AttendanceIndex({
                                     )}
                                 </div>
 
-                                <div className="flex justify-center gap-4">
-                                    <Button onClick={handleCheckIn} disabled={!canCheckIn || processing} className="bg-green-600 hover:bg-green-700">
-                                        {processing && canCheckIn ? 'Đang xử lý...' : 'Chấm công vào'}
-                                    </Button>
-                                    <Button onClick={handleCheckOut} disabled={!canCheckOut || processing} className="bg-blue-600 hover:bg-blue-700">
-                                        {processing && canCheckOut ? 'Đang xử lý...' : 'Chấm công ra'}
-                                    </Button>
-                                </div>
+                                {/* Hiển thị nút chấm công hoặc thông báo đã hoàn thành */}
+                                {hasAttendanceRecord && checkInTime && checkOutTime ? (
+                                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md text-center">
+                                        <p className="text-green-700 font-medium">
+                                            Bạn đã hoàn thành ca làm việc hôm nay!
+                                        </p>
+                                        <p className="text-green-600 text-sm mt-1">
+                                            Giờ vào: {formatTime(checkInTime)} - Giờ ra: {formatTime(checkOutTime)} - Tổng: {currentShift.attendanceRecord?.total_hours?.toFixed(1) || '0'} giờ
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="flex justify-center gap-4">
+                                        <Button
+                                            onClick={handleCheckIn}
+                                            disabled={!canCheckIn || processing}
+                                            className="bg-green-600 hover:bg-green-700"
+                                        >
+                                            {processing && canCheckIn ? 'Đang xử lý...' : 'Chấm công vào'}
+                                        </Button>
+                                        <Button
+                                            onClick={handleCheckOut}
+                                            disabled={!canCheckOut || processing}
+                                            className="bg-blue-600 hover:bg-blue-700"
+                                        >
+                                            {processing && canCheckOut ? 'Đang xử lý...' : 'Chấm công ra'}
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="text-muted-foreground py-4 text-center">Bạn không có ca làm việc nào trong hôm nay</div>

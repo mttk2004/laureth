@@ -11,183 +11,243 @@ use Inertia\Inertia;
 
 class AttendanceController extends Controller
 {
-    private $attendanceService;
+  private $attendanceService;
 
-    public function __construct(AttendanceService $attendanceService)
-    {
-        $this->attendanceService = $attendanceService;
+  public function __construct(AttendanceService $attendanceService)
+  {
+    $this->attendanceService = $attendanceService;
+  }
+
+  /**
+   * Hiển thị trang chấm công
+   *
+   * @return \Inertia\Response
+   */
+  public function index()
+  {
+    $user = Auth::user();
+
+    // Lấy ca làm việc hôm nay của nhân viên
+    $currentShift = $this->attendanceService->getCurrentShift($user->id);
+
+    // Lấy lịch sử chấm công của nhân viên
+    $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
+
+    // Log để debug
+    Log::info('Attendance index data', [
+      'user_id' => $user->id,
+      'has_current_shift' => $currentShift ? 'yes' : 'no',
+      'has_attendance_record' => $currentShift && $currentShift->attendanceRecord ? 'yes' : 'no',
+      'check_in' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_in : null,
+      'check_out' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_out : null,
+    ]);
+
+    // Đảm bảo dữ liệu attendanceRecord được chuyển đổi đúng cách
+    if ($currentShift && $currentShift->attendanceRecord) {
+      // Chuyển đổi attendanceRecord thành mảng để tránh mất dữ liệu khi serialize
+      $attendanceRecord = $currentShift->attendanceRecord->toArray();
+
+      // Log để debug
+      Log::info('Attendance record being sent to frontend', [
+        'attendance_record' => $attendanceRecord,
+      ]);
+
+      // Gán lại attendanceRecord đã chuyển đổi
+      $currentShift->attendanceRecord = $attendanceRecord;
     }
 
-    /**
-     * Hiển thị trang chấm công
-     *
-     * @return \Inertia\Response
-     */
-    public function index()
-    {
-        $user = Auth::user();
+    return Inertia::render('Attendance/Index', [
+      'user' => $user,
+      'currentShift' => $currentShift,
+      'attendanceHistory' => $attendanceHistory,
+      // Thêm các thuộc tính riêng để đảm bảo dữ liệu được truyền đúng
+      'hasAttendanceRecord' => $currentShift && $currentShift->attendanceRecord ? true : false,
+      'checkInTime' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord['check_in'] : null,
+      'checkOutTime' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord['check_out'] : null,
+    ]);
+  }
 
-        // Lấy ca làm việc hôm nay của nhân viên
-        $currentShift = $this->attendanceService->getCurrentShift($user->id);
+  /**
+   * Chấm công giờ vào
+   *
+   * @param CheckInRequest $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function checkIn(CheckInRequest $request)
+  {
+    $user = Auth::user();
+    $validatedData = $request->validated();
+    $shiftId = $validatedData['shift_id'];
 
-        // Lấy lịch sử chấm công của nhân viên
-        $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
+    Log::info('Processing check-in request', [
+      'user_id' => $user->id,
+      'shift_id' => $shiftId
+    ]);
 
-        // Log để debug
-        Log::info('Attendance index data', [
-            'user_id' => $user->id,
-            'has_current_shift' => $currentShift ? 'yes' : 'no',
-            'has_attendance_record' => $currentShift && $currentShift->attendanceRecord ? 'yes' : 'no',
-            'check_in' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_in : null,
-            'check_out' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_out : null,
-        ]);
+    $result = $this->attendanceService->checkIn($user->id, $shiftId);
 
-        // Đảm bảo dữ liệu attendanceRecord được chuyển đổi đúng cách
-        if ($currentShift && $currentShift->attendanceRecord) {
-            // Chuyển đổi attendanceRecord thành mảng để tránh mất dữ liệu khi serialize
-            $attendanceRecord = $currentShift->attendanceRecord->toArray();
+    if ($result) {
+      Log::info('Check-in successful', [
+        'user_id' => $user->id,
+        'shift_id' => $shiftId
+      ]);
 
-            // Log để debug
-            Log::info('Attendance record being sent to frontend', [
-                'attendance_record' => $attendanceRecord,
-            ]);
+      // Lấy thông tin mới nhất sau khi check-in để trả về
+      $currentShift = $this->attendanceService->getCurrentShift($user->id);
 
-            // Gán lại attendanceRecord đã chuyển đổi
-            $currentShift->attendanceRecord = $attendanceRecord;
+      // Kiểm tra dữ liệu trước khi trả về
+      $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord !== null;
+      $checkIn = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_in : null;
+      $checkOut = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_out : null;
+
+      Log::info('Check-in response data', [
+        'has_current_shift' => $currentShift ? 'yes' : 'no',
+        'has_attendance_record' => $hasAttendanceRecord ? 'yes' : 'no',
+        'check_in' => $checkIn,
+        'check_out' => $checkOut
+      ]);
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Chấm công vào ca làm việc thành công.',
+        'data' => [
+          'currentShift' => $currentShift,
+          'has_attendance_record' => $hasAttendanceRecord,
+          'check_in' => $checkIn,
+          'check_out' => $checkOut,
+        ]
+      ]);
+    } else {
+      // Kiểm tra log để xác định lỗi cụ thể
+      $latestLog = $this->getLatestAttendanceLog();
+      $errorMessage = 'Không thể chấm công vào. Vui lòng thử lại sau.';
+
+      // Xác định thông báo lỗi dựa trên log
+      if (strpos($latestLog, 'Invalid check-in time') !== false) {
+        $errorMessage = 'Bạn chỉ có thể chấm công vào sớm nhất 1 giờ trước giờ bắt đầu ca.';
+      } elseif (strpos($latestLog, 'Already checked in') !== false) {
+        $errorMessage = 'Bạn đã chấm công vào ca này rồi.';
+      }
+
+      Log::warning('Check-in failed', [
+        'user_id' => $user->id,
+        'shift_id' => $shiftId,
+        'error_message' => $errorMessage
+      ]);
+
+      return response()->json([
+        'success' => false,
+        'message' => $errorMessage
+      ], 422);
+    }
+  }
+
+  /**
+   * Chấm công giờ ra
+   *
+   * @param CheckOutRequest $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function checkOut(CheckOutRequest $request)
+  {
+    $user = Auth::user();
+    $validatedData = $request->validated();
+    $shiftId = $validatedData['shift_id'];
+
+    Log::info('Processing check-out request', [
+      'user_id' => $user->id,
+      'shift_id' => $shiftId
+    ]);
+
+    $result = $this->attendanceService->checkOut($user->id, $shiftId);
+
+    if ($result) {
+      Log::info('Check-out successful', [
+        'user_id' => $user->id,
+        'shift_id' => $shiftId
+      ]);
+
+      // Lấy thông tin mới nhất sau khi check-out để trả về
+      $currentShift = $this->attendanceService->getCurrentShift($user->id);
+
+      // Kiểm tra dữ liệu trước khi trả về
+      $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord !== null;
+      $checkIn = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_in : null;
+      $checkOut = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_out : null;
+
+      Log::info('Check-out response data', [
+        'has_current_shift' => $currentShift ? 'yes' : 'no',
+        'has_attendance_record' => $hasAttendanceRecord ? 'yes' : 'no',
+        'check_in' => $checkIn,
+        'check_out' => $checkOut
+      ]);
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Chấm công ra ca làm việc thành công.',
+        'data' => [
+          'currentShift' => $currentShift,
+          'has_attendance_record' => $hasAttendanceRecord,
+          'check_in' => $checkIn,
+          'check_out' => $checkOut,
+        ]
+      ]);
+    } else {
+      // Kiểm tra log để xác định lỗi cụ thể
+      $latestLog = $this->getLatestAttendanceLog();
+      $errorMessage = 'Không thể chấm công ra. Vui lòng thử lại sau.';
+
+      // Xác định thông báo lỗi dựa trên log
+      if (strpos($latestLog, 'Invalid check-out time') !== false) {
+        $errorMessage = 'Bạn chỉ có thể chấm công ra trễ nhất 1 giờ sau giờ kết thúc ca.';
+      } elseif (strpos($latestLog, 'Already checked out') !== false) {
+        $errorMessage = 'Bạn đã chấm công ra ca này rồi.';
+      } elseif (strpos($latestLog, 'No check-in record found') !== false) {
+        $errorMessage = 'Bạn chưa chấm công vào ca này.';
+      }
+
+      Log::warning('Check-out failed', [
+        'user_id' => $user->id,
+        'shift_id' => $shiftId,
+        'error_message' => $errorMessage
+      ]);
+
+      return response()->json([
+        'success' => false,
+        'message' => $errorMessage
+      ], 422);
+    }
+  }
+
+  /**
+   * Lấy log mới nhất liên quan đến chấm công
+   *
+   * @return string
+   */
+  private function getLatestAttendanceLog(): string
+  {
+    try {
+      $logPath = storage_path('logs/laravel.log');
+      if (file_exists($logPath)) {
+        $logContent = file_get_contents($logPath);
+        $lines = explode("\n", $logContent);
+        $lines = array_filter($lines);
+        $lines = array_reverse($lines);
+
+        // Tìm log liên quan đến chấm công
+        foreach ($lines as $line) {
+          if (
+            strpos($line, 'Check-in failed') !== false ||
+            strpos($line, 'Check-out failed') !== false
+          ) {
+            return $line;
+          }
         }
-
-        return Inertia::render('Attendance/Index', [
-            'user' => $user,
-            'currentShift' => $currentShift,
-            'attendanceHistory' => $attendanceHistory,
-            // Thêm các thuộc tính riêng để đảm bảo dữ liệu được truyền đúng
-            'hasAttendanceRecord' => $currentShift && $currentShift->attendanceRecord ? true : false,
-            'checkInTime' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord['check_in'] : null,
-            'checkOutTime' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord['check_out'] : null,
-        ]);
+      }
+    } catch (\Exception $e) {
+      Log::error('Error reading log file: ' . $e->getMessage());
     }
 
-    /**
-     * Chấm công giờ vào
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function checkIn(CheckInRequest $request)
-    {
-        $user = Auth::user();
-        $validatedData = $request->validated();
-        $shiftId = $validatedData['shift_id'];
-
-        Log::info('Processing check-in request', [
-            'user_id' => $user->id,
-            'shift_id' => $shiftId,
-        ]);
-
-        $result = $this->attendanceService->checkIn($user->id, $shiftId);
-
-        if ($result) {
-            Log::info('Check-in successful', [
-                'user_id' => $user->id,
-                'shift_id' => $shiftId,
-            ]);
-
-            // Lấy thông tin mới nhất sau khi check-in để trả về
-            $currentShift = $this->attendanceService->getCurrentShift($user->id);
-
-            // Kiểm tra dữ liệu trước khi trả về
-            $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord !== null;
-            $checkIn = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_in : null;
-            $checkOut = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_out : null;
-
-            Log::info('Check-in response data', [
-                'has_current_shift' => $currentShift ? 'yes' : 'no',
-                'has_attendance_record' => $hasAttendanceRecord ? 'yes' : 'no',
-                'check_in' => $checkIn,
-                'check_out' => $checkOut,
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Chấm công vào ca làm việc thành công.',
-                'data' => [
-                    'currentShift' => $currentShift,
-                    'has_attendance_record' => $hasAttendanceRecord,
-                    'check_in' => $checkIn,
-                    'check_out' => $checkOut,
-                ],
-            ]);
-        } else {
-            Log::warning('Check-in failed', [
-                'user_id' => $user->id,
-                'shift_id' => $shiftId,
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Không thể chấm công vào. Vui lòng thử lại sau.',
-            ], 422);
-        }
-    }
-
-    /**
-     * Chấm công giờ ra
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function checkOut(CheckOutRequest $request)
-    {
-        $user = Auth::user();
-        $validatedData = $request->validated();
-        $shiftId = $validatedData['shift_id'];
-
-        Log::info('Processing check-out request', [
-            'user_id' => $user->id,
-            'shift_id' => $shiftId,
-        ]);
-
-        $result = $this->attendanceService->checkOut($user->id, $shiftId);
-
-        if ($result) {
-            Log::info('Check-out successful', [
-                'user_id' => $user->id,
-                'shift_id' => $shiftId,
-            ]);
-
-            // Lấy thông tin mới nhất sau khi check-out để trả về
-            $currentShift = $this->attendanceService->getCurrentShift($user->id);
-
-            // Kiểm tra dữ liệu trước khi trả về
-            $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord !== null;
-            $checkIn = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_in : null;
-            $checkOut = $hasAttendanceRecord ? $currentShift->attendanceRecord->check_out : null;
-
-            Log::info('Check-out response data', [
-                'has_current_shift' => $currentShift ? 'yes' : 'no',
-                'has_attendance_record' => $hasAttendanceRecord ? 'yes' : 'no',
-                'check_in' => $checkIn,
-                'check_out' => $checkOut,
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Chấm công ra ca làm việc thành công.',
-                'data' => [
-                    'currentShift' => $currentShift,
-                    'has_attendance_record' => $hasAttendanceRecord,
-                    'check_in' => $checkIn,
-                    'check_out' => $checkOut,
-                ],
-            ]);
-        } else {
-            Log::warning('Check-out failed', [
-                'user_id' => $user->id,
-                'shift_id' => $shiftId,
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Không thể chấm công ra. Vui lòng thử lại sau.',
-            ], 422);
-        }
-    }
+    return '';
+  }
 }
