@@ -6,6 +6,7 @@ use App\Models\AttendanceRecord;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceService extends BaseService
 {
@@ -35,14 +36,40 @@ class AttendanceService extends BaseService
   {
     $today = Carbon::today()->format('Y-m-d');
 
-    // Sử dụng DB::raw để đảm bảo không có caching
-    return Shift::where('user_id', $userId)
+    // Tìm ca làm việc hôm nay
+    $shift = DB::table('shifts')
+      ->where('user_id', $userId)
       ->where('date', $today)
-      ->with(['attendanceRecord' => function ($query) {
-        // Đảm bảo lấy dữ liệu mới nhất
-        $query->latest();
-      }])
       ->first();
+
+    if (!$shift) {
+      return null;
+    }
+
+    // Convert DB object to Shift model
+    $shiftModel = Shift::find($shift->id);
+
+    if (!$shiftModel) {
+      return null;
+    }
+
+    // Lấy bản ghi chấm công mới nhất liên quan đến ca này
+    $attendance = AttendanceRecord::where('shift_id', $shiftModel->id)
+      ->orderBy('updated_at', 'desc')
+      ->first();
+
+    // Attach attendance record trực tiếp vào shift
+    $shiftModel->setRelation('attendanceRecord', $attendance);
+
+    // Log để debug
+    Log::info('Current shift info', [
+      'shift_id' => $shiftModel->id,
+      'has_attendance' => $attendance ? 'yes' : 'no',
+      'check_in' => $attendance ? $attendance->check_in : null,
+      'check_out' => $attendance ? $attendance->check_out : null,
+    ]);
+
+    return $shiftModel;
   }
 
   /**

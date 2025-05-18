@@ -3,7 +3,7 @@ import { AttendanceRecord } from '@/types/attendance_record';
 import { Shift, ShiftType } from '@/types/shift';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { formatTime } from '@/lib/format';
 import AppLayout from '@/layouts/app-layout';
@@ -27,9 +27,17 @@ interface AttendancePageProps {
   };
 }
 
-export default function AttendanceIndex({ user, currentShift, attendanceHistory }: AttendancePageProps) {
+export default function AttendanceIndex({ user, currentShift: initialShift, attendanceHistory: initialHistory }: AttendancePageProps) {
   const [processing, setProcessing] = useState(false);
+  const [currentShift, setCurrentShift] = useState(initialShift);
+  const [attendanceHistory, setAttendanceHistory] = useState(initialHistory);
   const { addToast } = useToast();
+
+  // Cập nhật state khi props thay đổi
+  useEffect(() => {
+    setCurrentShift(initialShift);
+    setAttendanceHistory(initialHistory);
+  }, [initialShift, initialHistory]);
 
   // Kiểm tra trạng thái check-in/check-out của ca làm việc hiện tại
   const canCheckIn = useMemo(() => {
@@ -44,6 +52,13 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
            !currentShift.attendanceRecord.check_out;
   }, [currentShift]);
 
+  // Debug
+  useEffect(() => {
+    console.log('Current shift state:', currentShift);
+    console.log('Can check in:', canCheckIn);
+    console.log('Can check out:', canCheckOut);
+  }, [currentShift, canCheckIn, canCheckOut]);
+
   // Xử lý sự kiện check-in
   const handleCheckIn = () => {
     if (!currentShift || processing) return;
@@ -53,12 +68,46 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
     router.post(route('attendance.check-in'), {
       shift_id: currentShift.id,
     }, {
-      onSuccess: () => {
+      preserveState: true,
+      onSuccess: (page) => {
         addToast('Chấm công vào ca làm việc thành công', 'success');
-        setProcessing(false);
 
-        // Tải lại trang để cập nhật dữ liệu
-        router.reload();
+        // Cập nhật trạng thái local sau khi check-in thành công
+        if (currentShift && currentShift.attendanceRecord) {
+          const updatedAttendanceRecord = {
+            ...currentShift.attendanceRecord,
+            check_in: new Date().toISOString(),
+          };
+
+          setCurrentShift({
+            ...currentShift,
+            attendanceRecord: updatedAttendanceRecord,
+          });
+        } else if (currentShift) {
+          // Tạo mới attendance record nếu chưa có
+          const newAttendanceRecord = {
+            id: Date.now(), // Temporary ID
+            user_id: user.id,
+            shift_id: currentShift.id,
+            check_in: new Date().toISOString(),
+            check_out: null,
+            total_hours: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+
+          setCurrentShift({
+            ...currentShift,
+            attendanceRecord: newAttendanceRecord,
+          });
+        }
+
+        // Tải lại trang sau một khoảng thời gian ngắn để cập nhật dữ liệu từ server
+        setTimeout(() => {
+          router.reload();
+        }, 500);
+
+        setProcessing(false);
       },
       onError: (errors) => {
         console.error(errors);
@@ -70,19 +119,41 @@ export default function AttendanceIndex({ user, currentShift, attendanceHistory 
 
   // Xử lý sự kiện check-out
   const handleCheckOut = () => {
-    if (!currentShift || processing) return;
+    if (!currentShift || processing || !canCheckOut) return;
 
     setProcessing(true);
 
     router.post(route('attendance.check-out'), {
       shift_id: currentShift.id,
     }, {
-      onSuccess: () => {
+      preserveState: true,
+      onSuccess: (page) => {
         addToast('Chấm công ra ca làm việc thành công', 'success');
-        setProcessing(false);
 
-        // Tải lại trang để cập nhật dữ liệu
-        router.reload();
+        // Cập nhật trạng thái local sau khi check-out thành công
+        if (currentShift && currentShift.attendanceRecord) {
+          const checkOutTime = new Date();
+          const checkInTime = new Date(currentShift.attendanceRecord.check_in);
+          const totalHours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
+
+          const updatedAttendanceRecord = {
+            ...currentShift.attendanceRecord,
+            check_out: checkOutTime.toISOString(),
+            total_hours: totalHours,
+          };
+
+          setCurrentShift({
+            ...currentShift,
+            attendanceRecord: updatedAttendanceRecord,
+          });
+        }
+
+        // Tải lại trang sau một khoảng thời gian ngắn để cập nhật dữ liệu từ server
+        setTimeout(() => {
+          router.reload();
+        }, 500);
+
+        setProcessing(false);
       },
       onError: (errors) => {
         console.error(errors);
