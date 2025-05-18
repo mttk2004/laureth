@@ -23,7 +23,7 @@ export default function AppLayout({ children, user }: PropsWithChildren<AppLayou
     }
 
     // Log thông tin user để debug
-    console.log('App Layout user position:', user.position, 'isAdminRole:', isAdminRole(user.position));
+    // console.log('App Layout user position:', user.position, 'isAdminRole:', isAdminRole(user.position));
 
     // Redirect to appropriate layout based on user position
     if (isAdminRole(user.position)) {

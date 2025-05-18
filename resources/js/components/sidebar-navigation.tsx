@@ -72,7 +72,7 @@ export default function SidebarNavigation({ user, className }: SidebarNavigation
     const { url } = usePage();
     const links = roleLinks[user.position] || [];
 
-    console.log('SidebarNavigation - user position:', user.position);
+    // console.log('SidebarNavigation - user position:', user.position);
 
     return (
         <div className={cn('flex flex-col gap-2', className)}>

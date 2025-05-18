@@ -15,20 +15,20 @@ createInertiaApp({
         const root = createRoot(el);
 
         // Console.log để debug
-        console.log('Inertia props:', props);
+        // console.log('Inertia props:', props);
 
         // Debug thông tin user
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const auth = (props.initialPage.props as any).auth;
         if (auth?.user) {
-            console.log('Auth user:', {
-                id: auth.user.id,
-                full_name: auth.user.full_name,
-                email: auth.user.email,
-                position: auth.user.position,
-            });
+            // console.log('Auth user:', {
+            //     id: auth.user.id,
+            //     full_name: auth.user.full_name,
+            //     email: auth.user.email,
+            //     position: auth.user.position,
+            // });
         } else {
-            console.log('No authenticated user');
+            // console.log('No authenticated user');
         }
 
         // Wrap App with ThemeProvider và ToastProvider

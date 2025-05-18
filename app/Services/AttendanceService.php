@@ -65,9 +65,33 @@ class AttendanceService extends BaseService
     if ($attendance) {
       // Convert DB object to AttendanceRecord model
       $attendanceModel = AttendanceRecord::find($attendance->id);
-      $shiftModel->setRelation('attendanceRecord', $attendanceModel);
+
+      // Kiểm tra xem attendance model có hợp lệ không
+      if ($attendanceModel) {
+        $shiftModel->setRelation('attendanceRecord', $attendanceModel);
+
+        // Log để debug
+        Log::info('Found valid attendance record', [
+          'shift_id' => $shiftModel->id,
+          'attendance_id' => $attendanceModel->id,
+          'check_in' => $attendanceModel->check_in,
+          'check_out' => $attendanceModel->check_out
+        ]);
+      } else {
+        // Nếu không tìm thấy model, đặt relation là null thay vì object rỗng
+        $shiftModel->setRelation('attendanceRecord', null);
+
+        Log::warning('Attendance record found in DB but model not found', [
+          'shift_id' => $shiftModel->id,
+          'attendance_id' => $attendance->id
+        ]);
+      }
     } else {
       $shiftModel->setRelation('attendanceRecord', null);
+
+      Log::info('No attendance record found for shift', [
+        'shift_id' => $shiftModel->id
+      ]);
     }
 
     // Log để debug
