@@ -28,6 +28,7 @@ interface AttendancePageProps {
     hasAttendanceRecord: boolean;
     checkInTime: string | null;
     checkOutTime: string | null;
+    error?: string;
 }
 
 export default function AttendanceIndex({
@@ -37,6 +38,7 @@ export default function AttendanceIndex({
     hasAttendanceRecord: initialHasAttendanceRecord,
     checkInTime: initialCheckInTime,
     checkOutTime: initialCheckOutTime,
+    error,
 }: AttendancePageProps) {
     const [processing, setProcessing] = useState(false);
     const [currentShift, setCurrentShift] = useState(initialShift);
@@ -161,6 +163,13 @@ export default function AttendanceIndex({
             setHasAttendanceRecord(false);
         }
     }, [currentShift]);
+
+    // Hiển thị lỗi nếu có
+    useEffect(() => {
+        if (error) {
+            addToast(error, 'error');
+        }
+    }, [error]);
 
     // Xử lý sự kiện check-in
     const handleCheckIn = () => {
@@ -308,7 +317,7 @@ export default function AttendanceIndex({
                                             Bạn đã hoàn thành ca làm việc hôm nay!
                                         </p>
                                         <p className="text-green-600 text-sm mt-1">
-                                            Giờ vào: {formatTime(checkInTime)} - Giờ ra: {formatTime(checkOutTime)} - Tổng: {currentShift.attendanceRecord?.total_hours?.toFixed(1) || '0'} giờ
+                                            Giờ vào: {formatTime(checkInTime)} - Giờ ra: {formatTime(checkOutTime)} - Tổng: {currentShift.attendanceRecord?.total_hours ? Number(currentShift.attendanceRecord.total_hours).toFixed(1) : '0'} giờ
                                         </p>
                                     </div>
                                 ) : (
