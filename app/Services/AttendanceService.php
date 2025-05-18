@@ -425,8 +425,11 @@ class AttendanceService extends BaseService
     // Tạo thời gian trễ nhất có thể chấm công (1 giờ sau giờ kết thúc ca)
     $latestCheckOut = $shiftEnd->copy()->addHour();
 
-    // Kiểm tra xem thời gian hiện tại có nằm trong khoảng cho phép không
-    $canCheckOut = $now->greaterThanOrEqualTo($shiftEnd->copy()->subHours(2)) && $now->lessThanOrEqualTo($latestCheckOut);
+    // IMPORTANT:
+    // Cho phép chấm công ra bất kỳ lúc nào sau khi đã chấm công vào và trước thời gian kết thúc ca + 1 giờ
+    // Bỏ điều kiện phải sau (kết thúc ca - 2 giờ)
+    // $canCheckOut = $now->greaterThanOrEqualTo($shiftEnd->copy()->subHours(2)) && $now->lessThanOrEqualTo($latestCheckOut);
+    $canCheckOut = $now->lessThanOrEqualTo($latestCheckOut);
 
     // Log để debug
     Log::info('Check-out time validation', [
