@@ -135,22 +135,11 @@ class AttendanceController extends Controller
         'error_message' => $errorMessage
       ]);
 
-      // Lấy dữ liệu mới nhất và trả về view Inertia với thông báo lỗi
-      $currentShift = $this->attendanceService->getCurrentShift($user->id);
-      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
-      $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord ? true : false;
-      $checkInTime = $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_in : null;
-      $checkOutTime = $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_out : null;
-
-      return Inertia::render('Attendance/Index', [
-        'user' => $user,
-        'currentShift' => $currentShift,
-        'attendanceHistory' => $attendanceHistory,
-        'hasAttendanceRecord' => $hasAttendanceRecord,
-        'checkInTime' => $checkInTime,
-        'checkOutTime' => $checkOutTime,
-        'error' => $errorMessage
-      ])->with('error', $errorMessage);
+      // Trả về response JSON với thông báo lỗi
+      return response()->json([
+        'success' => false,
+        'message' => $errorMessage
+      ], 400);
     }
   }
 
@@ -224,22 +213,11 @@ class AttendanceController extends Controller
         'error_message' => $errorMessage
       ]);
 
-      // Lấy dữ liệu mới nhất và trả về view Inertia với thông báo lỗi
-      $currentShift = $this->attendanceService->getCurrentShift($user->id);
-      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
-      $hasAttendanceRecord = $currentShift && $currentShift->attendanceRecord ? true : false;
-      $checkInTime = $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_in : null;
-      $checkOutTime = $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_out : null;
-
-      return Inertia::render('Attendance/Index', [
-        'user' => $user,
-        'currentShift' => $currentShift,
-        'attendanceHistory' => $attendanceHistory,
-        'hasAttendanceRecord' => $hasAttendanceRecord,
-        'checkInTime' => $checkInTime,
-        'checkOutTime' => $checkOutTime,
-        'error' => $errorMessage
-      ])->with('error', $errorMessage);
+      // Trả về response JSON với thông báo lỗi
+      return response()->json([
+        'success' => false,
+        'message' => $errorMessage
+      ], 400);
     }
   }
 

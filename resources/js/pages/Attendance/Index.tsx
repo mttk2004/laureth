@@ -173,10 +173,10 @@ export default function AttendanceIndex({
 
     // Xử lý sự kiện check-in
     const handleCheckIn = () => {
-        if (!currentShift || processing) return;
+        if (!currentShift || processing || !canCheckIn) return;
 
         setProcessing(true);
-        console.log('Handling check-in for shift:', currentShift);
+        console.log('Starting check-in process for shift:', currentShift);
 
         router.post(
             route('attendance.check-in'),
@@ -185,12 +185,19 @@ export default function AttendanceIndex({
             },
             {
                 preserveState: true,
-                onSuccess: () => {
+                onSuccess: (response) => {
+                    const data = response.props as { success?: boolean; message?: string };
+                    if (data.success === false) {
+                        // Xử lý lỗi từ server trả về
+                        addToast(data.message || 'Không thể chấm công vào. Vui lòng thử lại sau.', 'error');
+                        setProcessing(false);
+                        return;
+                    }
+
                     addToast('Chấm công vào ca làm việc thành công', 'success');
                     console.log('Check-in successful, updating local state');
 
                     // Cập nhật state sau khi check-in thành công
-                    setHasAttendanceRecord(true);
                     setCheckInTime(new Date().toISOString());
 
                     // Tải lại trang sau một khoảng thời gian ngắn để cập nhật dữ liệu từ server
@@ -207,7 +214,11 @@ export default function AttendanceIndex({
                 },
                 onError: (errors) => {
                     console.error('Check-in failed with errors:', errors);
-                    addToast('Không thể chấm công vào. Vui lòng thử lại sau.', 'error');
+                    if (errors.message) {
+                        addToast(errors.message, 'error');
+                    } else {
+                        addToast('Không thể chấm công vào. Vui lòng thử lại sau.', 'error');
+                    }
                     setProcessing(false);
                 },
             },
@@ -228,7 +239,15 @@ export default function AttendanceIndex({
             },
             {
                 preserveState: true,
-                onSuccess: () => {
+                onSuccess: (response) => {
+                    const data = response.props as { success?: boolean; message?: string };
+                    if (data.success === false) {
+                        // Xử lý lỗi từ server trả về
+                        addToast(data.message || 'Không thể chấm công ra. Vui lòng thử lại sau.', 'error');
+                        setProcessing(false);
+                        return;
+                    }
+
                     addToast('Chấm công ra ca làm việc thành công', 'success');
                     console.log('Check-out successful, updating local state');
 
@@ -249,7 +268,11 @@ export default function AttendanceIndex({
                 },
                 onError: (errors) => {
                     console.error('Check-out failed with errors:', errors);
-                    addToast('Không thể chấm công ra. Vui lòng thử lại sau.', 'error');
+                    if (errors.message) {
+                        addToast(errors.message, 'error');
+                    } else {
+                        addToast('Không thể chấm công ra. Vui lòng thử lại sau.', 'error');
+                    }
                     setProcessing(false);
                 },
             },

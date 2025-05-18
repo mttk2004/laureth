@@ -371,8 +371,12 @@ class AttendanceService extends BaseService
     // Lấy giờ bắt đầu và kết thúc ca
     [$startHour, $startMinute, $endHour, $endMinute] = $this->getShiftHours($shift->shift_type);
 
-    // Tạo thời gian bắt đầu ca
-    $shiftStart = Carbon::parse($shift->date)->setHour($startHour)->setMinute($startMinute)->setSecond(0);
+    // Tạo thời gian bắt đầu ca với múi giờ hiện tại
+    $shiftStart = Carbon::parse($shift->date)
+      ->setHour($startHour)
+      ->setMinute($startMinute)
+      ->setSecond(0)
+      ->setTimezone('Asia/Ho_Chi_Minh');
 
     // Tạo thời gian sớm nhất có thể chấm công (1 giờ trước giờ bắt đầu ca)
     $earliestCheckIn = $shiftStart->copy()->subHour();
@@ -383,10 +387,13 @@ class AttendanceService extends BaseService
     // Log để debug
     Log::info('Check-in time validation', [
       'now' => $now->toDateTimeString(),
+      'now_timezone' => $now->timezone->getName(),
       'shift_date' => $shiftDate->toDateString(),
       'shift_type' => $shift->shift_type,
       'shift_start' => $shiftStart->toDateTimeString(),
+      'shift_start_timezone' => $shiftStart->timezone->getName(),
       'earliest_check_in' => $earliestCheckIn->toDateTimeString(),
+      'earliest_check_in_timezone' => $earliestCheckIn->timezone->getName(),
       'can_check_in' => $canCheckIn ? 'yes' : 'no'
     ]);
 
@@ -408,8 +415,12 @@ class AttendanceService extends BaseService
     // Lấy giờ bắt đầu và kết thúc ca
     [$startHour, $startMinute, $endHour, $endMinute] = $this->getShiftHours($shift->shift_type);
 
-    // Tạo thời gian kết thúc ca
-    $shiftEnd = Carbon::parse($shift->date)->setHour($endHour)->setMinute($endMinute)->setSecond(0);
+    // Tạo thời gian kết thúc ca với múi giờ hiện tại
+    $shiftEnd = Carbon::parse($shift->date)
+      ->setHour($endHour)
+      ->setMinute($endMinute)
+      ->setSecond(0)
+      ->setTimezone('Asia/Ho_Chi_Minh');
 
     // Tạo thời gian trễ nhất có thể chấm công (1 giờ sau giờ kết thúc ca)
     $latestCheckOut = $shiftEnd->copy()->addHour();
@@ -420,10 +431,13 @@ class AttendanceService extends BaseService
     // Log để debug
     Log::info('Check-out time validation', [
       'now' => $now->toDateTimeString(),
+      'now_timezone' => $now->timezone->getName(),
       'shift_date' => $shiftDate->toDateString(),
       'shift_type' => $shift->shift_type,
       'shift_end' => $shiftEnd->toDateTimeString(),
+      'shift_end_timezone' => $shiftEnd->timezone->getName(),
       'latest_check_out' => $latestCheckOut->toDateTimeString(),
+      'latest_check_out_timezone' => $latestCheckOut->timezone->getName(),
       'can_check_out' => $canCheckOut ? 'yes' : 'no'
     ]);
 
