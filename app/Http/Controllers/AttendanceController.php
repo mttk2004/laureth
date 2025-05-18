@@ -125,7 +125,7 @@ class AttendanceController extends Controller
         'checkOutTime' => $checkOutTime,
         'success' => true,
         'message' => 'Chấm công vào ca làm việc thành công.'
-      ]);
+      ])->with('success', 'Chấm công vào ca làm việc thành công.');
     } else {
       // Kiểm tra log để xác định lỗi cụ thể
       $latestLog = $this->getLatestAttendanceLog();
@@ -167,7 +167,7 @@ class AttendanceController extends Controller
         'checkInTime' => $checkInTime,
         'checkOutTime' => $checkOutTime,
         'error' => $errorMessage
-      ]);
+      ])->with('error', $errorMessage);
     }
   }
 
@@ -229,7 +229,7 @@ class AttendanceController extends Controller
         'checkOutTime' => $checkOutTime,
         'success' => true,
         'message' => 'Chấm công ra ca làm việc thành công.'
-      ]);
+      ])->with('success', 'Chấm công ra ca làm việc thành công.');
     } else {
       // Kiểm tra log để xác định lỗi cụ thể
       $latestLog = $this->getLatestAttendanceLog();
@@ -273,7 +273,7 @@ class AttendanceController extends Controller
         'checkInTime' => $checkInTime,
         'checkOutTime' => $checkOutTime,
         'error' => $errorMessage
-      ]);
+      ])->with('error', $errorMessage);
     }
   }
 

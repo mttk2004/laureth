@@ -52,144 +52,40 @@ export default function AttendanceIndex({
     const [checkInTime, setCheckInTime] = useState(initialCheckInTime);
     const [checkOutTime, setCheckOutTime] = useState(initialCheckOutTime);
 
-    // Cập nhật state khi props thay đổi
+    // Cập nhật state khi props thay đổi - chỉ chạy khi các prop thực sự thay đổi
     useEffect(() => {
-        console.log('Props changed, updating state with:', {
-            initialShift,
-            initialHistory,
-            initialHasAttendanceRecord,
-            initialCheckInTime,
-            initialCheckOutTime,
-            success,
-            message,
-        });
         setCurrentShift(initialShift);
         setAttendanceHistory(initialHistory);
         setHasAttendanceRecord(initialHasAttendanceRecord);
         setCheckInTime(initialCheckInTime);
         setCheckOutTime(initialCheckOutTime);
-    }, [initialShift, initialHistory, initialHasAttendanceRecord, initialCheckInTime, initialCheckOutTime, success, message]);
+    }, [initialShift, initialHistory, initialHasAttendanceRecord, initialCheckInTime, initialCheckOutTime]);
 
-    // Log khi component được mount
-    useEffect(() => {
-        console.log('Component mounted with initial data:', {
-            initialShift,
-            initialHistory,
-            hasAttendanceRecord: initialShift && !!initialShift.attendanceRecord,
-            checkIn: initialShift && initialShift.attendanceRecord ? initialShift.attendanceRecord.check_in : null,
-            checkOut: initialShift && initialShift.attendanceRecord ? initialShift.attendanceRecord.check_out : null,
-        });
-
-        // Kiểm tra chi tiết về attendance record ban đầu
-        if (initialShift && initialShift.attendanceRecord) {
-            console.log('Initial attendance record details:', {
-                id: initialShift.attendanceRecord.id,
-                user_id: initialShift.attendanceRecord.user_id,
-                shift_id: initialShift.attendanceRecord.shift_id,
-                check_in: initialShift.attendanceRecord.check_in,
-                check_out: initialShift.attendanceRecord.check_out,
-                total_hours: initialShift.attendanceRecord.total_hours,
-                created_at: initialShift.attendanceRecord.created_at,
-                updated_at: initialShift.attendanceRecord.updated_at,
-                type_of_check_in: typeof initialShift.attendanceRecord.check_in,
-                type_of_check_out: typeof initialShift.attendanceRecord.check_out,
-                is_empty_object: Object.keys(initialShift.attendanceRecord as object).length === 0,
-            });
-        }
-    }, []);
-
-    // Kiểm tra trạng thái check-in/check-out của ca làm việc hiện tại
-    const canCheckIn = useMemo(() => {
-        // Sử dụng trực tiếp state hasAttendanceRecord và checkInTime
-        if (!currentShift) return false;
-
-        // Nếu không có attendance record hoặc không có check-in
-        if (!hasAttendanceRecord) return true;
-
-        // Nếu có attendance record nhưng không có check-in
-        return !checkInTime;
-    }, [currentShift, hasAttendanceRecord, checkInTime]);
-
-    const canCheckOut = useMemo(() => {
-        // Sử dụng trực tiếp state hasAttendanceRecord, checkInTime và checkOutTime
-        if (!currentShift) return false;
-
-        // Nếu không có attendance record hoặc không có check-in
-        if (!hasAttendanceRecord || !checkInTime) return false;
-
-        // Nếu có check-in nhưng chưa có check-out
-        return !checkOutTime;
-    }, [currentShift, hasAttendanceRecord, checkInTime, checkOutTime]);
-
-    // Debug
-    useEffect(() => {
-        console.log('Current shift state:', currentShift);
-        console.log('Direct state values:', {
-            hasAttendanceRecord,
-            checkInTime,
-            checkOutTime,
-        });
-        console.log('Can check in:', canCheckIn);
-        console.log('Can check out:', canCheckOut);
-    }, [currentShift, hasAttendanceRecord, checkInTime, checkOutTime, canCheckIn, canCheckOut]);
-
-    // Kiểm tra và cập nhật trạng thái attendance record
-    useEffect(() => {
-        if (currentShift) {
-            // Kiểm tra attendance record có tồn tại và có dữ liệu hợp lệ không
-            const hasRecord =
-                !!currentShift.attendanceRecord && typeof currentShift.attendanceRecord === 'object' && currentShift.attendanceRecord !== null;
-
-            // Kiểm tra xem có phải là object rỗng không
-            const isEmptyObject = hasRecord && Object.keys(currentShift.attendanceRecord as object).length === 0;
-
-            // Kiểm tra xem có chứa dữ liệu hợp lệ không
-            const hasValidData =
-                hasRecord &&
-                !isEmptyObject &&
-                ('id' in (currentShift.attendanceRecord as object) ||
-                    'check_in' in (currentShift.attendanceRecord as object) ||
-                    'check_out' in (currentShift.attendanceRecord as object));
-
-            // Chỉ coi là có attendance record nếu nó không phải là object rỗng và chứa dữ liệu hợp lệ
-            const validRecord = hasRecord && !isEmptyObject && hasValidData;
-
-            console.log('Attendance record check:', {
-                hasRecord,
-                isEmptyObject,
-                hasValidData,
-                validRecord,
-                attendanceRecord: currentShift.attendanceRecord,
-                typeofAttendanceRecord: typeof currentShift.attendanceRecord,
-                keys: hasRecord ? Object.keys(currentShift.attendanceRecord as object) : [],
-            });
-
-            setHasAttendanceRecord(validRecord);
-        } else {
-            setHasAttendanceRecord(false);
-        }
-    }, [currentShift]);
-
-    // Hiển thị thông báo lỗi nếu có
+    // Xử lý thông báo - chỉ chạy một lần khi có thông báo mới
     useEffect(() => {
         if (error) {
             addToast(error, 'error');
-        }
-    }, [error, addToast]);
-
-    // Hiển thị thông báo thành công nếu có
-    useEffect(() => {
-        if (success && message) {
+        } else if (success && message) {
             addToast(message, 'success');
         }
-    }, [success, message, addToast]);
+    }, [error, success, message]);
+
+    // Kiểm tra trạng thái check-in/check-out của ca làm việc hiện tại
+    const canCheckIn = useMemo(() => {
+        if (!currentShift) return false;
+        return !hasAttendanceRecord || !checkInTime;
+    }, [currentShift, hasAttendanceRecord, checkInTime]);
+
+    const canCheckOut = useMemo(() => {
+        if (!currentShift) return false;
+        return hasAttendanceRecord && !!checkInTime && !checkOutTime;
+    }, [currentShift, hasAttendanceRecord, checkInTime, checkOutTime]);
 
     // Xử lý sự kiện check-in
     const handleCheckIn = () => {
         if (!currentShift || processing || !canCheckIn) return;
 
         setProcessing(true);
-        console.log('Starting check-in process for shift:', currentShift);
 
         router.post(
             route('attendance.check-in'),
@@ -199,12 +95,9 @@ export default function AttendanceIndex({
             {
                 preserveState: false,
                 onSuccess: () => {
-                    // Không cần xử lý gì thêm vì trang đã được render lại với dữ liệu mới
-                    console.log('Check-in successful, page has been re-rendered');
                     setProcessing(false);
                 },
                 onError: (errors) => {
-                    console.error('Check-in failed with errors:', errors);
                     if (errors.message) {
                         addToast(errors.message, 'error');
                     } else {
@@ -221,7 +114,6 @@ export default function AttendanceIndex({
         if (!currentShift || processing || !canCheckOut) return;
 
         setProcessing(true);
-        console.log('Starting check-out process for shift:', currentShift);
 
         router.post(
             route('attendance.check-out'),
@@ -231,12 +123,9 @@ export default function AttendanceIndex({
             {
                 preserveState: false,
                 onSuccess: () => {
-                    // Không cần xử lý gì thêm vì trang đã được render lại với dữ liệu mới
-                    console.log('Check-out successful, page has been re-rendered');
                     setProcessing(false);
                 },
                 onError: (errors) => {
-                    console.error('Check-out failed with errors:', errors);
                     if (errors.message) {
                         addToast(errors.message, 'error');
                     } else {
