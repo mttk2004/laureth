@@ -48,7 +48,7 @@ export default function AttendanceIndex({ user, currentShift: initialShift, atte
   const canCheckOut = useMemo(() => {
     if (!currentShift) return false;
     return currentShift.attendanceRecord &&
-           currentShift.attendanceRecord.check_in &&
+           currentShift.attendanceRecord.check_in !== null &&
            !currentShift.attendanceRecord.check_out;
   }, [currentShift]);
 
@@ -69,7 +69,7 @@ export default function AttendanceIndex({ user, currentShift: initialShift, atte
       shift_id: currentShift.id,
     }, {
       preserveState: true,
-      onSuccess: (page) => {
+      onSuccess: () => {
         addToast('Chấm công vào ca làm việc thành công', 'success');
 
         // Cập nhật trạng thái local sau khi check-in thành công
@@ -104,7 +104,10 @@ export default function AttendanceIndex({ user, currentShift: initialShift, atte
 
         // Tải lại trang sau một khoảng thời gian ngắn để cập nhật dữ liệu từ server
         setTimeout(() => {
-          router.reload();
+          router.visit(route('attendance.index'), {
+            preserveScroll: true,
+            replace: true
+          });
         }, 500);
 
         setProcessing(false);
@@ -127,11 +130,11 @@ export default function AttendanceIndex({ user, currentShift: initialShift, atte
       shift_id: currentShift.id,
     }, {
       preserveState: true,
-      onSuccess: (page) => {
+      onSuccess: () => {
         addToast('Chấm công ra ca làm việc thành công', 'success');
 
         // Cập nhật trạng thái local sau khi check-out thành công
-        if (currentShift && currentShift.attendanceRecord) {
+        if (currentShift && currentShift.attendanceRecord && currentShift.attendanceRecord.check_in) {
           const checkOutTime = new Date();
           const checkInTime = new Date(currentShift.attendanceRecord.check_in);
           const totalHours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
@@ -150,7 +153,10 @@ export default function AttendanceIndex({ user, currentShift: initialShift, atte
 
         // Tải lại trang sau một khoảng thời gian ngắn để cập nhật dữ liệu từ server
         setTimeout(() => {
-          router.reload();
+          router.visit(route('attendance.index'), {
+            preserveScroll: true,
+            replace: true
+          });
         }, 500);
 
         setProcessing(false);

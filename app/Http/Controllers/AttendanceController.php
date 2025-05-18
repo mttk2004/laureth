@@ -6,6 +6,7 @@ use App\Http\Requests\CheckInRequest;
 use App\Http\Requests\CheckOutRequest;
 use App\Services\AttendanceService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class AttendanceController extends Controller
@@ -32,6 +33,15 @@ class AttendanceController extends Controller
     // Lấy lịch sử chấm công của nhân viên
     $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
 
+    // Log để debug
+    Log::info('Attendance index data', [
+      'user_id' => $user->id,
+      'has_current_shift' => $currentShift ? 'yes' : 'no',
+      'has_attendance_record' => $currentShift && $currentShift->attendanceRecord ? 'yes' : 'no',
+      'check_in' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_in : null,
+      'check_out' => $currentShift && $currentShift->attendanceRecord ? $currentShift->attendanceRecord->check_out : null,
+    ]);
+
     return Inertia::render('Attendance/Index', [
       'user' => $user,
       'currentShift' => $currentShift,
@@ -51,20 +61,33 @@ class AttendanceController extends Controller
     $validatedData = $request->validated();
     $shiftId = $validatedData['shift_id'];
 
+    Log::info('Processing check-in request', [
+      'user_id' => $user->id,
+      'shift_id' => $shiftId
+    ]);
+
     $result = $this->attendanceService->checkIn($user->id, $shiftId);
 
     if ($result) {
-      // Lấy thông tin mới nhất sau khi check-in
-      $currentShift = $this->attendanceService->getCurrentShift($user->id);
-      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
+      Log::info('Check-in successful', [
+        'user_id' => $user->id,
+        'shift_id' => $shiftId
+      ]);
 
-      return redirect()->route('attendance.index')
-        ->with('success', 'Chấm công vào ca làm việc thành công.')
-        ->with('currentShift', $currentShift)
-        ->with('attendanceHistory', $attendanceHistory);
+      return response()->json([
+        'success' => true,
+        'message' => 'Chấm công vào ca làm việc thành công.'
+      ]);
     } else {
-      return redirect()->route('attendance.index')
-        ->with('error', 'Không thể chấm công vào. Vui lòng thử lại sau.');
+      Log::warning('Check-in failed', [
+        'user_id' => $user->id,
+        'shift_id' => $shiftId
+      ]);
+
+      return response()->json([
+        'success' => false,
+        'message' => 'Không thể chấm công vào. Vui lòng thử lại sau.'
+      ], 422);
     }
   }
 
@@ -80,20 +103,33 @@ class AttendanceController extends Controller
     $validatedData = $request->validated();
     $shiftId = $validatedData['shift_id'];
 
+    Log::info('Processing check-out request', [
+      'user_id' => $user->id,
+      'shift_id' => $shiftId
+    ]);
+
     $result = $this->attendanceService->checkOut($user->id, $shiftId);
 
     if ($result) {
-      // Lấy thông tin mới nhất sau khi check-out
-      $currentShift = $this->attendanceService->getCurrentShift($user->id);
-      $attendanceHistory = $this->attendanceService->getAttendanceHistory($user->id);
+      Log::info('Check-out successful', [
+        'user_id' => $user->id,
+        'shift_id' => $shiftId
+      ]);
 
-      return redirect()->route('attendance.index')
-        ->with('success', 'Chấm công ra ca làm việc thành công.')
-        ->with('currentShift', $currentShift)
-        ->with('attendanceHistory', $attendanceHistory);
+      return response()->json([
+        'success' => true,
+        'message' => 'Chấm công ra ca làm việc thành công.'
+      ]);
     } else {
-      return redirect()->route('attendance.index')
-        ->with('error', 'Không thể chấm công ra. Vui lòng thử lại sau.');
+      Log::warning('Check-out failed', [
+        'user_id' => $user->id,
+        'shift_id' => $shiftId
+      ]);
+
+      return response()->json([
+        'success' => false,
+        'message' => 'Không thể chấm công ra. Vui lòng thử lại sau.'
+      ], 422);
     }
   }
 }

@@ -43,6 +43,7 @@ class AttendanceService extends BaseService
       ->first();
 
     if (!$shift) {
+      Log::info('No shift found for today', ['user_id' => $userId, 'date' => $today]);
       return null;
     }
 
@@ -50,16 +51,24 @@ class AttendanceService extends BaseService
     $shiftModel = Shift::find($shift->id);
 
     if (!$shiftModel) {
+      Log::info('Shift model not found', ['shift_id' => $shift->id]);
       return null;
     }
 
     // Lấy bản ghi chấm công mới nhất liên quan đến ca này
-    $attendance = AttendanceRecord::where('shift_id', $shiftModel->id)
+    // Sử dụng DB::table để tránh cache
+    $attendance = DB::table('attendance_records')
+      ->where('shift_id', $shiftModel->id)
       ->orderBy('updated_at', 'desc')
       ->first();
 
-    // Attach attendance record trực tiếp vào shift
-    $shiftModel->setRelation('attendanceRecord', $attendance);
+    if ($attendance) {
+      // Convert DB object to AttendanceRecord model
+      $attendanceModel = AttendanceRecord::find($attendance->id);
+      $shiftModel->setRelation('attendanceRecord', $attendanceModel);
+    } else {
+      $shiftModel->setRelation('attendanceRecord', null);
+    }
 
     // Log để debug
     Log::info('Current shift info', [
@@ -107,6 +116,10 @@ class AttendanceService extends BaseService
         ->first();
 
       if (!$shift) {
+        Log::warning('Check-in failed: Shift not found or not owned by user', [
+          'user_id' => $userId,
+          'shift_id' => $shiftId
+        ]);
         return false;
       }
 
@@ -114,6 +127,12 @@ class AttendanceService extends BaseService
       $attendance = AttendanceRecord::where('shift_id', $shiftId)->first();
 
       if ($attendance && $attendance->check_in) {
+        Log::warning('Check-in failed: Already checked in', [
+          'user_id' => $userId,
+          'shift_id' => $shiftId,
+          'attendance_id' => $attendance->id,
+          'check_in' => $attendance->check_in
+        ]);
         return false; // Đã chấm công vào rồi
       }
 
@@ -125,11 +144,31 @@ class AttendanceService extends BaseService
           'check_in' => Carbon::now(),
         ]);
 
-        return $attendance->save();
+        $result = $attendance->save();
+
+        Log::info('New attendance record created', [
+          'user_id' => $userId,
+          'shift_id' => $shiftId,
+          'attendance_id' => $attendance->id,
+          'check_in' => $attendance->check_in,
+          'success' => $result
+        ]);
+
+        return $result;
       } else {
-        return $attendance->update([
+        $result = $attendance->update([
           'check_in' => Carbon::now(),
         ]);
+
+        Log::info('Attendance record updated for check-in', [
+          'user_id' => $userId,
+          'shift_id' => $shiftId,
+          'attendance_id' => $attendance->id,
+          'check_in' => $attendance->check_in,
+          'success' => $result
+        ]);
+
+        return $result;
       }
     });
   }
@@ -151,10 +190,21 @@ class AttendanceService extends BaseService
         ->first();
 
       if (!$attendance || !$attendance->check_in) {
+        Log::warning('Check-out failed: No check-in record found', [
+          'user_id' => $userId,
+          'shift_id' => $shiftId,
+          'has_attendance' => $attendance ? 'yes' : 'no'
+        ]);
         return false; // Chưa chấm công vào
       }
 
       if ($attendance->check_out) {
+        Log::warning('Check-out failed: Already checked out', [
+          'user_id' => $userId,
+          'shift_id' => $shiftId,
+          'attendance_id' => $attendance->id,
+          'check_out' => $attendance->check_out
+        ]);
         return false; // Đã chấm công ra rồi
       }
 
@@ -165,10 +215,22 @@ class AttendanceService extends BaseService
       $totalHours = $checkOut->diffInMinutes($attendance->check_in) / 60;
 
       // Cập nhật giờ ra và tổng thời gian
-      return $attendance->update([
+      $result = $attendance->update([
         'check_out' => $checkOut,
         'total_hours' => $totalHours,
       ]);
+
+      Log::info('Attendance record updated for check-out', [
+        'user_id' => $userId,
+        'shift_id' => $shiftId,
+        'attendance_id' => $attendance->id,
+        'check_in' => $attendance->check_in,
+        'check_out' => $checkOut,
+        'total_hours' => $totalHours,
+        'success' => $result
+      ]);
+
+      return $result;
     });
   }
 }
