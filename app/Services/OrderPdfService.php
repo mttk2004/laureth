@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\View;
+
+class OrderPdfService
+{
+  /**
+   * Tạo file PDF cho đơn hàng
+   *
+   * @param Order $order
+   * @return \Illuminate\Http\Response
+   */
+  public function generatePdf(Order $order)
+  {
+    // Lấy đơn hàng với các quan hệ liên quan
+    $order->load(['items.product', 'user', 'store']);
+
+    // Tính toán tổng số lượng
+    $totalQuantity = $order->items->sum('quantity');
+
+    // Tạo view từ blade template
+    $html = View::make('pdf.order', [
+      'order' => $order,
+      'totalQuantity' => $totalQuantity,
+    ])->render();
+
+    // Tạo PDF từ HTML
+    $pdf = PDF::loadHTML($html);
+
+    // Tùy chỉnh PDF
+    $pdf->setPaper('a4');
+    $pdf->setOptions([
+      'isHtml5ParserEnabled' => true,
+      'isRemoteEnabled' => true,
+      'defaultFont' => 'sans-serif',
+      'isFontSubsettingEnabled' => true,
+      'isPhpEnabled' => true,
+    ]);
+
+    // Tên file download
+    $filename = 'don-hang-' . substr($order->id, -6) . '.pdf';
+
+    // Trả về response để download
+    return $pdf->download($filename);
+  }
+}

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderPdfController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductInventoryController;
@@ -90,6 +91,7 @@ Route::middleware(['web', 'auth', 'verified', 'staff'])->group(function () {
   Route::get('/api/orders/{order}/items', [OrderController::class, 'getItems']);
   Route::get('/api/orders/{order}/details', [OrderController::class, 'getDetails']);
   Route::patch('/api/orders/{order}/update-status', [OrderController::class, 'updateStatus']);
+  Route::get('/orders/{order}/download', [OrderPdfController::class, 'download'])->name('orders.download');
   // });
 });
 

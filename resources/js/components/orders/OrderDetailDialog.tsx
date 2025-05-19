@@ -7,7 +7,7 @@ import { formatCurrency, formatDate } from '@/lib/formatters';
 import { Order, OrderItem, OrderStatus } from '@/types/order';
 import { User } from '@/types/user';
 import axios from 'axios';
-import { Loader2Icon } from 'lucide-react';
+import { Loader2Icon, PrinterIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface OrderWithDetails extends Order {
@@ -88,6 +88,16 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
             .finally(() => {
                 setUpdatingStatus(false);
             });
+    };
+
+    const handlePrint = () => {
+        if (!order) return;
+
+        // Sử dụng URL để tải xuống PDF
+        const downloadUrl = `/orders/${order.id}/download`;
+
+        // Mở URL trong tab mới (trình duyệt sẽ tự động tải xuống)
+        window.open(downloadUrl, '_blank');
     };
 
     if (loading) {
@@ -224,6 +234,11 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Đóng
                     </Button>
+                    { order.status === 'completed' &&
+                    <Button onClick={handlePrint}>
+                    <PrinterIcon className="mr-2 h-4 w-4" />
+                    In PDF
+                </Button>}
                 </DialogFooter>
             </DialogContent>
         </Dialog>
