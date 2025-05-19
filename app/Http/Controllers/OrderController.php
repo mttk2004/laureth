@@ -12,6 +12,8 @@ use App\Http\Requests\OrderRequest;
 use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\InventoryItem;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -61,25 +63,113 @@ class OrderController extends Controller
   public function create()
   {
     $user = Auth::user();
+    Log::info('Đang tạo đơn hàng mới cho user:', ['user_id' => $user->id, 'store_id' => $user->store_id]);
 
-    // Tìm warehouse của cửa hàng
-    $warehouse = Warehouse::where('store_id', $user->store_id)->first();
+    // Lấy danh sách warehouse_ids của cửa hàng
+    $warehouseIds = Warehouse::where('store_id', $user->store_id)
+      ->pluck('id')
+      ->toArray();
 
-    if (!$warehouse) {
+    Log::info('Danh sách warehouse_ids:', ['warehouse_ids' => $warehouseIds]);
+
+    if (empty($warehouseIds)) {
+      Log::warning('Không tìm thấy kho hàng cho cửa hàng', ['store_id' => $user->store_id]);
       return redirect()->route('pos.index')->with('error', 'Không tìm thấy kho hàng cho cửa hàng này.');
     }
 
+    // So sánh với tổng số lượng trong tất cả các kho
+    $totalInventoryCheck = DB::table('inventory_items')
+      ->select('product_id', DB::raw('SUM(quantity) as total_quantity'))
+      ->groupBy('product_id')
+      ->get();
+
+    Log::info('Kiểm tra tổng số lượng trong TẤT CẢ các kho:', ['total_inventory_check' => $totalInventoryCheck]);
+
+    // Kiểm tra số lượng tồn kho trong các kho của cửa hàng
+    $storeInventoryCheck = DB::table('inventory_items')
+      ->join('warehouses', 'inventory_items.warehouse_id', '=', 'warehouses.id')
+      ->where('warehouses.store_id', $user->store_id)
+      ->where('inventory_items.quantity', '>', 0)
+      ->select('inventory_items.product_id', DB::raw('SUM(inventory_items.quantity) as store_quantity'))
+      ->groupBy('inventory_items.product_id')
+      ->get();
+
+    Log::info('Kiểm tra số lượng tồn kho trong các kho của CỬA HÀNG:', ['store_inventory_check' => $storeInventoryCheck]);
+
+    // So sánh chi tiết từng sản phẩm
+    foreach ($totalInventoryCheck as $totalItem) {
+      $storeItem = $storeInventoryCheck->firstWhere('product_id', $totalItem->product_id);
+      $storeQuantity = $storeItem ? $storeItem->store_quantity : 0;
+
+      Log::info("So sánh số lượng sản phẩm {$totalItem->product_id}:", [
+        'total_quantity' => $totalItem->total_quantity,
+        'store_quantity' => $storeQuantity,
+        'difference' => $totalItem->total_quantity - $storeQuantity
+      ]);
+    }
+
     // Lấy danh sách sản phẩm có trong kho của cửa hàng
-    $products = Product::whereHas('inventoryItems', function ($query) use ($warehouse) {
-      $query->where('warehouse_id', $warehouse->id)
-        ->where('quantity', '>', 0);
-    })->with(['inventoryItems' => function ($query) use ($warehouse) {
-      $query->where('warehouse_id', $warehouse->id);
-    }])->get();
+    $productIds = $storeInventoryCheck->pluck('product_id')->toArray();
+
+    Log::info('Danh sách product_ids có số lượng > 0 trong cửa hàng:', ['product_ids' => $productIds, 'count' => count($productIds)]);
+
+    // Lấy thông tin chi tiết của sản phẩm
+    $products = Product::whereIn('id', $productIds)->get();
+
+    Log::info('Số lượng sản phẩm lấy được:', ['count' => $products->count()]);
+
+    // Chuẩn bị dữ liệu để hiển thị
+    $productsWithInventory = [];
+    foreach ($products as $product) {
+      // Lấy tổng số lượng từ kết quả kiểm tra trước đó
+      $inventoryItem = $storeInventoryCheck->firstWhere('product_id', $product->id);
+      $totalItem = $totalInventoryCheck->firstWhere('product_id', $product->id);
+
+      $storeQuantity = $inventoryItem ? $inventoryItem->store_quantity : 0;
+      $totalQuantity = $totalItem ? $totalItem->total_quantity : 0;
+
+      Log::info("Chi tiết số lượng của sản phẩm {$product->name}:", [
+        'store_quantity' => $storeQuantity,
+        'total_quantity' => $totalQuantity
+      ]);
+
+      if ($storeQuantity > 0) {
+        $productData = $product->toArray();
+
+        // Thêm trường inventoryItems (camelCase) cho frontend
+        $productData['inventoryItems'] = [
+          [
+            'id' => 0,
+            'warehouse_id' => $warehouseIds[0],
+            'product_id' => $product->id,
+            'quantity' => $storeQuantity,
+          ]
+        ];
+
+        Log::info('Đã tạo inventoryItems cho sản phẩm', [
+          'product_id' => $product->id,
+          'inventory_item' => $productData['inventoryItems'][0]
+        ]);
+
+        $productsWithInventory[] = $productData;
+      }
+    }
+
+    Log::info('Số lượng sản phẩm sau khi xử lý:', ['count' => count($productsWithInventory)]);
+
+    // Kiểm tra cấu trúc dữ liệu cuối cùng
+    foreach ($productsWithInventory as $index => $product) {
+      Log::info("Sản phẩm cuối cùng {$index}:", [
+        'id' => $product['id'],
+        'name' => $product['name'],
+        'inventoryItems_count' => isset($product['inventoryItems']) ? count($product['inventoryItems']) : 0,
+        'quantity' => isset($product['inventoryItems'][0]) ? $product['inventoryItems'][0]['quantity'] : 'không có'
+      ]);
+    }
 
     return Inertia::render('Orders/Create', [
       'user' => $user,
-      'products' => $products,
+      'products' => $productsWithInventory,
     ]);
   }
 

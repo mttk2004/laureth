@@ -81,11 +81,13 @@ Route::middleware(['web', 'auth', 'verified', 'staff'])->group(function () {
   Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
 
   // Routes cho chức năng POS
-  Route::get('/pos', [OrderController::class, 'index'])->name('pos.index');
-  Route::get('/pos/create', [OrderController::class, 'create'])->name('pos.create');
-  Route::post('/pos', [OrderController::class, 'store'])->name('pos.store');
-  Route::get('/api/orders/{order}/items', [OrderController::class, 'getItems']);
-  Route::get('/api/orders/{order}/details', [OrderController::class, 'getDetails']);
+  Route::middleware(['check-active-shift'])->group(function () {
+    Route::get('/pos', [OrderController::class, 'index'])->name('pos.index');
+    Route::get('/pos/create', [OrderController::class, 'create'])->name('pos.create');
+    Route::post('/pos', [OrderController::class, 'store'])->name('pos.store');
+    Route::get('/api/orders/{order}/items', [OrderController::class, 'getItems']);
+    Route::get('/api/orders/{order}/details', [OrderController::class, 'getDetails']);
+  });
 });
 
 require __DIR__ . '/settings.php';
