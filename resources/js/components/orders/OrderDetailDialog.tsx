@@ -117,7 +117,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
             <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogContent className="sm:max-w-lg md:max-w-2xl">
                     <div className="flex h-40 items-center justify-center">
-                        <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
+                        <Loader2Icon className="text-primary h-8 w-8 animate-spin" />
                         <span className="ml-2">Đang tải thông tin đơn hàng...</span>
                     </div>
                 </DialogContent>
@@ -143,7 +143,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                     {/* Cột trái - Thông tin đơn hàng */}
                     <div className="space-y-4">
                         <div>
-                            <h3 className="mb-2 text-sm font-medium text-muted-foreground">Thông tin đơn hàng</h3>
+                            <h3 className="text-muted-foreground mb-2 text-sm font-medium">Thông tin đơn hàng</h3>
                             <div className="grid grid-cols-3 gap-2 text-sm">
                                 <div className="font-medium">Ngày đặt:</div>
                                 <div className="col-span-2">{formatDate(order.order_date)}</div>
@@ -170,7 +170,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                         </div>
 
                         <div>
-                            <h3 className="mb-2 text-sm font-medium text-muted-foreground">Thông tin khác</h3>
+                            <h3 className="text-muted-foreground mb-2 text-sm font-medium">Thông tin khác</h3>
                             <div className="grid grid-cols-3 gap-2 text-sm">
                                 <div className="font-medium">Cửa hàng:</div>
                                 <div className="col-span-2">{order.store?.name || 'N/A'}</div>
@@ -180,46 +180,40 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                             </div>
                         </div>
 
-                        { order.status === 'pending' &&
-                        <div>
-                            <h3 className="mb-2 text-sm font-medium text-muted-foreground">Cập nhật trạng thái</h3>
-                            <div className="flex items-center space-x-2">
-                                <Select
-                                    value={selectedStatus || undefined}
-                                    onValueChange={(value) => setSelectedStatus(value as OrderStatus)}
-                                >
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Chọn trạng thái" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value={OrderStatus.PENDING}>Đang xử lý</SelectItem>
-                                        <SelectItem value={OrderStatus.COMPLETED}>Hoàn thành</SelectItem>
-                                        <SelectItem value={OrderStatus.CANCELED}>Đã hủy</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Button
-                                    onClick={handleUpdateStatus}
-                                    disabled={updatingStatus || selectedStatus === order.status}
-                                    size="sm"
-                                >
-                                    {updatingStatus && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-                                    Cập nhật
-                                </Button>
+                        {order.status === 'pending' && (
+                            <div>
+                                <h3 className="text-muted-foreground mb-2 text-sm font-medium">Cập nhật trạng thái</h3>
+                                <div className="flex items-center space-x-2">
+                                    <Select value={selectedStatus || undefined} onValueChange={(value) => setSelectedStatus(value as OrderStatus)}>
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue placeholder="Chọn trạng thái" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={OrderStatus.PENDING}>Đang xử lý</SelectItem>
+                                            <SelectItem value={OrderStatus.COMPLETED}>Hoàn thành</SelectItem>
+                                            <SelectItem value={OrderStatus.CANCELED}>Đã hủy</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Button onClick={handleUpdateStatus} disabled={updatingStatus || selectedStatus === order.status} size="sm">
+                                        {updatingStatus && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                                        Cập nhật
+                                    </Button>
+                                </div>
                             </div>
-                        </div> }
+                        )}
                     </div>
 
                     {/* Cột phải - Chi tiết sản phẩm */}
                     <div>
-                        <h3 className="mb-2 text-sm font-medium text-muted-foreground">Chi tiết sản phẩm</h3>
+                        <h3 className="text-muted-foreground mb-2 text-sm font-medium">Chi tiết sản phẩm</h3>
                         <div className="max-h-[300px] overflow-y-auto rounded-md border">
                             <table className="w-full text-sm">
                                 <thead className="bg-muted/50">
                                     <tr>
-                                        <th className="whitespace-nowrap px-4 py-2 text-left font-medium">Sản phẩm</th>
-                                        <th className="whitespace-nowrap px-4 py-2 text-right font-medium">SL</th>
-                                        <th className="whitespace-nowrap px-4 py-2 text-right font-medium">Đơn giá</th>
-                                        <th className="whitespace-nowrap px-4 py-2 text-right font-medium">Thành tiền</th>
+                                        <th className="px-4 py-2 text-left font-medium whitespace-nowrap">Sản phẩm</th>
+                                        <th className="px-4 py-2 text-right font-medium whitespace-nowrap">SL</th>
+                                        <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Đơn giá</th>
+                                        <th className="px-4 py-2 text-right font-medium whitespace-nowrap">Thành tiền</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -233,7 +227,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                                     ))}
                                     {orderItems.length === 0 && (
                                         <tr>
-                                            <td colSpan={4} className="px-4 py-2 text-center text-muted-foreground">
+                                            <td colSpan={4} className="text-muted-foreground px-4 py-2 text-center">
                                                 Không có dữ liệu sản phẩm
                                             </td>
                                         </tr>
@@ -248,11 +242,12 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Đóng
                     </Button>
-                    { order.status === 'completed' &&
-                    <Button onClick={handlePrint}>
-                    <PrinterIcon className="mr-2 h-4 w-4" />
-                    In PDF
-                </Button>}
+                    {order.status === 'completed' && (
+                        <Button onClick={handlePrint}>
+                            <PrinterIcon className="mr-2 h-4 w-4" />
+                            In PDF
+                        </Button>
+                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

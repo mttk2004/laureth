@@ -46,11 +46,11 @@ export default function OrderCreate({ user, products }: Props) {
         payment_method: PaymentMethod.CASH,
         status: OrderStatus.COMPLETED,
         store_id: user.store_id,
-        items: items.map(item => ({
+        items: items.map((item) => ({
             product_id: item.product_id,
             quantity: item.quantity,
             unit_price: item.unit_price,
-            total_price: item.total_price
+            total_price: item.total_price,
         })),
     });
 
@@ -64,11 +64,11 @@ export default function OrderCreate({ user, products }: Props) {
             payment_method: data.payment_method,
             status: data.status,
             store_id: data.store_id,
-            items: items.map(item => ({
+            items: items.map((item) => ({
                 product_id: item.product_id,
                 quantity: item.quantity,
                 unit_price: item.unit_price,
-                total_price: item.total_price
+                total_price: item.total_price,
             })),
         });
     }, [items, discountAmount]);
@@ -213,11 +213,7 @@ export default function OrderCreate({ user, products }: Props) {
                                                     const inventoryItem = product.inventoryItems?.[0];
                                                     const quantity = inventoryItem?.quantity || 0;
                                                     return (
-                                                        <SelectItem
-                                                            key={product.id}
-                                                            value={product.id}
-                                                            disabled={quantity <= 0}
-                                                        >
+                                                        <SelectItem key={product.id} value={product.id} disabled={quantity <= 0}>
                                                             {product.name} - {formatCurrency(product.price)} (Còn {quantity})
                                                         </SelectItem>
                                                     );
@@ -245,7 +241,7 @@ export default function OrderCreate({ user, products }: Props) {
                                 <div className="rounded-md border">
                                     <table className="w-full">
                                         <thead>
-                                            <tr className="border-b bg-muted/50">
+                                            <tr className="bg-muted/50 border-b">
                                                 <th className="p-2 text-left font-medium">Sản phẩm</th>
                                                 <th className="p-2 text-center font-medium">Đơn giá</th>
                                                 <th className="p-2 text-center font-medium">Số lượng</th>
@@ -256,7 +252,7 @@ export default function OrderCreate({ user, products }: Props) {
                                         <tbody>
                                             {items.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                                                    <td colSpan={5} className="text-muted-foreground p-4 text-center">
                                                         Chưa có sản phẩm nào được thêm vào đơn hàng
                                                     </td>
                                                 </tr>
@@ -292,13 +288,8 @@ export default function OrderCreate({ user, products }: Props) {
                                                         </td>
                                                         <td className="p-2 text-right">{formatCurrency(item.total_price)}</td>
                                                         <td className="p-2 text-center">
-                                                            <Button
-                                                                type="button"
-                                                                size="icon"
-                                                                variant="ghost"
-                                                                onClick={() => handleRemoveItem(index)}
-                                                            >
-                                                                <TrashIcon className="h-4 w-4 text-destructive" />
+                                                            <Button type="button" size="icon" variant="ghost" onClick={() => handleRemoveItem(index)}>
+                                                                <TrashIcon className="text-destructive h-4 w-4" />
                                                             </Button>
                                                         </td>
                                                     </tr>
@@ -319,10 +310,7 @@ export default function OrderCreate({ user, products }: Props) {
                             <CardContent className="space-y-4">
                                 <div>
                                     <Label htmlFor="payment_method">Phương thức thanh toán</Label>
-                                    <Select
-                                        value={data.payment_method}
-                                        onValueChange={(value) => setData('payment_method', value as PaymentMethod)}
-                                    >
+                                    <Select value={data.payment_method} onValueChange={(value) => setData('payment_method', value as PaymentMethod)}>
                                         <SelectTrigger id="payment_method">
                                             <SelectValue placeholder="Chọn phương thức thanh toán" />
                                         </SelectTrigger>
@@ -332,7 +320,7 @@ export default function OrderCreate({ user, products }: Props) {
                                             <SelectItem value={PaymentMethod.TRANSFER}>Chuyển khoản</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    {errors.payment_method && <p className="mt-1 text-sm text-destructive">{errors.payment_method}</p>}
+                                    {errors.payment_method && <p className="text-destructive mt-1 text-sm">{errors.payment_method}</p>}
                                 </div>
 
                                 <div>
@@ -345,10 +333,10 @@ export default function OrderCreate({ user, products }: Props) {
                                         value={discountAmount}
                                         onChange={(e) => setDiscountAmount(Math.min(totalAmount, Math.max(0, parseInt(e.target.value) || 0)))}
                                     />
-                                    {errors.discount_amount && <p className="mt-1 text-sm text-destructive">{errors.discount_amount}</p>}
+                                    {errors.discount_amount && <p className="text-destructive mt-1 text-sm">{errors.discount_amount}</p>}
                                 </div>
 
-                                <div className="rounded-lg bg-muted p-4">
+                                <div className="bg-muted rounded-lg p-4">
                                     <div className="flex justify-between py-1">
                                         <span>Tổng tiền hàng:</span>
                                         <span>{formatCurrency(totalAmount)}</span>
