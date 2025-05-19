@@ -156,6 +156,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                             </div>
                         </div>
 
+                        { order.status === 'pending' &&
                         <div>
                             <h3 className="mb-2 text-sm font-medium text-muted-foreground">Cập nhật trạng thái</h3>
                             <div className="flex items-center space-x-2">
@@ -181,7 +182,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                                     Cập nhật
                                 </Button>
                             </div>
-                        </div>
+                        </div> }
                     </div>
 
                     {/* Cột phải - Chi tiết sản phẩm */}
