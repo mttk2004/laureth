@@ -39,14 +39,14 @@ class OrderController extends Controller
     $orders = $this->orderService->getOrders(
       $filters,
       10,
-      $request->input('sort', 'created_at_desc')
+      $request->input('sort', 'order_date_desc')
     );
 
     return Inertia::render('Orders/Index', [
       'orders' => $orders,
       'user' => $user,
       'filters' => $request->only(['store_id', 'status', 'payment_method', 'date_from', 'date_to']),
-      'sort' => $request->input('sort', 'created_at_desc'),
+      'sort' => $request->input('sort', 'order_date_desc'),
     ]);
   }
 

@@ -35,8 +35,8 @@ const paymentMethodLabels: Record<PaymentMethod, string> = {
 
 export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFiltersProps) {
     const [filters, setFilters] = useState({
-        status: initialFilters.status || '',
-        payment_method: initialFilters.payment_method || '',
+        status: initialFilters.status || 'all',
+        payment_method: initialFilters.payment_method || 'all',
         date_from: initialFilters.date_from || '',
         date_to: initialFilters.date_to || '',
     });
@@ -52,8 +52,8 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
 
     const handleResetFilters = () => {
         setFilters({
-            status: '',
-            payment_method: '',
+            status: 'all',
+            payment_method: 'all',
             date_from: '',
             date_to: '',
         });
@@ -68,11 +68,11 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
             date_to?: string;
         } = {};
 
-        if (filters.status) {
+        if (filters.status && filters.status !== 'all') {
             appliedFilters.status = filters.status;
         }
 
-        if (filters.payment_method) {
+        if (filters.payment_method && filters.payment_method !== 'all') {
             appliedFilters.payment_method = filters.payment_method;
         }
 
@@ -108,7 +108,7 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
                             <SelectValue placeholder="Tất cả trạng thái" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">Tất cả trạng thái</SelectItem>
+                            <SelectItem value="all">Tất cả trạng thái</SelectItem>
                             {Object.entries(orderStatusLabels).map(([value, label]) => (
                                 <SelectItem key={value} value={value}>
                                     {label}
@@ -127,7 +127,7 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
                             <SelectValue placeholder="Tất cả phương thức" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">Tất cả phương thức</SelectItem>
+                            <SelectItem value="all">Tất cả phương thức</SelectItem>
                             {Object.entries(paymentMethodLabels).map(([value, label]) => (
                                 <SelectItem key={value} value={value}>
                                     {label}

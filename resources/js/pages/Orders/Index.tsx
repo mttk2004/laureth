@@ -12,14 +12,16 @@ import { useToast } from '@/hooks/use-toast';
 interface Props {
     orders: {
         data: Order[];
-        meta: {
-            current_page: number;
-            last_page: number;
-            from: number;
-            to: number;
-            total: number;
-            per_page: number;
-        };
+        links: {
+            url: string | null;
+            label: string;
+            active: boolean;
+        }[];
+        from: number;
+        to: number;
+        total: number;
+        current_page: number;
+        last_page: number;
     };
     user: User;
     filters?: {
@@ -37,7 +39,7 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
 
     // Kiểm tra dữ liệu orders
     const hasOrders = orders && orders.data && Array.isArray(orders.data);
-    const hasPagination = orders && orders.meta;
+    const hasPagination = orders && orders.links;
     const { addToast } = useToast();
 
     // Xử lý thay đổi sắp xếp
@@ -111,20 +113,10 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
 
     // Chuyển đổi pagination từ Laravel sang định dạng của DataTable
     const paginationData = hasPagination ? {
-        links: orders.meta.last_page > 1
-            ? Array.from({ length: orders.meta.last_page + 2 }, (_, i) => {
-                if (i === 0) return { url: null, label: '&laquo; Previous', active: false };
-                if (i === orders.meta.last_page + 1) return { url: null, label: 'Next &raquo;', active: false };
-                return {
-                    url: `/pos?page=${i}`,
-                    label: i.toString(),
-                    active: i === orders.meta.current_page
-                };
-              })
-            : [],
-        from: orders.meta.from,
-        to: orders.meta.to,
-        total: orders.meta.total,
+        links: orders.links,
+        from: orders.from,
+        to: orders.to,
+        total: orders.total,
     } : undefined;
 
     return (

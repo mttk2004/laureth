@@ -62,7 +62,7 @@ class OrderService extends BaseService
    * @param string $sort Cách sắp xếp
    * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
    */
-  public function getOrders(array $filters = [], int $perPage = 10, string $sort = 'created_at_desc')
+  public function getOrders(array $filters = [], int $perPage = 10, string $sort = 'order_date_desc')
   {
     return $this->getDataWithFilters(
       $filters,

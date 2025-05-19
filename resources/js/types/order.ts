@@ -37,8 +37,8 @@ export interface OrderItem {
 }
 
 export enum OrderSortOption {
-    NEWEST = 'created_at_desc',
-    OLDEST = 'created_at_asc',
+    NEWEST = 'order_date_desc',
+    OLDEST = 'order_date_asc',
     AMOUNT_ASC = 'final_amount_asc',
     AMOUNT_DESC = 'final_amount_desc',
 }
