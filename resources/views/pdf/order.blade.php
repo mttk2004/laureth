@@ -325,7 +325,11 @@
                     </div>
                     <div class="totals-row">
                         <span class="totals-label">Thanh toán:</span>
-                        <span class="totals-value-highlight">{{ number_format($order->final_amount, 0, ',', '.') }} ₫</span>
+                        @php
+                            // Tính lại final_amount để đảm bảo chính xác
+                            $finalAmount = $order->total_amount - $order->discount_amount;
+                        @endphp
+                        <span class="totals-value-highlight">{{ number_format($finalAmount, 0, ',', '.') }} ₫</span>
                     </div>
                 </div>
             </div>

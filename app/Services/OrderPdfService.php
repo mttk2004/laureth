@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Log;
 
 class OrderPdfService
 {
@@ -21,6 +22,13 @@ class OrderPdfService
 
     // Tính toán tổng số lượng
     $totalQuantity = $order->items->sum('quantity');
+
+    // Đảm bảo final_amount được tính chính xác
+    $finalAmount = $order->total_amount - $order->discount_amount;
+    if (abs($order->final_amount - $finalAmount) > 0.01) {
+      Log::warning("Phát hiện sai lệch trong final_amount của đơn hàng {$order->id}, đang điều chỉnh để hiển thị chính xác");
+      $order->final_amount = $finalAmount;
+    }
 
     // Tạo view từ blade template
     $html = View::make('pdf.order', [

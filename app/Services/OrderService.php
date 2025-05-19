@@ -98,12 +98,17 @@ class OrderService extends BaseService
   public function createOrder(array $data)
   {
     return DB::transaction(function () use ($data) {
+      // Đảm bảo tính toán đúng final_amount
+      $totalAmount = $data['total_amount'];
+      $discountAmount = $data['discount_amount'] ?? 0;
+      $finalAmount = $totalAmount - $discountAmount;
+
       // Tạo đơn hàng
       $order = Order::create([
         'order_date' => $data['order_date'] ?? now(),
-        'total_amount' => $data['total_amount'],
-        'discount_amount' => $data['discount_amount'] ?? 0,
-        'final_amount' => $data['final_amount'],
+        'total_amount' => $totalAmount,
+        'discount_amount' => $discountAmount,
+        'final_amount' => $finalAmount,
         'payment_method' => $data['payment_method'],
         'status' => $data['status'] ?? 'completed',
         'user_id' => $data['user_id'],

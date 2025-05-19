@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Validation\Validator;
 
 class OrderRequest extends FormRequest
 {
@@ -75,5 +76,39 @@ class OrderRequest extends FormRequest
       'items.*.unit_price.min' => 'Đơn giá sản phẩm phải lớn hơn 0',
       'items.*.total_price.min' => 'Thành tiền sản phẩm phải lớn hơn 0',
     ];
+  }
+
+  /**
+   * Configure the validator instance.
+   *
+   * @param  \Illuminate\Contracts\Validation\Validator  $validator
+   * @return void
+   */
+  public function withValidator(Validator $validator)
+  {
+    $validator->after(function ($validator) {
+      $data = $validator->getData();
+
+      // Kiểm tra final_amount phải bằng total_amount - discount_amount
+      $expectedFinalAmount = $data['total_amount'] - $data['discount_amount'];
+      if (abs($data['final_amount'] - $expectedFinalAmount) > 0.01) { // Dùng sai số nhỏ để tránh vấn đề làm tròn số thập phân
+        $validator->errors()->add(
+          'final_amount',
+          'Thành tiền phải bằng tổng tiền hàng trừ đi giảm giá'
+        );
+      }
+
+      // Kiểm tra tổng tiền của các sản phẩm phải bằng total_amount
+      $itemsTotal = array_reduce($data['items'], function ($sum, $item) {
+        return $sum + $item['total_price'];
+      }, 0);
+
+      if (abs($data['total_amount'] - $itemsTotal) > 0.01) {
+        $validator->errors()->add(
+          'total_amount',
+          'Tổng tiền hàng phải bằng tổng giá trị của tất cả sản phẩm'
+        );
+      }
+    });
   }
 }

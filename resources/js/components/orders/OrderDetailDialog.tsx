@@ -47,8 +47,18 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
             axios
                 .get(`/api/orders/${orderId}/details`)
                 .then((response) => {
-                    setOrder(response.data);
-                    setSelectedStatus(response.data.status);
+                    // Đảm bảo dữ liệu hiển thị chính xác
+                    const orderData = response.data;
+
+                    // Kiểm tra và tính lại final_amount nếu cần
+                    const calculatedFinalAmount = orderData.total_amount - orderData.discount_amount;
+                    if (Math.abs(orderData.final_amount - calculatedFinalAmount) > 0.01) {
+                        console.warn('Phát hiện sai lệch trong final_amount, đang điều chỉnh để hiển thị chính xác');
+                        orderData.final_amount = calculatedFinalAmount;
+                    }
+
+                    setOrder(orderData);
+                    setSelectedStatus(orderData.status);
 
                     // Lấy chi tiết các sản phẩm trong đơn hàng
                     return axios.get(`/api/orders/${orderId}/items`);
@@ -100,6 +110,11 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
         window.open(downloadUrl, '_blank');
     };
 
+    // Tính toán lại final_amount để đảm bảo hiển thị chính xác
+    const calculateFinalAmount = (order: OrderWithDetails) => {
+        return order.total_amount - order.discount_amount;
+    };
+
     if (loading) {
         return (
             <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,6 +129,9 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
     }
 
     if (!order) return null;
+
+    // Đảm bảo hiển thị final_amount chính xác
+    const displayFinalAmount = calculateFinalAmount(order);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -151,7 +169,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                                 <div className="col-span-2">{formatCurrency(order.discount_amount)}</div>
 
                                 <div className="font-medium">Thanh toán:</div>
-                                <div className="col-span-2 font-semibold">{formatCurrency(order.final_amount)}</div>
+                                <div className="col-span-2 font-semibold">{formatCurrency(displayFinalAmount)}</div>
                             </div>
                         </div>
 
