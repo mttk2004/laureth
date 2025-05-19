@@ -7,6 +7,7 @@ use App\Models\Shift;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckActiveShift
@@ -33,7 +34,13 @@ class CheckActiveShift
       ->first();
 
     if (!$shift) {
-      return redirect()->route('dashboard')->with('error', 'Bạn không có ca làm việc hôm nay. Không thể truy cập chức năng bán hàng.');
+      // Chuyển hướng đến trang lỗi với thông báo
+      return Inertia::render('Error', [
+        'user' => $user,
+        'message' => 'Bạn không có ca làm việc hôm nay. Không thể truy cập chức năng bán hàng.',
+        'returnUrl' => '/dashboard',
+        'returnLabel' => 'Quay lại trang chủ'
+      ])->toResponse($request);
     }
 
     // Kiểm tra xem nhân viên đã check-in chưa
@@ -44,7 +51,13 @@ class CheckActiveShift
       ->first();
 
     if (!$attendance) {
-      return redirect()->route('attendance.index')->with('error', 'Bạn chưa check-in cho ca làm việc hôm nay. Vui lòng check-in trước khi sử dụng chức năng bán hàng.');
+      // Chuyển hướng đến trang lỗi với thông báo và đường dẫn đến trang chấm công
+      return Inertia::render('Error', [
+        'user' => $user,
+        'message' => 'Bạn chưa check-in cho ca làm việc hôm nay. Vui lòng check-in trước khi sử dụng chức năng bán hàng.',
+        'returnUrl' => '/attendance',
+        'returnLabel' => 'Đi đến trang chấm công'
+      ])->toResponse($request);
     }
 
     return $next($request);
