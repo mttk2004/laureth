@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\InventoryItem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -120,14 +121,24 @@ class OrderService extends BaseService
         ]);
 
         // Cập nhật số lượng tồn kho
-        $inventoryItem = $order->store->inventoryItems()
-          ->where('product_id', $item['product_id'])
+        $storeId = $data['store_id'];
+
+        // Tìm warehouse của cửa hàng
+        $warehouse = DB::table('warehouses')
+          ->where('store_id', $storeId)
           ->first();
 
-        if ($inventoryItem) {
-          $inventoryItem->update([
-            'quantity' => $inventoryItem->quantity - $item['quantity'],
-          ]);
+        if ($warehouse) {
+          // Cập nhật inventory_item
+          $inventoryItem = InventoryItem::where('warehouse_id', $warehouse->id)
+            ->where('product_id', $item['product_id'])
+            ->first();
+
+          if ($inventoryItem) {
+            $inventoryItem->update([
+              'quantity' => $inventoryItem->quantity - $item['quantity'],
+            ]);
+          }
         }
       }
 

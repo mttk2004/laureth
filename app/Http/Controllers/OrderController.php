@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Requests\OrderRequest;
 use App\Models\Product;
+use App\Models\Warehouse;
+use App\Models\InventoryItem;
 
 class OrderController extends Controller
 {
@@ -60,12 +62,19 @@ class OrderController extends Controller
   {
     $user = Auth::user();
 
+    // Tìm warehouse của cửa hàng
+    $warehouse = Warehouse::where('store_id', $user->store_id)->first();
+
+    if (!$warehouse) {
+      return redirect()->route('pos.index')->with('error', 'Không tìm thấy kho hàng cho cửa hàng này.');
+    }
+
     // Lấy danh sách sản phẩm có trong kho của cửa hàng
-    $products = Product::whereHas('inventoryItems', function ($query) use ($user) {
-      $query->where('store_id', $user->store_id)
+    $products = Product::whereHas('inventoryItems', function ($query) use ($warehouse) {
+      $query->where('warehouse_id', $warehouse->id)
         ->where('quantity', '>', 0);
-    })->with(['inventoryItems' => function ($query) use ($user) {
-      $query->where('store_id', $user->store_id);
+    })->with(['inventoryItems' => function ($query) use ($warehouse) {
+      $query->where('warehouse_id', $warehouse->id);
     }])->get();
 
     return Inertia::render('Orders/Create', [

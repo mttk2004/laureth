@@ -1,3 +1,5 @@
+import { InventoryItem } from './inventory_item';
+
 export enum ProductStatus {
     ACTIVE = 'active',
     INACTIVE = 'inactive',
@@ -15,6 +17,7 @@ export interface Product {
     updated_at: string;
     deleted_at: string | null;
     category?: Category;
+    inventoryItems?: InventoryItem[];
 }
 
 export interface Category {

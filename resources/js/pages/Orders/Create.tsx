@@ -46,17 +46,30 @@ export default function OrderCreate({ user, products }: Props) {
         payment_method: PaymentMethod.CASH,
         status: OrderStatus.COMPLETED,
         store_id: user.store_id,
-        items: items,
+        items: items.map(item => ({
+            product_id: item.product_id,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            total_price: item.total_price
+        })),
     });
 
     // Cập nhật dữ liệu form khi items hoặc discountAmount thay đổi
     useEffect(() => {
         setData({
-            ...data,
+            order_date: data.order_date,
             total_amount: totalAmount,
             discount_amount: discountAmount,
             final_amount: finalAmount,
-            items: items,
+            payment_method: data.payment_method,
+            status: data.status,
+            store_id: data.store_id,
+            items: items.map(item => ({
+                product_id: item.product_id,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                total_price: item.total_price
+            })),
         });
     }, [items, discountAmount]);
 
