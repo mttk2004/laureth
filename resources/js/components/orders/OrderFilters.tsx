@@ -11,12 +11,7 @@ interface OrderFiltersProps {
         date_from?: string;
         date_to?: string;
     };
-    onApplyFilters: (filters: {
-        status?: string;
-        payment_method?: string;
-        date_from?: string;
-        date_to?: string;
-    }) => void;
+    onApplyFilters: (filters: { status?: string; payment_method?: string; date_from?: string; date_to?: string }) => void;
 }
 
 // Định nghĩa các trạng thái đơn hàng
@@ -88,9 +83,7 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
     };
 
     // Kiểm tra xem đã áp dụng filter nào chưa
-    const hasActiveFilters = Boolean(
-        initialFilters.status || initialFilters.payment_method || initialFilters.date_from || initialFilters.date_to
-    );
+    const hasActiveFilters = Boolean(initialFilters.status || initialFilters.payment_method || initialFilters.date_from || initialFilters.date_to);
 
     return (
         <BaseFilterDialog
@@ -119,10 +112,7 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
                 </BaseFilterRow>
 
                 <BaseFilterRow label="Phương thức thanh toán">
-                    <Select
-                        value={filters.payment_method}
-                        onValueChange={(value) => handleSelectChange('payment_method', value)}
-                    >
+                    <Select value={filters.payment_method} onValueChange={(value) => handleSelectChange('payment_method', value)}>
                         <SelectTrigger id="payment_method">
                             <SelectValue placeholder="Tất cả phương thức" />
                         </SelectTrigger>
@@ -138,21 +128,11 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
                 </BaseFilterRow>
 
                 <BaseFilterRow label="Từ ngày">
-                    <Input
-                        type="date"
-                        name="date_from"
-                        value={filters.date_from}
-                        onChange={handleInputChange}
-                    />
+                    <Input type="date" name="date_from" value={filters.date_from} onChange={handleInputChange} />
                 </BaseFilterRow>
 
                 <BaseFilterRow label="Đến ngày">
-                    <Input
-                        type="date"
-                        name="date_to"
-                        value={filters.date_to}
-                        onChange={handleInputChange}
-                    />
+                    <Input type="date" name="date_to" value={filters.date_to} onChange={handleInputChange} />
                 </BaseFilterRow>
             </BaseFilterForm>
         </BaseFilterDialog>

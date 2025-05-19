@@ -1,13 +1,13 @@
-import { Head, router } from '@inertiajs/react';
-import { Order, OrderSortOption } from '@/types/order';
-import { User } from '@/types/user';
+import { OrderFilters, OrderSortSelect, OrderStatusBadge, PaymentMethodBadge } from '@/components/orders';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
-import { formatCurrency, formatDate } from '@/lib/formatters';
-import { PlusIcon, EyeIcon } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { OrderFilters, OrderSortSelect, OrderStatusBadge, PaymentMethodBadge } from '@/components/orders';
 import { useToast } from '@/hooks/use-toast';
+import AppLayout from '@/layouts/app-layout';
+import { formatCurrency, formatDate } from '@/lib/formatters';
+import { Order, OrderSortOption } from '@/types/order';
+import { User } from '@/types/user';
+import { Head, router } from '@inertiajs/react';
+import { EyeIcon, PlusIcon } from 'lucide-react';
 
 interface Props {
     orders: {
@@ -44,25 +44,28 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
 
     // Xử lý thay đổi sắp xếp
     const handleSortChange = (sortOption: OrderSortOption) => {
-        router.get('/pos', { ...filters, sort: sortOption }, {
-            preserveState: true,
-            replace: true,
-            preserveScroll: true,
-        });
+        router.get(
+            '/pos',
+            { ...filters, sort: sortOption },
+            {
+                preserveState: true,
+                replace: true,
+                preserveScroll: true,
+            },
+        );
     };
 
     // Xử lý áp dụng bộ lọc
-    const handleApplyFilters = (newFilters: {
-        status?: string;
-        payment_method?: string;
-        date_from?: string;
-        date_to?: string;
-    }) => {
-        router.get('/pos', { ...newFilters, sort }, {
-            preserveState: true,
-            replace: true,
-            preserveScroll: true,
-        });
+    const handleApplyFilters = (newFilters: { status?: string; payment_method?: string; date_from?: string; date_to?: string }) => {
+        router.get(
+            '/pos',
+            { ...newFilters, sort },
+            {
+                preserveState: true,
+                replace: true,
+                preserveScroll: true,
+            },
+        );
     };
 
     // Xử lý xem chi tiết đơn hàng
@@ -112,12 +115,14 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
     );
 
     // Chuyển đổi pagination từ Laravel sang định dạng của DataTable
-    const paginationData = hasPagination ? {
-        links: orders.links,
-        from: orders.from,
-        to: orders.to,
-        total: orders.total,
-    } : undefined;
+    const paginationData = hasPagination
+        ? {
+              links: orders.links,
+              from: orders.from,
+              to: orders.to,
+              total: orders.total,
+          }
+        : undefined;
 
     return (
         <AppLayout user={user}>
@@ -136,12 +141,7 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
                     </div>
                 </div>
 
-                <DataTable
-                    columns={columns}
-                    data={hasOrders ? orders.data : []}
-                    actions={renderActions}
-                    pagination={paginationData}
-                />
+                <DataTable columns={columns} data={hasOrders ? orders.data : []} actions={renderActions} pagination={paginationData} />
             </div>
         </AppLayout>
     );
