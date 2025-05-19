@@ -96,6 +96,9 @@ class OrderRequest extends FormRequest
           'final_amount',
           'Thành tiền phải bằng tổng tiền hàng trừ đi giảm giá'
         );
+
+        // Ghi log cảnh báo về sai lệch
+        \Illuminate\Support\Facades\Log::warning("Phát hiện sai lệch trong final_amount của đơn hàng, giá trị đúng phải là: {$expectedFinalAmount}");
       }
 
       // Kiểm tra tổng tiền của các sản phẩm phải bằng total_amount

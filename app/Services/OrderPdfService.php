@@ -28,6 +28,9 @@ class OrderPdfService
     if (abs($order->final_amount - $finalAmount) > 0.01) {
       Log::warning("Phát hiện sai lệch trong final_amount của đơn hàng {$order->id}, đang điều chỉnh để hiển thị chính xác");
       $order->final_amount = $finalAmount;
+
+      // Lưu lại giá trị đúng vào database để tránh lỗi trong tương lai
+      $order->save();
     }
 
     // Tạo view từ blade template

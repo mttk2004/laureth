@@ -219,7 +219,7 @@
             </div>
             <div class="header-right">
                 <h2 class="document-title">HÓA ĐƠN BÁN HÀNG</h2>
-                <p class="document-number">#{{ substr($order->id, -6) }}</p>
+                <p class="document-number">#{{ $order->id }}</p>
                 <p class="document-date">Ngày: {{ date('d/m/Y', strtotime($order->order_date)) }}</p>
             </div>
         </div>
@@ -328,6 +328,10 @@
                         @php
                             // Tính lại final_amount để đảm bảo chính xác
                             $finalAmount = $order->total_amount - $order->discount_amount;
+                            // Ghi log nếu có sai lệch
+                            if (abs($order->final_amount - $finalAmount) > 0.01) {
+                                \Illuminate\Support\Facades\Log::warning("Phát hiện sai lệch trong final_amount của đơn hàng {$order->id}, giá trị đúng phải là: {$finalAmount}");
+                            }
                         @endphp
                         <span class="totals-value-highlight">{{ number_format($finalAmount, 0, ',', '.') }} ₫</span>
                     </div>

@@ -110,10 +110,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
         window.open(downloadUrl, '_blank');
     };
 
-    // Tính toán lại final_amount để đảm bảo hiển thị chính xác
-    const calculateFinalAmount = (order: OrderWithDetails) => {
-        return order.total_amount - order.discount_amount;
-    };
+    // Lưu ý: Chúng ta tính toán final_amount trực tiếp khi hiển thị
 
     if (loading) {
         return (
@@ -130,8 +127,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
 
     if (!order) return null;
 
-    // Đảm bảo hiển thị final_amount chính xác
-    const displayFinalAmount = calculateFinalAmount(order);
+    // Không cần biến displayFinalAmount vì chúng ta tính trực tiếp khi hiển thị
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -139,7 +135,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                 <DialogHeader>
                     <DialogTitle>Chi tiết đơn hàng</DialogTitle>
                     <DialogDescription>
-                        Mã đơn hàng: {order.id.substring(0, 8)}... | Ngày tạo: {formatDate(order.created_at)}
+                        Mã đơn hàng: {order.id} | Ngày tạo: {formatDate(order.created_at)}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -169,7 +165,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                                 <div className="col-span-2">{formatCurrency(order.discount_amount)}</div>
 
                                 <div className="font-medium">Thanh toán:</div>
-                                <div className="col-span-2 font-semibold">{formatCurrency(displayFinalAmount)}</div>
+                                <div className="col-span-2 font-semibold">{formatCurrency(order.total_amount - order.discount_amount)}</div>
                             </div>
                         </div>
 

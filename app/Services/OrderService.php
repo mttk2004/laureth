@@ -103,6 +103,9 @@ class OrderService extends BaseService
       $discountAmount = $data['discount_amount'] ?? 0;
       $finalAmount = $totalAmount - $discountAmount;
 
+      // Ghi đè final_amount từ request để đảm bảo tính đúng
+      $data['final_amount'] = $finalAmount;
+
       // Tạo đơn hàng
       $order = Order::create([
         'order_date' => $data['order_date'] ?? now(),
