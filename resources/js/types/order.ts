@@ -35,3 +35,17 @@ export interface OrderItem {
     created_at: string;
     updated_at: string;
 }
+
+export enum OrderSortOption {
+    NEWEST = 'created_at_desc',
+    OLDEST = 'created_at_asc',
+    AMOUNT_ASC = 'final_amount_asc',
+    AMOUNT_DESC = 'final_amount_desc',
+}
+
+export const OrderSortOptionLabels: Record<OrderSortOption, string> = {
+    [OrderSortOption.NEWEST]: 'Mới nhất',
+    [OrderSortOption.OLDEST]: 'Cũ nhất',
+    [OrderSortOption.AMOUNT_ASC]: 'Giá trị tăng dần',
+    [OrderSortOption.AMOUNT_DESC]: 'Giá trị giảm dần',
+};
