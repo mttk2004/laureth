@@ -8,64 +8,109 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Http\Requests\OrderRequest;
+use App\Models\Product;
 
 class OrderController extends Controller
 {
-    private $orderService;
+  private $orderService;
 
-    public function __construct(OrderService $orderService)
-    {
-        $this->orderService = $orderService;
+  public function __construct(OrderService $orderService)
+  {
+    $this->orderService = $orderService;
+  }
+
+  /**
+   * Hiển thị danh sách đơn hàng
+   *
+   * @return \Inertia\Response
+   */
+  public function index(Request $request)
+  {
+    // Lấy người dùng hiện tại
+    $user = Auth::user();
+
+    // Thiết lập bộ lọc mặc định theo cửa hàng của nhân viên
+    $filters = $request->all();
+    if ($user->store_id) {
+      $filters['store_id'] = $user->store_id;
     }
 
-    /**
-     * Hiển thị danh sách đơn hàng
-     *
-     * @return \Inertia\Response
-     */
-    public function index(Request $request)
-    {
-        // Lấy người dùng hiện tại
-        $user = Auth::user();
+    // Lấy danh sách đơn hàng đã lọc, sắp xếp và phân trang
+    $orders = $this->orderService->getOrders(
+      $filters,
+      10,
+      $request->input('sort', 'order_date_desc')
+    );
 
-        // Thiết lập bộ lọc mặc định theo cửa hàng của nhân viên
-        $filters = $request->all();
-        if ($user->store_id) {
-            $filters['store_id'] = $user->store_id;
-        }
+    return Inertia::render('Orders/Index', [
+      'orders' => $orders,
+      'user' => $user,
+      'filters' => $request->only(['store_id', 'status', 'payment_method', 'date_from', 'date_to']),
+      'sort' => $request->input('sort', 'order_date_desc'),
+    ]);
+  }
 
-        // Lấy danh sách đơn hàng đã lọc, sắp xếp và phân trang
-        $orders = $this->orderService->getOrders(
-            $filters,
-            10,
-            $request->input('sort', 'order_date_desc')
-        );
+  /**
+   * Hiển thị form tạo đơn hàng mới
+   *
+   * @return \Inertia\Response
+   */
+  public function create()
+  {
+    $user = Auth::user();
 
-        return Inertia::render('Orders/Index', [
-            'orders' => $orders,
-            'user' => $user,
-            'filters' => $request->only(['store_id', 'status', 'payment_method', 'date_from', 'date_to']),
-            'sort' => $request->input('sort', 'order_date_desc'),
-        ]);
-    }
+    // Lấy danh sách sản phẩm có trong kho của cửa hàng
+    $products = Product::whereHas('inventoryItems', function ($query) use ($user) {
+      $query->where('store_id', $user->store_id)
+        ->where('quantity', '>', 0);
+    })->with(['inventoryItems' => function ($query) use ($user) {
+      $query->where('store_id', $user->store_id);
+    }])->get();
 
-    /**
-     * Lấy chi tiết các sản phẩm trong đơn hàng
-     */
-    public function getItems(Order $order): JsonResponse
-    {
-        $items = $this->orderService->getOrderItems($order);
+    return Inertia::render('Orders/Create', [
+      'user' => $user,
+      'products' => $products,
+    ]);
+  }
 
-        return response()->json($items);
-    }
+  /**
+   * Lưu đơn hàng mới
+   *
+   * @param OrderRequest $request
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function store(OrderRequest $request)
+  {
+    $user = Auth::user();
+    $data = $request->validated();
 
-    /**
-     * Lấy thông tin đầy đủ của đơn hàng
-     */
-    public function getDetails(Order $order): JsonResponse
-    {
-        $orderDetails = $this->orderService->getOrderWithRelations($order);
+    // Thêm thông tin người tạo và cửa hàng
+    $data['user_id'] = $user->id;
+    $data['store_id'] = $user->store_id;
 
-        return response()->json($orderDetails);
-    }
+    $order = $this->orderService->createOrder($data);
+
+    return redirect()->route('pos.index')->with('success', 'Đơn hàng đã được tạo thành công.');
+  }
+
+  /**
+   * Lấy chi tiết các sản phẩm trong đơn hàng
+   */
+  public function getItems(Order $order): JsonResponse
+  {
+    $items = $this->orderService->getOrderItems($order);
+
+    return response()->json($items);
+  }
+
+  /**
+   * Lấy thông tin đầy đủ của đơn hàng
+   */
+  public function getDetails(Order $order): JsonResponse
+  {
+    $orderDetails = $this->orderService->getOrderWithRelations($order);
+
+    return response()->json($orderDetails);
+  }
 }
