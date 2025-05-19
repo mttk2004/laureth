@@ -1,13 +1,13 @@
-import { OrderFilters, OrderSortSelect, OrderStatusBadge, PaymentMethodBadge } from '@/components/orders';
+import { OrderDetailDialog, OrderFilters, OrderSortSelect, OrderStatusBadge, PaymentMethodBadge } from '@/components/orders';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
-import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency, formatDate } from '@/lib/formatters';
 import { Order, OrderSortOption } from '@/types/order';
 import { User } from '@/types/user';
 import { Head, router } from '@inertiajs/react';
 import { EyeIcon, PlusIcon } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
     orders: {
@@ -34,13 +34,16 @@ interface Props {
 }
 
 export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSortOption.NEWEST }: Props) {
+    // State cho dialog chi tiết đơn hàng
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+    const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+
     // Debug
     console.log('Orders data:', orders);
 
     // Kiểm tra dữ liệu orders
     const hasOrders = orders && orders.data && Array.isArray(orders.data);
     const hasPagination = orders && orders.links;
-    const { addToast } = useToast();
 
     // Xử lý thay đổi sắp xếp
     const handleSortChange = (sortOption: OrderSortOption) => {
@@ -70,9 +73,16 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
 
     // Xử lý xem chi tiết đơn hàng
     const handleViewDetails = (orderId: string) => {
-        // TODO: Implement view details
-        console.log(`View details for order ${orderId}`);
-        addToast('Chức năng xem chi tiết đơn hàng đang được phát triển', 'info');
+        setSelectedOrderId(orderId);
+        setDetailDialogOpen(true);
+    };
+
+    // Xử lý khi cập nhật trạng thái đơn hàng thành công
+    const handleOrderStatusUpdate = () => {
+        // Refresh lại danh sách đơn hàng để hiển thị trạng thái mới
+        router.reload({
+            only: ['orders'],
+        });
     };
 
     // Định nghĩa các cột cho bảng dữ liệu
@@ -142,6 +152,13 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
                 </div>
 
                 <DataTable columns={columns} data={hasOrders ? orders.data : []} actions={renderActions} pagination={paginationData} />
+
+                <OrderDetailDialog
+                    orderId={selectedOrderId}
+                    open={detailDialogOpen}
+                    onOpenChange={setDetailDialogOpen}
+                    onStatusUpdate={handleOrderStatusUpdate}
+                />
             </div>
         </AppLayout>
     );

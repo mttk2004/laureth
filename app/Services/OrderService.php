@@ -145,4 +145,70 @@ class OrderService extends BaseService
       return $order;
     });
   }
+
+  /**
+   * Cập nhật trạng thái đơn hàng
+   *
+   * @param Order $order Đơn hàng cần cập nhật
+   * @param string $status Trạng thái mới
+   * @return Order Đơn hàng sau khi cập nhật
+   */
+  public function updateOrderStatus(Order $order, string $status): Order
+  {
+    $order->status = $status;
+    $order->save();
+
+    // Nếu đơn hàng bị hủy, cần hoàn lại số lượng sản phẩm vào kho
+    if ($status === 'canceled') {
+      $this->restoreInventoryForCanceledOrder($order);
+    }
+
+    return $order->fresh();
+  }
+
+  /**
+   * Hoàn lại số lượng sản phẩm vào kho khi hủy đơn hàng
+   *
+   * @param Order $order Đơn hàng bị hủy
+   */
+  private function restoreInventoryForCanceledOrder(Order $order): void
+  {
+    // Chỉ hoàn lại kho nếu đơn hàng trước đó không phải đã hủy
+    if ($order->getOriginal('status') === 'canceled') {
+      return;
+    }
+
+    // Tìm warehouse của cửa hàng
+    $warehouse = DB::table('warehouses')
+      ->where('store_id', $order->store_id)
+      ->first();
+
+    if (!$warehouse) {
+      return;
+    }
+
+    // Lấy các mục đơn hàng
+    $orderItems = $order->items;
+
+    foreach ($orderItems as $item) {
+      // Tìm inventory_item tương ứng
+      $inventoryItem = InventoryItem::where('warehouse_id', $warehouse->id)
+        ->where('product_id', $item->product_id)
+        ->first();
+
+      if ($inventoryItem) {
+        // Cập nhật số lượng
+        $inventoryItem->update([
+          'quantity' => $inventoryItem->quantity + $item->quantity,
+        ]);
+      } else {
+        // Tạo mới inventory_item nếu không tồn tại
+        InventoryItem::create([
+          'warehouse_id' => $warehouse->id,
+          'product_id' => $item->product_id,
+          'quantity' => $item->quantity,
+        ]);
+      }
+    }
+  }
 }

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Requests\OrderRequest;
+use App\Http\Requests\OrderStatusUpdateRequest;
 use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\InventoryItem;
@@ -211,5 +212,24 @@ class OrderController extends Controller
     $orderDetails = $this->orderService->getOrderWithRelations($order);
 
     return response()->json($orderDetails);
+  }
+
+  /**
+   * Cập nhật trạng thái đơn hàng
+   *
+   * @param Order $order
+   * @param OrderStatusUpdateRequest $request
+   * @return JsonResponse
+   */
+  public function updateStatus(Order $order, OrderStatusUpdateRequest $request): JsonResponse
+  {
+    $data = $request->validated();
+    $updatedOrder = $this->orderService->updateOrderStatus($order, $data['status']);
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Cập nhật trạng thái đơn hàng thành công',
+      'order' => $updatedOrder
+    ]);
   }
 }

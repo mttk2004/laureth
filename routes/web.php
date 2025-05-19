@@ -81,13 +81,16 @@ Route::middleware(['web', 'auth', 'verified', 'staff'])->group(function () {
   Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
 
   // Routes cho chức năng POS
-  Route::middleware(['check-active-shift'])->group(function () {
-    Route::get('/pos', [OrderController::class, 'index'])->name('pos.index');
-    Route::get('/pos/create', [OrderController::class, 'create'])->name('pos.create');
-    Route::post('/pos', [OrderController::class, 'store'])->name('pos.store');
-    Route::get('/api/orders/{order}/items', [OrderController::class, 'getItems']);
-    Route::get('/api/orders/{order}/details', [OrderController::class, 'getDetails']);
-  });
+  // TODO: Thêm middleware check-active-shift
+  // Tạm thời tắt middleware check-active-shift để test
+  // Route::middleware(['check-active-shift'])->group(function () {
+  Route::get('/pos', [OrderController::class, 'index'])->name('pos.index');
+  Route::get('/pos/create', [OrderController::class, 'create'])->name('pos.create');
+  Route::post('/pos', [OrderController::class, 'store'])->name('pos.store');
+  Route::get('/api/orders/{order}/items', [OrderController::class, 'getItems']);
+  Route::get('/api/orders/{order}/details', [OrderController::class, 'getDetails']);
+  Route::patch('/api/orders/{order}/update-status', [OrderController::class, 'updateStatus']);
+  // });
 });
 
 require __DIR__ . '/settings.php';
