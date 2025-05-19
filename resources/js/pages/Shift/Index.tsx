@@ -46,14 +46,18 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
 
     // Xử lý khi thay đổi tháng
     const handleMonthChange = (month: number, year: number) => {
-        router.get('/shift', { month, year }, {
-            preserveState: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                setSelectedMonth(month);
-                setSelectedYear(year);
+        router.get(
+            '/shift',
+            { month, year },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    setSelectedMonth(month);
+                    setSelectedYear(year);
+                },
             },
-        });
+        );
     };
 
     // Chuyển sang tháng trước
@@ -85,8 +89,18 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
     // Lấy tên tháng hiện tại
     const getCurrentMonthName = () => {
         const monthNames = [
-            'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+            'Tháng 1',
+            'Tháng 2',
+            'Tháng 3',
+            'Tháng 4',
+            'Tháng 5',
+            'Tháng 6',
+            'Tháng 7',
+            'Tháng 8',
+            'Tháng 9',
+            'Tháng 10',
+            'Tháng 11',
+            'Tháng 12',
         ];
         return `${monthNames[selectedMonth - 1]} ${selectedYear}`;
     };
@@ -134,21 +148,11 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
 
                     {/* Bộ chọn tháng */}
                     <div className="flex items-center space-x-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={goToPreviousMonth}
-                        >
+                        <Button variant="outline" size="sm" onClick={goToPreviousMonth}>
                             <ChevronLeftIcon className="h-4 w-4" />
                         </Button>
-                        <div className="min-w-[120px] text-center font-medium">
-                            {getCurrentMonthName()}
-                        </div>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={goToNextMonth}
-                        >
+                        <div className="min-w-[120px] text-center font-medium">{getCurrentMonthName()}</div>
+                        <Button variant="outline" size="sm" onClick={goToNextMonth}>
                             <ChevronRightIcon className="h-4 w-4" />
                         </Button>
                     </div>
@@ -158,9 +162,7 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
                 <div className="grid gap-4 md:grid-cols-4">
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Tổng số ca
-                            </CardTitle>
+                            <CardTitle className="text-muted-foreground text-sm font-medium">Tổng số ca</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-4xl font-bold">{summary.totalShifts}</div>
@@ -168,9 +170,7 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Đã hoàn thành
-                            </CardTitle>
+                            <CardTitle className="text-muted-foreground text-sm font-medium">Đã hoàn thành</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-4xl font-bold text-green-600">{summary.completedShifts}</div>
@@ -178,9 +178,7 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Vắng mặt
-                            </CardTitle>
+                            <CardTitle className="text-muted-foreground text-sm font-medium">Vắng mặt</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-4xl font-bold text-red-600">{summary.absentShifts}</div>
@@ -188,9 +186,7 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Tổng giờ làm
-                            </CardTitle>
+                            <CardTitle className="text-muted-foreground text-sm font-medium">Tổng giờ làm</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-4xl font-bold">{summary.totalHours ? Number(summary.totalHours).toFixed(1) : '0'}</div>
@@ -208,9 +204,9 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
                     </CardHeader>
                     <CardContent>
                         {/* Tiêu đề các ngày trong tuần */}
-                        <div className="grid grid-cols-7 gap-1 mb-2">
+                        <div className="mb-2 grid grid-cols-7 gap-1">
                             {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day, index) => (
-                                <div key={index} className="text-center font-medium py-2">
+                                <div key={index} className="py-2 text-center font-medium">
                                     {day}
                                 </div>
                             ))}
@@ -221,42 +217,28 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
                             {shifts.calendar.map((item, index) => (
                                 <div
                                     key={index}
-                                    className={`min-h-[100px] border rounded-md p-1 ${
-                                        !item.isCurrentMonth
-                                            ? 'bg-gray-50 text-gray-400'
-                                            : item.isToday
-                                            ? 'bg-blue-50 border-blue-200'
-                                            : ''
+                                    className={`min-h-[100px] rounded-md border p-1 ${
+                                        !item.isCurrentMonth ? 'bg-gray-50 text-gray-400' : item.isToday ? 'border-blue-200 bg-blue-50' : ''
                                     }`}
                                 >
                                     {item.date && (
                                         <>
-                                            <div className="text-right text-sm font-medium mb-1">
-                                                {new Date(item.date).getDate()}
-                                            </div>
+                                            <div className="mb-1 text-right text-sm font-medium">{new Date(item.date).getDate()}</div>
                                             <div className="space-y-1">
                                                 {item.shifts.map((shift) => (
                                                     <div
                                                         key={shift.id}
-                                                        className={`text-xs p-1 rounded border ${getStatusColor(
-                                                            shift.status as ShiftStatus
-                                                        )}`}
+                                                        className={`rounded border p-1 text-xs ${getStatusColor(shift.status as ShiftStatus)}`}
                                                     >
-                                                        <div className="font-medium">
-                                                            {getShiftTypeLabel(shift.shift_type as ShiftType)}
-                                                        </div>
+                                                        <div className="font-medium">{getShiftTypeLabel(shift.shift_type as ShiftType)}</div>
                                                         <div>{getStatusLabel(shift.status as ShiftStatus)}</div>
                                                         {shift.attendanceRecord && (
                                                             <div className="mt-1 text-xs">
                                                                 {shift.attendanceRecord.check_in && (
-                                                                    <span>
-                                                                        Vào: {formatTime(shift.attendanceRecord.check_in)}
-                                                                    </span>
+                                                                    <span>Vào: {formatTime(shift.attendanceRecord.check_in)}</span>
                                                                 )}
                                                                 {shift.attendanceRecord.check_out && (
-                                                                    <span className="ml-1">
-                                                                        - Ra: {formatTime(shift.attendanceRecord.check_out)}
-                                                                    </span>
+                                                                    <span className="ml-1">- Ra: {formatTime(shift.attendanceRecord.check_out)}</span>
                                                                 )}
                                                             </div>
                                                         )}
@@ -272,15 +254,15 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
                         {/* Chú thích */}
                         <div className="mt-4 flex flex-wrap gap-4">
                             <div className="flex items-center">
-                                <div className="w-4 h-4 rounded mr-2 bg-blue-100 border border-blue-300"></div>
+                                <div className="mr-2 h-4 w-4 rounded border border-blue-300 bg-blue-100"></div>
                                 <span className="text-sm">Đã lên lịch</span>
                             </div>
                             <div className="flex items-center">
-                                <div className="w-4 h-4 rounded mr-2 bg-green-100 border border-green-300"></div>
+                                <div className="mr-2 h-4 w-4 rounded border border-green-300 bg-green-100"></div>
                                 <span className="text-sm">Đã hoàn thành</span>
                             </div>
                             <div className="flex items-center">
-                                <div className="w-4 h-4 rounded mr-2 bg-red-100 border border-red-300"></div>
+                                <div className="mr-2 h-4 w-4 rounded border border-red-300 bg-red-100"></div>
                                 <span className="text-sm">Vắng mặt</span>
                             </div>
                         </div>
