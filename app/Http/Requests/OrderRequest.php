@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class OrderRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class OrderRequest extends FormRequest
    */
   public function authorize(): bool
   {
-    return true; // Quyền được kiểm tra trong middleware
+    return Auth::check() && (Auth::user()->position === 'SL' || Auth::user()->position === 'SA');
   }
 
   /**
