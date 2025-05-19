@@ -194,7 +194,7 @@ export default function ShiftIndex({ user, shifts, summary, filters }: ShiftPage
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{summary.totalHours?.toFixed(1) || 0}</div>
+                                <div className="text-2xl font-bold">{summary.totalHours ? Number(summary.totalHours).toFixed(1) : '0'}</div>
                             </CardContent>
                         </Card>
                     </div>
