@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ShiftService extends BaseService
 {
@@ -113,25 +114,44 @@ class ShiftService extends BaseService
    */
   private function updatePastShiftsStatus(string $userId, string $startDate, string $endDate): void
   {
-    $today = Carbon::today()->format('Y-m-d');
+    $now = Carbon::now();
+    $today = $now->format('Y-m-d');
 
     // Tìm các ca làm việc trong quá khứ mà vẫn ở trạng thái "planned"
     $pastShifts = Shift::where('user_id', $userId)
       ->whereBetween('date', [$startDate, $endDate])
-      ->where('date', '<', $today)
       ->where('status', 'planned')
       ->get();
 
     foreach ($pastShifts as $shift) {
-      // Kiểm tra xem có bản ghi chấm công không
-      $hasAttendance = DB::table('attendance_records')
-        ->where('shift_id', $shift->id)
-        ->exists();
+      $shiftDate = Carbon::parse($shift->date);
+      $isToday = $shiftDate->format('Y-m-d') === $today;
 
-      // Nếu không có bản ghi chấm công, cập nhật thành "absent"
-      if (!$hasAttendance) {
-        $shift->status = 'absent';
-        $shift->save();
+      // Xác định giờ kết thúc ca làm việc
+      $endHour = $shift->shift_type === 'A' ? 16 : 22; // Ca A: 8-16h, Ca B: 14:30-22:30
+      $endMinute = $shift->shift_type === 'A' ? 0 : 30;
+
+      // Tạo thời điểm kết thúc ca làm việc
+      $shiftEndTime = Carbon::parse($shift->date)->setHour($endHour)->setMinute($endMinute)->setSecond(0);
+
+      // Kiểm tra xem ca làm việc đã kết thúc chưa
+      $shiftHasEnded = $now->greaterThan($shiftEndTime);
+
+      // Nếu ca làm việc đã kết thúc (ngày trong quá khứ hoặc hôm nay nhưng đã qua giờ kết thúc)
+      if ($shiftDate->lessThan($now->startOfDay()) || ($isToday && $shiftHasEnded)) {
+        // Kiểm tra xem có bản ghi chấm công không
+        $hasAttendance = DB::table('attendance_records')
+          ->where('shift_id', $shift->id)
+          ->exists();
+
+        // Nếu không có bản ghi chấm công, cập nhật thành "absent"
+        if (!$hasAttendance) {
+          $shift->status = 'absent';
+          $shift->save();
+
+          // Log để debug
+          Log::info("Updated shift {$shift->id} to absent. Date: {$shift->date}, Type: {$shift->shift_type}, End time: {$shiftEndTime}");
+        }
       }
     }
   }
