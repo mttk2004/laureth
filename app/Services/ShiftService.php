@@ -38,6 +38,9 @@ class ShiftService extends BaseService
     $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth()->format('Y-m-d');
     $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth()->format('Y-m-d');
 
+    // Tự động cập nhật trạng thái các ca làm việc trong quá khứ mà chưa được chấm công
+    $this->updatePastShiftsStatus($userId, $startDate, $endDate);
+
     // Lấy danh sách ca làm việc trong tháng
     $shifts = Shift::where('user_id', $userId)
       ->whereBetween('date', [$startDate, $endDate])
@@ -96,6 +99,41 @@ class ShiftService extends BaseService
       'month' => $month,
       'year' => $year,
     ];
+  }
+
+  /**
+   * Tự động cập nhật trạng thái các ca làm việc trong quá khứ
+   * Nếu ca làm việc đã qua mà vẫn ở trạng thái "planned" và không có bản ghi chấm công
+   * thì cập nhật thành "absent" (vắng mặt)
+   *
+   * @param string $userId ID của nhân viên
+   * @param string $startDate Ngày bắt đầu
+   * @param string $endDate Ngày kết thúc
+   * @return void
+   */
+  private function updatePastShiftsStatus(string $userId, string $startDate, string $endDate): void
+  {
+    $today = Carbon::today()->format('Y-m-d');
+
+    // Tìm các ca làm việc trong quá khứ mà vẫn ở trạng thái "planned"
+    $pastShifts = Shift::where('user_id', $userId)
+      ->whereBetween('date', [$startDate, $endDate])
+      ->where('date', '<', $today)
+      ->where('status', 'planned')
+      ->get();
+
+    foreach ($pastShifts as $shift) {
+      // Kiểm tra xem có bản ghi chấm công không
+      $hasAttendance = DB::table('attendance_records')
+        ->where('shift_id', $shift->id)
+        ->exists();
+
+      // Nếu không có bản ghi chấm công, cập nhật thành "absent"
+      if (!$hasAttendance) {
+        $shift->status = 'absent';
+        $shift->save();
+      }
+    }
   }
 
   /**
