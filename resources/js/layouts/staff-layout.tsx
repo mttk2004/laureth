@@ -11,7 +11,7 @@ interface StaffLayoutProps extends PropsWithChildren {
     className?: string;
 }
 
-export function StaffLayout({ children, user, title, className }: StaffLayoutProps) {
+export default function StaffLayout({ children, user, title, className }: StaffLayoutProps) {
     return (
         <>
             <Head title={title ?? 'LAURETH Staff'} />
