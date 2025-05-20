@@ -11,7 +11,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { InventoryItem } from '@/types/inventory_item';
 import { Product } from '@/types/product';
-import { Warehouse, WarehouseWithStore } from '@/types/warehouse';
+import { WarehouseWithStore } from '@/types/warehouse';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,13 +25,11 @@ interface InventoryItemWithProduct extends InventoryItem {
 }
 
 interface CreateTransferDialogProps {
-    storeWarehouses: Warehouse[];
     allWarehouses: WarehouseWithStore[];
     onTransferCreated: () => void;
 }
 
 export default function CreateTransferDialog({
-    storeWarehouses,
     allWarehouses,
     onTransferCreated,
 }: CreateTransferDialogProps) {
@@ -160,13 +158,13 @@ export default function CreateTransferDialog({
                                 <SelectValue placeholder="Chọn kho nguồn" />
                             </SelectTrigger>
                             <SelectContent>
-                                {storeWarehouses.map((warehouse) => (
+                                {allWarehouses.map((warehouse) => (
                                     <SelectItem
                                         key={warehouse.id}
                                         value={warehouse.id.toString()}
                                         disabled={warehouse.id.toString() === selectedDestinationWarehouse}
                                     >
-                                        {warehouse.name}
+                                        {warehouse.name} {warehouse.store?.name ? `(${warehouse.store.name})` : ''}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

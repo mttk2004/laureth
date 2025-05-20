@@ -317,7 +317,6 @@ export default function WarehouseManagementIndex({
                             onApplyFilters={handleApplyFilters}
                         />
                         <CreateTransferDialog
-                            storeWarehouses={storeWarehouses}
                             allWarehouses={allWarehouses}
                             onTransferCreated={handleTransferUpdated}
                         />
