@@ -7,7 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { InventoryTransfer, InventoryTransferStatus } from '@/types/inventory_transfer';
+import {  InventoryTransferStatus } from '@/types/inventory_transfer';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
