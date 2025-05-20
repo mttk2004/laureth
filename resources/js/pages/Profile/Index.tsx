@@ -3,10 +3,7 @@ import { Head } from "@inertiajs/react";
 import { User } from "@/types/user";
 import { formatCurrency, formatLastLogin, formatPhoneNumber } from "@/lib";
 import UserRoleBadge from "@/components/users/UserRoleBadge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PencilIcon } from "lucide-react";
-import { router } from "@inertiajs/react";
 
 interface PageProps {
     user: User;
@@ -23,13 +20,6 @@ export default function Profile({ user }: PageProps) {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold tracking-tight">Thông tin cá nhân</h1>
-                    <Button
-                        onClick={() => router.visit(`/profile/edit`)}
-                        className="flex items-center gap-2"
-                    >
-                        <PencilIcon className="h-4 w-4" />
-                        Chỉnh sửa
-                    </Button>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -63,7 +53,7 @@ export default function Profile({ user }: PageProps) {
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="text-muted-foreground">Cửa hàng:</div>
-                                        <div>{user.store?.name || 'Chưa phân công'}</div>
+                                        <div>{user.store?.name}</div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="text-muted-foreground">Đăng nhập cuối:</div>
@@ -133,12 +123,7 @@ export default function Profile({ user }: PageProps) {
                             </div>
 
                             <div className="mt-6 flex items-center justify-end">
-                                <Button
-                                    variant="outline"
-                                    onClick={() => router.visit('/change-password')}
-                                >
-                                    Đổi mật khẩu
-                                </Button>
+                                <p className="text-sm text-gray-500">Liên hệ với quản lý để cập nhật thông tin cá nhân</p>
                             </div>
                         </CardContent>
                     </Card>
