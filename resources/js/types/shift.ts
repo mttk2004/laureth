@@ -1,3 +1,5 @@
+import { User } from './user';
+
 export enum ShiftType {
     A = 'A',
     B = 'B',
@@ -18,4 +20,5 @@ export interface Shift {
     status: ShiftStatus;
     created_at: string;
     updated_at: string;
+    user?: User;
 }

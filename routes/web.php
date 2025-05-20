@@ -12,6 +12,7 @@ use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseOrderPdfController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\ShiftManagerController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -87,6 +88,20 @@ Route::middleware(['web', 'auth', 'verified', 'dm'])->group(function () {
   Route::get('/api/reports/expense-summary', [ReportController::class, 'getExpenseSummary']);
   Route::get('/api/reports/store-performance', [ReportController::class, 'getStorePerformance']);
   Route::get('/api/reports/product-performance', [ReportController::class, 'getProductPerformance']);
+});
+
+// Route cho SM (Store Manager)
+Route::middleware(['web', 'auth', 'verified', 'sm'])->group(function () {
+  // Routes cho quản lý ca làm việc
+  Route::get('/shifts-management', [ShiftManagerController::class, 'index'])->name('shifts-management.index');
+  Route::get('/shifts-management/create', [ShiftManagerController::class, 'create'])->name('shifts-management.create');
+  Route::post('/shifts-management', [ShiftManagerController::class, 'store'])->name('shifts-management.store');
+  Route::delete('/shifts-management/{shift}', [ShiftManagerController::class, 'destroy'])->name('shifts-management.destroy');
+
+  // API routes cho quản lý ca làm việc
+  Route::get('/api/shifts-management/store-staff', [ShiftManagerController::class, 'getStoreStaff']);
+  Route::get('/api/shifts-management/month-shifts', [ShiftManagerController::class, 'getMonthShifts']);
+  Route::post('/api/shifts-management/bulk', [ShiftManagerController::class, 'storeBulk'])->name('shifts-management.store-bulk');
 });
 
 // Route cho nhân viên (SL và SA)
