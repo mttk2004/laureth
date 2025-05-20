@@ -22,3 +22,10 @@ export function formatCurrency(value: number): string {
 export function formatPhoneNumber(value: string): string {
     return value.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
 }
+
+/**
+ * Format ngày tháng theo định dạng dd/mm/yyyy
+ */
+export function formatDate(value: string): string {
+    return new Date(value).toLocaleDateString('vi-VN');
+}

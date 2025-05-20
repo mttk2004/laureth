@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryTransferController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderPdfController;
 use App\Http\Controllers\PayrollController;
@@ -99,6 +100,12 @@ Route::middleware(['web', 'auth', 'verified', 'sm'])->group(function () {
 
   // Routes cho quản lý nhân viên của SM
   Route::get('/staff', [App\Http\Controllers\Staff\StaffController::class, 'index'])->name('staff.index');
+
+  // Routes cho quản lý kho và chuyển kho
+  Route::get('/warehouse-management', [InventoryTransferController::class, 'index'])->name('warehouse-management.index');
+  Route::get('/api/warehouses/{warehouse}/inventory', [InventoryTransferController::class, 'getWarehouseInventory']);
+  Route::post('/api/inventory-transfers', [InventoryTransferController::class, 'store'])->name('inventory-transfers.store');
+  Route::put('/api/inventory-transfers/{inventoryTransfer}/status', [InventoryTransferController::class, 'updateStatus'])->name('inventory-transfers.update-status');
 
   Route::get('/store-reports', function () {
     return Inertia::render('Others/FeatureOnDeveloping', [
