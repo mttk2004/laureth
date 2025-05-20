@@ -12,7 +12,7 @@ interface UserDetailDialogProps {
     currentUserRole?: UserRole;
 }
 
-export default function UserDetailDialog({ user, open, onOpenChange, currentUserRole }: UserDetailDialogProps) {
+export default function UserDetailDialog({ user, open, onOpenChange, currentUserRole = 'DM' }: UserDetailDialogProps) {
     if (!user) return null;
 
     // Chuyển đổi tỷ lệ hoa hồng từ thập phân sang phần trăm
