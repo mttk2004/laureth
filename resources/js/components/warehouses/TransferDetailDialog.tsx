@@ -59,8 +59,8 @@ interface TransferDetailResponse {
 }
 
 interface TransferDetailDialogProps {
-    transfer: InventoryTransfer | null;
-    selectedTransfer: InventoryTransfer | null;
+    transfer: TransferDetailResponse | null;
+    selectedTransfer: TransferDetailResponse | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onStatusUpdated: () => void;

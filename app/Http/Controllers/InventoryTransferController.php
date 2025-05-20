@@ -71,13 +71,67 @@ class InventoryTransferController extends Controller
       $user
     );
 
+    // Chuyển đổi dữ liệu sang định dạng phù hợp cho frontend
+    $formattedTransfers = $transfers->through(function ($transfer) {
+      // Log dữ liệu gốc để debug
+      Log::debug('Original transfer data before formatting', [
+        'id' => $transfer->id,
+        'source_warehouse' => $transfer->sourceWarehouse ? true : false,
+        'destination_warehouse' => $transfer->destinationWarehouse ? true : false,
+        'requested_by' => $transfer->requestedBy ? $transfer->requestedBy->id : null,
+        'approved_by' => $transfer->approvedBy ? $transfer->approvedBy->id : null,
+      ]);
+
+      // Chuyển quan hệ từ camelCase sang snake_case để phù hợp với API
+      return [
+        'id' => $transfer->id,
+        'source_warehouse_id' => $transfer->source_warehouse_id,
+        'destination_warehouse_id' => $transfer->destination_warehouse_id,
+        'product_id' => $transfer->product_id,
+        'quantity' => $transfer->quantity,
+        'status' => $transfer->status,
+        'created_at' => $transfer->created_at,
+        'updated_at' => $transfer->updated_at,
+        'source_warehouse' => $transfer->sourceWarehouse ? [
+          'id' => $transfer->sourceWarehouse->id,
+          'name' => $transfer->sourceWarehouse->name,
+          'store' => $transfer->sourceWarehouse->store ? [
+            'id' => $transfer->sourceWarehouse->store->id,
+            'name' => $transfer->sourceWarehouse->store->name
+          ] : null
+        ] : null,
+        'destination_warehouse' => $transfer->destinationWarehouse ? [
+          'id' => $transfer->destinationWarehouse->id,
+          'name' => $transfer->destinationWarehouse->name,
+          'store' => $transfer->destinationWarehouse->store ? [
+            'id' => $transfer->destinationWarehouse->store->id,
+            'name' => $transfer->destinationWarehouse->store->name
+          ] : null
+        ] : null,
+        'product' => $transfer->product ? [
+          'id' => $transfer->product->id,
+          'name' => $transfer->product->name
+        ] : null,
+        'requested_by' => $transfer->requestedBy ? [
+          'id' => $transfer->requestedBy->id,
+          'name' => $transfer->requestedBy->name,
+          'full_name' => $transfer->requestedBy->full_name ?? $transfer->requestedBy->name,
+        ] : null,
+        'approved_by' => $transfer->approvedBy ? [
+          'id' => $transfer->approvedBy->id,
+          'name' => $transfer->approvedBy->name,
+          'full_name' => $transfer->approvedBy->full_name ?? $transfer->approvedBy->name,
+        ] : null,
+      ];
+    });
+
     Log::info('Rendering inventory transfer page', [
       'transfer_count' => $transfers->count(),
       'filters' => $filters
     ]);
 
     return Inertia::render('StoreManager/WarehouseManagement/Index', [
-      'transfers' => $transfers,
+      'transfers' => $formattedTransfers,
       'storeWarehouses' => $storeWarehouses,
       'allWarehouses' => $allWarehouses,
       'user' => $user,
@@ -248,26 +302,22 @@ class InventoryTransferController extends Controller
 
     // Lấy chi tiết với eager loading
     $transfer = InventoryTransfer::with([
-      'sourceWarehouse' => function ($query) {
-        $query->withTrashed()->with(['store' => function ($q) {
-          $q->withTrashed();
-        }]);
-      },
-      'destinationWarehouse' => function ($query) {
-        $query->withTrashed()->with(['store' => function ($q) {
-          $q->withTrashed();
-        }]);
-      },
-      'product' => function ($query) {
-        $query->withTrashed();
-      },
-      'requestedBy' => function ($query) {
-        $query->withTrashed();
-      },
-      'approvedBy' => function ($query) {
-        $query->withTrashed();
-      }
+      'sourceWarehouse.store',
+      'destinationWarehouse.store',
+      'product',
+      'requestedBy',
+      'approvedBy'
     ])->findOrFail($inventoryTransfer->id);
+
+    // Log các mối quan hệ được tải
+    Log::debug('Transfer relationships loaded', [
+      'transfer_id' => $transfer->id,
+      'has_source_warehouse' => $transfer->sourceWarehouse ? true : false,
+      'has_destination_warehouse' => $transfer->destinationWarehouse ? true : false,
+      'has_product' => $transfer->product ? true : false,
+      'has_requested_by' => $transfer->requestedBy ? true : false,
+      'has_approved_by' => $transfer->approvedBy ? true : false,
+    ]);
 
     // Chuyển đổi các quan hệ thành định dạng đồng nhất cho frontend
     $responseData = [

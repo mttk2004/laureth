@@ -34,8 +34,8 @@ class InventoryTransfer extends Model
   protected $casts = [
     'source_warehouse_id' => 'integer',
     'destination_warehouse_id' => 'integer',
-    'requested_by' => 'string',
-    'approved_by' => 'string',
+    'requested_by' => 'integer',
+    'approved_by' => 'integer',
     'product_id' => 'string',
     'quantity' => 'integer',
   ];
