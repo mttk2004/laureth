@@ -11,7 +11,6 @@ import {  InventoryTransferStatus } from '@/types/inventory_transfer';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import TransferStatusBadge from './TransferStatusBadge';
@@ -63,8 +62,6 @@ interface TransferDetailDialogProps {
     selectedTransfer: TransferDetailResponse | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onStatusUpdated: () => void;
-    currentUserStoreId: number;
 }
 
 export default function TransferDetailDialog({
@@ -72,18 +69,14 @@ export default function TransferDetailDialog({
     selectedTransfer,
     open,
     onOpenChange,
-    onStatusUpdated,
-    currentUserStoreId,
 }: TransferDetailDialogProps) {
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState<string>('');
     const [transferDetail, setTransferDetail] = useState<TransferDetailResponse | null>(null);
 
     // Xử lý khi mở/đóng dialog
     const handleOpenChange = (open: boolean) => {
         if (!open) {
-            setSelectedStatus('');
             setTransferDetail(null);
         } else if (selectedTransfer) {
             // Tải dữ liệu khi mở dialog
@@ -126,55 +119,6 @@ export default function TransferDetailDialog({
 
     // Lấy dữ liệu ưu tiên từ API
     const transferData = transferDetail || (selectedTransfer as unknown as TransferDetailResponse) || (transfer as unknown as TransferDetailResponse);
-
-    // Check if the current user can update this transfer
-    const canUpdateStatus = () => {
-        if (!transferData) return false;
-
-        // Nếu chuyển kho đã hoàn thành hoặc từ chối thì không thể cập nhật
-        if (
-            transferData.status === InventoryTransferStatus.COMPLETED ||
-            transferData.status === InventoryTransferStatus.REJECTED
-        ) {
-            return false;
-        }
-
-        // Kiểm tra quyền cập nhật dựa trên cửa hàng của kho đích
-        if (transferData.destination_warehouse?.store?.id) {
-            console.log('Checking permission:', {
-                destStoreId: transferData.destination_warehouse.store.id,
-                currentUserStoreId
-            });
-            return Number(transferData.destination_warehouse.store.id) === Number(currentUserStoreId);
-        }
-
-        return false;
-    };
-
-    // Update transfer status
-    const handleUpdateStatus = async () => {
-        if (!transferData || !selectedStatus) {
-            addToast('Vui lòng chọn trạng thái', 'error');
-            return;
-        }
-
-        try {
-            setLoading(true);
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const response = await axios.put(`/api/inventory-transfers/${transferData.id}/status`, {
-                status: selectedStatus,
-            });
-
-            addToast('Đã cập nhật trạng thái thành công', 'success');
-            onStatusUpdated();
-            handleOpenChange(false);
-        } catch (error) {
-            console.error('Error updating transfer status:', error);
-            addToast('Không thể cập nhật trạng thái', 'error');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (!transferData) return null;
 
@@ -266,36 +210,6 @@ export default function TransferDetailDialog({
                                     <TransferStatusBadge status={transferData.status} />
                                 </div>
                             </div>
-
-                            {canUpdateStatus() && (
-                                <div className="grid grid-cols-3 items-center gap-4 mt-4 pt-4 border-t">
-                                    <Label htmlFor="status" className="text-right font-medium">
-                                        Cập nhật trạng thái:
-                                    </Label>
-                                    <div className="col-span-2">
-                                        <Select
-                                            value={selectedStatus}
-                                            onValueChange={setSelectedStatus}
-                                            disabled={loading}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Chọn trạng thái mới" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {transferData.status === InventoryTransferStatus.PENDING && (
-                                                    <>
-                                                        <SelectItem value={InventoryTransferStatus.APPROVED}>Duyệt yêu cầu</SelectItem>
-                                                        <SelectItem value={InventoryTransferStatus.REJECTED}>Từ chối yêu cầu</SelectItem>
-                                                    </>
-                                                )}
-                                                {transferData.status === InventoryTransferStatus.APPROVED && (
-                                                    <SelectItem value={InventoryTransferStatus.COMPLETED}>Hoàn thành</SelectItem>
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            )}
                         </>
                     )}
                 </div>
@@ -303,11 +217,6 @@ export default function TransferDetailDialog({
                     <Button variant="outline" onClick={() => handleOpenChange(false)}>
                         Đóng
                     </Button>
-                    {canUpdateStatus() && selectedStatus && (
-                        <Button onClick={handleUpdateStatus} disabled={loading}>
-                            {loading ? 'Đang cập nhật...' : 'Cập nhật trạng thái'}
-                        </Button>
-                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

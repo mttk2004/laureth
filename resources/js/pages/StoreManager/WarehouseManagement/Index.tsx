@@ -352,7 +352,6 @@ export default function WarehouseManagementIndex({
                     open={detailDialogOpen}
                     onOpenChange={setDetailDialogOpen}
                     onStatusUpdated={handleTransferUpdated}
-                    currentUserStoreId={Number(store.id)}
                 />
             </div>
         </AppLayout>

@@ -216,9 +216,9 @@ export default function CreateTransferDialog({
                                     </SelectItem>
                                 ))}
                                 {inventory.length === 0 && (
-                                    <SelectItem value="" disabled>
+                                    <div className="p-2 text-sm text-muted-foreground">
                                         Không có sản phẩm nào trong kho
-                                    </SelectItem>
+                                    </div>
                                 )}
                             </SelectContent>
                         </Select>
