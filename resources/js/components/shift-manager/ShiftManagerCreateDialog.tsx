@@ -1,4 +1,5 @@
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui';
+import { useToast } from '@/hooks/use-toast';
 import { ShiftFormData, ShiftType, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
@@ -18,6 +19,7 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { addToast } = useToast();
 
     // Cập nhật formData khi date thay đổi
     useEffect(() => {
@@ -42,6 +44,7 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
             shift_type: formData.shift_type
         }, {
             onSuccess: () => {
+                addToast('Ca làm việc đã được tạo thành công', 'success');
                 onOpenChange(false);
                 setIsSubmitting(false);
                 // Reset form
@@ -52,9 +55,11 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
                 });
             },
             onError: (errors) => {
+                addToast('Có lỗi xảy ra khi tạo ca làm việc', 'error');
                 setErrors(errors);
                 setIsSubmitting(false);
             },
+            preserveScroll: true,
         });
     };
 
