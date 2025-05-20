@@ -229,9 +229,10 @@ export default function WarehouseManagementIndex({
         if (!warehouse) return 'Không xác định';
 
         const name = warehouse.name || 'Không xác định';
-        const storeName = warehouse.store?.name;
+        // const storeName = warehouse.store?.name;
 
-        return storeName ? `${name} (${storeName})` : name;
+        // return storeName ? `${name} (${storeName})` : name;
+        return name;
     };
 
     // Định nghĩa các cột trong bảng
