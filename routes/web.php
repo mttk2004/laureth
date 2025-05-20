@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderPdfController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductInventoryController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseOrderPdfController;
 use App\Http\Controllers\ReportController;
@@ -30,6 +31,7 @@ Route::get('/', function () {
 // Route cho tất cả user đã đăng nhập
 Route::middleware(['web', 'auth', 'verified'])->group(function () {
   Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+  Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 });
 
 // Route cho DM (District Manager)
