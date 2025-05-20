@@ -106,6 +106,7 @@ Route::middleware(['web', 'auth', 'verified', 'sm'])->group(function () {
   Route::get('/api/warehouses/{warehouse}/inventory', [InventoryTransferController::class, 'getWarehouseInventory']);
   Route::post('/api/inventory-transfers', [InventoryTransferController::class, 'store'])->name('inventory-transfers.store');
   Route::put('/api/inventory-transfers/{inventoryTransfer}/status', [InventoryTransferController::class, 'updateStatus'])->name('inventory-transfers.update-status');
+  Route::get('/api/inventory-transfers/{inventoryTransfer}', [InventoryTransferController::class, 'getTransferDetail'])->name('inventory-transfers.detail');
 
   Route::get('/store-reports', function () {
     return Inertia::render('Others/FeatureOnDeveloping', [

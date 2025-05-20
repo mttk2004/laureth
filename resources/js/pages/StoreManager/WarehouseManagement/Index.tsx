@@ -12,35 +12,11 @@ import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { BaseSortSelect } from '@/components/common/BaseSortSelect';
 import { formatDate } from '@/lib/utils';
-
-// Mở rộng type InventoryTransfer để bao gồm các quan hệ
-interface InventoryTransferWithRelations extends InventoryTransfer {
-    sourceWarehouse?: {
-        name: string;
-        store?: {
-            name: string;
-        };
-    };
-    destinationWarehouse?: {
-        name: string;
-        store?: {
-            name: string;
-        };
-    };
-    product?: {
-        name: string;
-    };
-    requestedBy?: {
-        name: string;
-    };
-    approvedBy?: {
-        name: string;
-    };
-}
+import axios from 'axios';
 
 interface Props {
     transfers: {
-        data: InventoryTransferWithRelations[];
+        data: InventoryTransfer[];
         links: {
             url: string | null;
             label: string;
@@ -71,13 +47,27 @@ export default function WarehouseManagementIndex({
     filters = {},
     sort = 'created_at_desc'
 }: Props) {
-    const [selectedTransfer, setSelectedTransfer] = useState<InventoryTransferWithRelations | null>(null);
+    const [selectedTransfer, setSelectedTransfer] = useState<InventoryTransfer | null>(null);
     const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
     // Xem chi tiết yêu cầu chuyển kho
-    const handleViewTransfer = (transfer: InventoryTransferWithRelations) => {
-        setSelectedTransfer(transfer);
-        setDetailDialogOpen(true);
+    const handleViewTransfer = async (transfer: InventoryTransfer) => {
+        try {
+            // Fetch chi tiết từ API trước khi mở dialog
+            const response = await axios.get(`/api/inventory-transfers/${transfer.id}`);
+            if (response.data) {
+                setSelectedTransfer(response.data);
+                console.log('Detail API response:', response.data);
+            } else {
+                setSelectedTransfer(transfer);
+            }
+        } catch (error) {
+            console.error('Error fetching transfer detail:', error);
+            // Nếu có lỗi, vẫn hiển thị dữ liệu từ bảng
+            setSelectedTransfer(transfer);
+        } finally {
+            setDetailDialogOpen(true);
+        }
     };
 
     // Lọc và sắp xếp
@@ -121,14 +111,14 @@ export default function WarehouseManagementIndex({
         {
             key: 'id',
             label: 'Mã YC',
-            render: (transfer: InventoryTransferWithRelations) => (
+            render: (transfer: InventoryTransfer) => (
                 <div className="text-sm font-medium">#{transfer.id}</div>
             ),
         },
         {
             key: 'source_warehouse',
             label: 'Kho nguồn',
-            render: (transfer: InventoryTransferWithRelations) => (
+            render: (transfer: InventoryTransfer) => (
                 <div className="text-sm">
                     {transfer.sourceWarehouse?.name}{' '}
                     {transfer.sourceWarehouse?.store?.name &&
@@ -140,7 +130,7 @@ export default function WarehouseManagementIndex({
         {
             key: 'destination_warehouse',
             label: 'Kho đích',
-            render: (transfer: InventoryTransferWithRelations) => (
+            render: (transfer: InventoryTransfer) => (
                 <div className="text-sm">
                     {transfer.destinationWarehouse?.name}{' '}
                     {transfer.destinationWarehouse?.store?.name &&
@@ -152,22 +142,22 @@ export default function WarehouseManagementIndex({
         {
             key: 'product',
             label: 'Sản phẩm',
-            render: (transfer: InventoryTransferWithRelations) => <div className="text-sm">{transfer.product?.name}</div>,
+            render: (transfer: InventoryTransfer) => <div className="text-sm">{transfer.product?.name}</div>,
         },
         {
             key: 'quantity',
             label: 'Số lượng',
-            render: (transfer: InventoryTransferWithRelations) => <div className="text-sm">{transfer.quantity}</div>,
+            render: (transfer: InventoryTransfer) => <div className="text-sm">{transfer.quantity}</div>,
         },
         {
             key: 'status',
             label: 'Trạng thái',
-            render: (transfer: InventoryTransferWithRelations) => <TransferStatusBadge status={transfer.status} />,
+            render: (transfer: InventoryTransfer) => <TransferStatusBadge status={transfer.status} />,
         },
         {
             key: 'created_at',
             label: 'Ngày tạo',
-            render: (transfer: InventoryTransferWithRelations) => <div className="text-sm">{formatDate(transfer.created_at)}</div>,
+            render: (transfer: InventoryTransfer) => <div className="text-sm">{formatDate(transfer.created_at)}</div>,
         },
     ];
 
@@ -217,7 +207,7 @@ export default function WarehouseManagementIndex({
                 <DataTable
                     data={transfers.data}
                     columns={columns}
-                    actions={(transfer: InventoryTransferWithRelations) => (
+                    actions={(transfer: InventoryTransfer) => (
                         <div className="flex">
                             <Button variant="ghost" size="sm" onClick={() => handleViewTransfer(transfer)}>
                                 <EyeIcon className="h-4 w-4" />
@@ -235,6 +225,7 @@ export default function WarehouseManagementIndex({
 
                 <TransferDetailDialog
                     transfer={selectedTransfer}
+                    selectedTransfer={selectedTransfer}
                     open={detailDialogOpen}
                     onOpenChange={setDetailDialogOpen}
                     onStatusUpdated={handleTransferUpdated}

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class InventoryTransferService
 {
@@ -22,8 +23,35 @@ class InventoryTransferService
    */
   public function getFilteredTransfers(array $warehouseIds, array $filters, string $sort, User $user): LengthAwarePaginator
   {
+    Log::info('Getting filtered transfers', [
+      'warehouse_ids' => $warehouseIds,
+      'filters' => $filters,
+      'sort' => $sort,
+      'user_id' => $user->id
+    ]);
+
     $query = InventoryTransfer::query()
-      ->with(['sourceWarehouse.store', 'destinationWarehouse.store', 'product', 'requestedBy', 'approvedBy'])
+      ->with([
+        'sourceWarehouse' => function ($query) {
+          $query->withTrashed()->with(['store' => function ($q) {
+            $q->withTrashed();
+          }]);
+        },
+        'destinationWarehouse' => function ($query) {
+          $query->withTrashed()->with(['store' => function ($q) {
+            $q->withTrashed();
+          }]);
+        },
+        'product' => function ($query) {
+          $query->withTrashed();
+        },
+        'requestedBy' => function ($query) {
+          $query->withTrashed();
+        },
+        'approvedBy' => function ($query) {
+          $query->withTrashed();
+        }
+      ])
       ->where(function ($query) use ($warehouseIds) {
         $query->whereIn('source_warehouse_id', $warehouseIds)
           ->orWhereIn('destination_warehouse_id', $warehouseIds);
@@ -53,7 +81,15 @@ class InventoryTransferService
       $query->orderBy('status', 'desc');
     }
 
-    return $query->paginate(10)->withQueryString();
+    $result = $query->paginate(10)->withQueryString();
+
+    // Ghi log kết quả
+    Log::info('Transfers result count: ' . $result->count(), [
+      'total' => $result->total(),
+      'first_item' => $result->count() > 0 ? json_encode($result->items()[0]) : 'No items'
+    ]);
+
+    return $result;
   }
 
   /**
@@ -73,13 +109,24 @@ class InventoryTransferService
    *
    * @param InventoryTransfer $transfer Yêu cầu chuyển kho
    * @param string $status Trạng thái mới (approved, rejected, completed)
-   * @param int $approvedById ID người duyệt
+   * @param string $approvedById ID người duyệt
    * @return InventoryTransfer
    */
-  public function updateTransferStatus(InventoryTransfer $transfer, string $status, int $approvedById): InventoryTransfer
+  public function updateTransferStatus(InventoryTransfer $transfer, string $status, string $approvedById): InventoryTransfer
   {
+    Log::info('Updating transfer status', [
+      'transfer_id' => $transfer->id,
+      'old_status' => $transfer->status,
+      'new_status' => $status,
+      'approved_by' => $approvedById
+    ]);
+
     // Không cho phép cập nhật nếu đã hoàn thành hoặc từ chối
     if ($transfer->status === 'completed' || $transfer->status === 'rejected') {
+      Log::warning('Cannot update transfer that is already completed or rejected', [
+        'transfer_id' => $transfer->id,
+        'current_status' => $transfer->status
+      ]);
       throw new \Exception('Không thể cập nhật yêu cầu đã hoàn thành hoặc bị từ chối');
     }
 
@@ -90,12 +137,47 @@ class InventoryTransferService
       $transfer->status = $status;
       $transfer->save();
 
+      Log::info('Transfer status updated', [
+        'transfer_id' => $transfer->id,
+        'new_status' => $status
+      ]);
+
       // Nếu trạng thái là completed, thực hiện chuyển kho
       if ($status === 'completed') {
         $this->processTransfer($transfer);
       }
 
-      return $transfer->fresh(['sourceWarehouse.store', 'destinationWarehouse.store', 'product', 'requestedBy', 'approvedBy']);
+      $refreshedTransfer = $transfer->fresh([
+        'sourceWarehouse' => function ($query) {
+          $query->withTrashed()->with(['store' => function ($q) {
+            $q->withTrashed();
+          }]);
+        },
+        'destinationWarehouse' => function ($query) {
+          $query->withTrashed()->with(['store' => function ($q) {
+            $q->withTrashed();
+          }]);
+        },
+        'product' => function ($query) {
+          $query->withTrashed();
+        },
+        'requestedBy' => function ($query) {
+          $query->withTrashed();
+        },
+        'approvedBy' => function ($query) {
+          $query->withTrashed();
+        }
+      ]);
+
+      Log::info('Refreshed transfer data', [
+        'has_source_warehouse' => isset($refreshedTransfer->sourceWarehouse),
+        'has_destination_warehouse' => isset($refreshedTransfer->destinationWarehouse),
+        'has_product' => isset($refreshedTransfer->product),
+        'has_requested_by' => isset($refreshedTransfer->requestedBy),
+        'has_approved_by' => isset($refreshedTransfer->approvedBy)
+      ]);
+
+      return $refreshedTransfer;
     });
   }
 
