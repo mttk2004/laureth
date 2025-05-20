@@ -72,7 +72,9 @@ export default function CreateTransferDialog({
     const fetchWarehouseInventory = async (warehouseId: string) => {
         try {
             setLoading(true);
+            // Sử dụng đúng API endpoint từ InventoryTransferController
             const response = await axios.get(`/api/warehouses/${warehouseId}/inventory`);
+            console.log('Inventory API response:', response.data);
             setInventory(response.data);
         } catch (error) {
             console.error('Error fetching inventory:', error);
