@@ -55,33 +55,4 @@ class StaffController extends Controller
       'sort' => $request->input('sort', 'created_at_desc'),
     ]);
   }
-
-  /**
-   * Hiển thị chi tiết của một nhân viên
-   *
-   * @param string $staffId
-   * @return \Inertia\Response
-   */
-  public function show($staffId)
-  {
-    $user = Auth::user();
-
-    // Đảm bảo chỉ người dùng có quyền SM mới có thể truy cập
-    if (!$user->isSm() || !$user->store_id) {
-      abort(403, 'Không có quyền truy cập');
-    }
-
-    // Tìm nhân viên theo ID
-    $staff = User::findOrFail($staffId);
-
-    // Kiểm tra xem nhân viên có thuộc cửa hàng của SM không
-    if ($staff->store_id !== $user->store_id) {
-      abort(403, 'Không có quyền truy cập thông tin nhân viên này');
-    }
-
-    return Inertia::render('Staff/Show', [
-      'staff' => $staff,
-      'user' => $user,
-    ]);
-  }
 }

@@ -133,7 +133,12 @@ export default function StaffIndex({ staff, user, store, filters = {}, sort = Us
                     }}
                 />
 
-                <UserDetailDialog user={selectedStaff} open={detailDialogOpen} onOpenChange={setDetailDialogOpen} />
+                <UserDetailDialog
+                    user={selectedStaff}
+                    open={detailDialogOpen}
+                    onOpenChange={setDetailDialogOpen}
+                    currentUserRole={user.position}
+                />
             </div>
         </AppLayout>
     );
