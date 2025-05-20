@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui';
 import { ShiftFormData, ShiftType, User } from '@/types';
 import { router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ShiftManagerCreateDialogProps {
     open: boolean;
@@ -16,15 +16,15 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
         date: date || '',
         shift_type: ShiftType.A,
     });
-
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Cập nhật formData khi date thay đổi
-    useState(() => {
+    useEffect(() => {
         if (date) {
             setFormData((prev) => ({ ...prev, date }));
         }
-    });
+    }, [date]);
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -34,8 +34,13 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setErrors({});
 
-        router.post('/shifts-management', formData, {
+        router.post('/shifts-management', {
+            user_id: formData.user_id,
+            date: formData.date,
+            shift_type: formData.shift_type
+        }, {
             onSuccess: () => {
                 onOpenChange(false);
                 setIsSubmitting(false);
@@ -46,7 +51,8 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
                     shift_type: ShiftType.A,
                 });
             },
-            onError: () => {
+            onError: (errors) => {
+                setErrors(errors);
                 setIsSubmitting(false);
             },
         });
@@ -83,6 +89,7 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
                                     </option>
                                 ))}
                             </select>
+                            {errors.user_id && <p className="text-sm text-red-500">{errors.user_id}</p>}
                         </div>
 
                         <div className="grid gap-2">
@@ -100,7 +107,9 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
                                 <option value={ShiftType.A}>Ca sáng (8h-16h)</option>
                                 <option value={ShiftType.B}>Ca chiều (14h30-22h30)</option>
                             </select>
+                            {errors.shift_type && <p className="text-sm text-red-500">{errors.shift_type}</p>}
                         </div>
+                        {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
                     </div>
 
                     <DialogFooter>
