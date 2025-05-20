@@ -83,11 +83,48 @@ class InventoryTransferService
 
     $result = $query->paginate(10)->withQueryString();
 
-    // Ghi log kết quả
+    // Kiểm tra và ghi log chi tiết các kết quả
     Log::info('Transfers result count: ' . $result->count(), [
-      'total' => $result->total(),
-      'first_item' => $result->count() > 0 ? json_encode($result->items()[0]) : 'No items'
+      'total' => $result->total()
     ]);
+
+    // Ghi log mẫu đầu tiên để debug
+    if ($result->count() > 0) {
+      $firstItem = $result->items()[0];
+      Log::debug('First transfer item for debugging', [
+        'id' => $firstItem->id,
+        'source_warehouse' => $firstItem->sourceWarehouse ? [
+          'id' => $firstItem->sourceWarehouse->id,
+          'name' => $firstItem->sourceWarehouse->name,
+          'store' => $firstItem->sourceWarehouse->store ? [
+            'id' => $firstItem->sourceWarehouse->store->id,
+            'name' => $firstItem->sourceWarehouse->store->name
+          ] : null
+        ] : null,
+        'destination_warehouse' => $firstItem->destinationWarehouse ? [
+          'id' => $firstItem->destinationWarehouse->id,
+          'name' => $firstItem->destinationWarehouse->name,
+          'store' => $firstItem->destinationWarehouse->store ? [
+            'id' => $firstItem->destinationWarehouse->store->id,
+            'name' => $firstItem->destinationWarehouse->store->name
+          ] : null
+        ] : null,
+        'product' => $firstItem->product ? [
+          'id' => $firstItem->product->id,
+          'name' => $firstItem->product->name
+        ] : null,
+        'requestedBy' => $firstItem->requestedBy ? [
+          'id' => $firstItem->requestedBy->id,
+          'name' => $firstItem->requestedBy->name,
+          'full_name' => $firstItem->requestedBy->full_name ?? null
+        ] : null,
+        'approvedBy' => $firstItem->approvedBy ? [
+          'id' => $firstItem->approvedBy->id,
+          'name' => $firstItem->approvedBy->name,
+          'full_name' => $firstItem->approvedBy->full_name ?? null
+        ] : null
+      ]);
+    }
 
     return $result;
   }
@@ -169,12 +206,33 @@ class InventoryTransferService
         }
       ]);
 
-      Log::info('Refreshed transfer data', [
-        'has_source_warehouse' => isset($refreshedTransfer->sourceWarehouse),
-        'has_destination_warehouse' => isset($refreshedTransfer->destinationWarehouse),
-        'has_product' => isset($refreshedTransfer->product),
-        'has_requested_by' => isset($refreshedTransfer->requestedBy),
-        'has_approved_by' => isset($refreshedTransfer->approvedBy)
+      // Ghi log chi tiết dữ liệu cập nhật
+      Log::debug('Updated transfer data', [
+        'id' => $refreshedTransfer->id,
+        'source_warehouse' => $refreshedTransfer->sourceWarehouse ? [
+          'id' => $refreshedTransfer->sourceWarehouse->id,
+          'name' => $refreshedTransfer->sourceWarehouse->name,
+          'store' => $refreshedTransfer->sourceWarehouse->store ? [
+            'id' => $refreshedTransfer->sourceWarehouse->store->id,
+            'name' => $refreshedTransfer->sourceWarehouse->store->name
+          ] : null
+        ] : null,
+        'destination_warehouse' => $refreshedTransfer->destinationWarehouse ? [
+          'id' => $refreshedTransfer->destinationWarehouse->id,
+          'name' => $refreshedTransfer->destinationWarehouse->name,
+          'store' => $refreshedTransfer->destinationWarehouse->store ? [
+            'id' => $refreshedTransfer->destinationWarehouse->store->id,
+            'name' => $refreshedTransfer->destinationWarehouse->store->name
+          ] : null
+        ] : null,
+        'requested_by' => $refreshedTransfer->requestedBy ? [
+          'id' => $refreshedTransfer->requestedBy->id,
+          'name' => $refreshedTransfer->requestedBy->name
+        ] : null,
+        'approved_by' => $refreshedTransfer->approvedBy ? [
+          'id' => $refreshedTransfer->approvedBy->id,
+          'name' => $refreshedTransfer->approvedBy->name
+        ] : null
       ]);
 
       return $refreshedTransfer;

@@ -10,7 +10,7 @@ import {
 import { InventoryTransfer, InventoryTransferStatus } from '@/types/inventory_transfer';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import axios from 'axios';
@@ -67,6 +67,18 @@ export default function TransferDetailDialog({
         }
     };
 
+    // Log dữ liệu mỗi khi transferDetail thay đổi
+    useEffect(() => {
+        if (transferDetail) {
+            console.log('Current transfer detail state:', {
+                source: transferDetail.sourceWarehouse,
+                destination: transferDetail.destinationWarehouse,
+                requestedBy: transferDetail.requestedBy,
+                approvedBy: transferDetail.approvedBy
+            });
+        }
+    }, [transferDetail]);
+
     // Lấy dữ liệu với thứ tự ưu tiên: transferDetail > selectedTransfer > transfer
     const transferToDisplay = transferDetail || selectedTransfer || transfer;
 
@@ -83,9 +95,17 @@ export default function TransferDetailDialog({
             return false;
         }
 
-        // Chỉ người ở cửa hàng đích mới có thể cập nhật trạng thái
-        const destWarehouseId = transferToUse.destinationWarehouse?.store?.id || 0;
-        return destWarehouseId === currentUserStoreId;
+        // Kiểm tra kho đích thuộc về store của user hiện tại
+        if (transferToUse.destinationWarehouse?.store?.id) {
+            console.log('Checking permission:', {
+                destStoreId: transferToUse.destinationWarehouse.store.id,
+                currentUserStoreId
+            });
+            return Number(transferToUse.destinationWarehouse.store.id) === Number(currentUserStoreId);
+        }
+
+        // Nếu không có thông tin store, so sánh warehouse_id
+        return Number(transferToUse.destination_warehouse_id) === Number(currentUserStoreId);
     };
 
     // Update transfer status
@@ -115,6 +135,31 @@ export default function TransferDetailDialog({
 
     if (!transferToDisplay) return null;
 
+    // Lấy tên kho nguồn và kho đích từ dữ liệu
+    const sourceWarehouseName = transferToDisplay.sourceWarehouse?.name || 'Kho trung tâm';
+    const sourceStoreName = transferToDisplay.sourceWarehouse?.store?.name || '';
+
+    const destWarehouseName = transferToDisplay.destinationWarehouse?.name || 'Kho trung tâm';
+    const destStoreName = transferToDisplay.destinationWarehouse?.store?.name || '';
+
+    // Lấy tên người yêu cầu và người duyệt
+    const requestedByName = transferToDisplay.requestedBy?.full_name ||
+                           transferToDisplay.requestedBy?.name ||
+                           'Không xác định';
+
+    const approvedByName = transferToDisplay.approvedBy?.full_name ||
+                          transferToDisplay.approvedBy?.name ||
+                          'Chưa có người duyệt';
+
+    console.log('Rendering transfer detail dialog with data:', {
+        sourceWarehouseName,
+        sourceStoreName,
+        destWarehouseName,
+        destStoreName,
+        requestedByName,
+        approvedByName
+    });
+
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
@@ -135,22 +180,21 @@ export default function TransferDetailDialog({
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Kho nguồn:</Label>
                                 <div className="col-span-2">
-                                    {transferToDisplay.sourceWarehouse?.name}{' '}
-                                    {transferToDisplay.sourceWarehouse?.store?.name && `(${transferToDisplay.sourceWarehouse.store.name})`}
+                                    {sourceWarehouseName}
+                                    {sourceStoreName && ` (${sourceStoreName})`}
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Kho đích:</Label>
                                 <div className="col-span-2">
-                                    {transferToDisplay.destinationWarehouse?.name}{' '}
-                                    {transferToDisplay.destinationWarehouse?.store?.name &&
-                                        `(${transferToDisplay.destinationWarehouse.store.name})`}
+                                    {destWarehouseName}
+                                    {destStoreName && ` (${destStoreName})`}
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Sản phẩm:</Label>
                                 <div className="col-span-2">
-                                    {transferToDisplay.product?.name}
+                                    {transferToDisplay.product?.name || 'Không có thông tin'}
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
@@ -159,12 +203,12 @@ export default function TransferDetailDialog({
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Người yêu cầu:</Label>
-                                <div className="col-span-2">{transferToDisplay.requestedBy?.full_name || transferToDisplay.requestedBy?.name}</div>
+                                <div className="col-span-2">{requestedByName}</div>
                             </div>
                             {transferToDisplay.approved_by && (
                                 <div className="grid grid-cols-3 items-center gap-4">
                                     <Label className="text-right font-medium">Người duyệt:</Label>
-                                    <div className="col-span-2">{transferToDisplay.approvedBy?.full_name || transferToDisplay.approvedBy?.name}</div>
+                                    <div className="col-span-2">{approvedByName}</div>
                                 </div>
                             )}
                             <div className="grid grid-cols-3 items-center gap-4">
