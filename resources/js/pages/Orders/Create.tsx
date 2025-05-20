@@ -71,6 +71,7 @@ export default function OrderCreate({ user, products }: Props) {
                 total_price: item.total_price,
             })),
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [items, discountAmount]);
 
     // Xử lý thêm sản phẩm vào đơn hàng

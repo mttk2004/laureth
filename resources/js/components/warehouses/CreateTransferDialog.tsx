@@ -52,6 +52,7 @@ export default function CreateTransferDialog({
             setSelectedProduct('');
             setMaxQuantity(0);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedSourceWarehouse]);
 
     // Cập nhật max quantity khi chọn sản phẩm

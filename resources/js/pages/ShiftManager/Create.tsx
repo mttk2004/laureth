@@ -57,8 +57,10 @@ export default function ShiftManagerCreate({ user, staff }: CreateShiftManagerPr
             shifts,
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         router.post('/api/shifts-management/bulk', formData as any, {
             onSuccess: (response) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const data = response.props as any;
                 addToast(
                     `Đã tạo ${data.created} ca làm việc thành công, bỏ qua ${data.skipped} ca trùng lặp hoặc không hợp lệ`,

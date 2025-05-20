@@ -68,6 +68,7 @@ export default function AttendanceIndex({
         } else if (success && message) {
             addToast(message, 'success');
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error, success, message]);
 
     // Kiểm tra trạng thái check-in/check-out của ca làm việc hiện tại
