@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatCurrency, formatLastLogin, formatPhoneNumber } from '@/lib';
-import { User, roleLabels } from '@/types';
+import { User, UserRole, roleLabels } from '@/types';
 import { router } from '@inertiajs/react';
 import { PencilIcon } from 'lucide-react';
 
@@ -9,13 +9,17 @@ interface UserDetailDialogProps {
     user: User | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    currentUserRole?: UserRole;
 }
 
-export default function UserDetailDialog({ user, open, onOpenChange }: UserDetailDialogProps) {
+export default function UserDetailDialog({ user, open, onOpenChange, currentUserRole }: UserDetailDialogProps) {
     if (!user) return null;
 
     // Chuyển đổi tỷ lệ hoa hồng từ thập phân sang phần trăm
     const formattedCommissionRate = user.commission_rate ? `${user.commission_rate * 100}%` : 'Không áp dụng';
+
+    // Chỉ DM mới có quyền chỉnh sửa người dùng
+    const canEdit = currentUserRole === 'DM';
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -89,16 +93,18 @@ export default function UserDetailDialog({ user, open, onOpenChange }: UserDetai
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Đóng
                     </Button>
-                    <Button
-                        onClick={() => {
-                            if (user) {
-                                router.visit(`/users/${user.id}/edit`);
-                            }
-                        }}
-                    >
-                        <PencilIcon className="mr-2 h-4 w-4" />
-                        Chỉnh sửa
-                    </Button>
+                    {canEdit && (
+                        <Button
+                            onClick={() => {
+                                if (user) {
+                                    router.visit(`/users/${user.id}/edit`);
+                                }
+                            }}
+                        >
+                            <PencilIcon className="mr-2 h-4 w-4" />
+                            Chỉnh sửa
+                        </Button>
+                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>
