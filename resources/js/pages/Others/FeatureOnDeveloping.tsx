@@ -11,7 +11,7 @@ export default function FeatureOnDeveloping({ user }: PageProps) {
         <AppLayout user={user}>
             <Head title="Tính năng này đang được phát triển" />
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] text-center">
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-10 shadow-sm max-w-2xl w-full">
+                <div className="rounded-xl p-10 max-w-2xl w-full">
                     <div className="flex justify-center mb-6">
                         <div className="bg-blue-100 p-4 rounded-full">
                             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#0066ff" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -29,7 +29,7 @@ export default function FeatureOnDeveloping({ user }: PageProps) {
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div className="bg-white p-4 rounded-lg border border-gray-100 flex items-center">
+                        <div className="bg-white p-4 rounded-lg border border-gray-100 flex items-center shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#0066ff" fill="none" strokeLinecap="round" strokeLinejoin="round" className="mr-3">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                 <path d="M3 21h4l13 -13a1.5 1.5 0 0 0 -4 -4l-13 13v4" />
@@ -44,7 +44,7 @@ export default function FeatureOnDeveloping({ user }: PageProps) {
                                 <p className="text-sm text-gray-500">Đội ngũ kỹ thuật đang làm việc</p>
                             </div>
                         </div>
-                        <div className="bg-white p-4 rounded-lg border border-gray-100 flex items-center">
+                        <div className="bg-white p-4 rounded-lg border border-gray-100 flex items-center shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#0066ff" fill="none" strokeLinecap="round" strokeLinejoin="round" className="mr-3">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                 <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
