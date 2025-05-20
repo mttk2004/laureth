@@ -31,7 +31,18 @@ Route::get('/', function () {
 // Route cho tất cả user đã đăng nhập
 Route::middleware(['web', 'auth', 'verified'])->group(function () {
   Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-  Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+  // Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+  // Route::get('/profile', function () {
+  //   return Inertia::render('Others/FeatureOnDeveloping', [
+  //     'user' => Auth::user(),
+  //   ]);
+  // })->name('profile');
+
+  // Route::get('/notifications', function () {
+  //   return Inertia::render('Others/FeatureOnDeveloping', [
+  //     'user' => Auth::user(),
+  //   ]);
+  // })->name('notifications');
 });
 
 // Route cho DM (District Manager)
