@@ -48,11 +48,6 @@ export function ShiftManagerCalendar({
         return `${monthNames[month - 1]} ${year}`;
     };
 
-    // Lấy tên ca làm việc
-    const getShiftTypeLabel = (shiftType: ShiftType) => {
-        return shiftType === ShiftType.A ? 'Ca sáng (8h-16h)' : 'Ca chiều (14h30-22h30)';
-    };
-
     // Lấy màu cho trạng thái ca làm việc
     const getShiftStatusColor = (status: ShiftStatus) => {
         switch (status) {
@@ -110,6 +105,7 @@ export function ShiftManagerCalendar({
                                         size="sm"
                                         className="h-6 w-6 p-0"
                                         onClick={() => handleDateClick(item.date)}
+                                        disabled={new Date(item.date) < new Date(new Date().setHours(0, 0, 0, 0))}
                                     >
                                         <PlusIcon className="h-4 w-4" />
                                         <span className="sr-only">Thêm ca</span>
