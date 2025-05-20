@@ -32,18 +32,12 @@ Route::get('/', function () {
 // Route cho tất cả user đã đăng nhập
 Route::middleware(['web', 'auth', 'verified'])->group(function () {
   Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-  // Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
-  // Route::get('/profile', function () {
-  //   return Inertia::render('Others/FeatureOnDeveloping', [
-  //     'user' => Auth::user(),
-  //   ]);
-  // })->name('profile');
-
-  // Route::get('/notifications', function () {
-  //   return Inertia::render('Others/FeatureOnDeveloping', [
-  //     'user' => Auth::user(),
-  //   ]);
-  // })->name('notifications');
+  Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+  Route::get('/notifications', function () {
+    return Inertia::render('Others/FeatureOnDeveloping', [
+      'user' => Auth::user(),
+    ]);
+  })->name('notifications');
 });
 
 // Route cho DM (District Manager)
@@ -102,6 +96,12 @@ Route::middleware(['web', 'auth', 'verified', 'sm'])->group(function () {
   Route::get('/api/shifts-management/store-staff', [ShiftManagerController::class, 'getStoreStaff']);
   Route::get('/api/shifts-management/month-shifts', [ShiftManagerController::class, 'getMonthShifts']);
   Route::post('/api/shifts-management/bulk', [ShiftManagerController::class, 'storeBulk'])->name('shifts-management.store-bulk');
+
+  Route::get('/store-reports', function () {
+    return Inertia::render('Others/FeatureOnDeveloping', [
+      'user' => Auth::user(),
+    ]);
+  })->name('store-reports');
 });
 
 // Route cho nhân viên (SL và SA)
