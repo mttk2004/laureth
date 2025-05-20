@@ -7,7 +7,7 @@ import { Store, roleLabels } from '@/types';
 import { useState } from 'react';
 
 interface UserFiltersProps {
-    stores: Store[];
+    stores?: Store[];
     initialFilters: {
         position?: string;
         store_id?: string;
@@ -15,9 +15,10 @@ interface UserFiltersProps {
         unassigned?: boolean;
     };
     onApplyFilters: (filters: { position?: string; store_id?: string; name?: string; unassigned?: boolean }) => void;
+    showStoreFilter?: boolean;
 }
 
-export default function UserFilters({ stores, initialFilters, onApplyFilters }: UserFiltersProps) {
+export default function UserFilters({ stores = [], initialFilters, onApplyFilters, showStoreFilter = true }: UserFiltersProps) {
     const [filters, setFilters] = useState({
         position: initialFilters.position || 'all',
         store_id: initialFilters.store_id || 'all',
@@ -111,28 +112,32 @@ export default function UserFilters({ stores, initialFilters, onApplyFilters }: 
                     </Select>
                 </BaseFilterRow>
 
-                <BaseFilterRow label="Cửa hàng">
-                    <Select value={filters.store_id} onValueChange={(value) => handleSelectChange('store_id', value)} disabled={filters.unassigned}>
-                        <SelectTrigger id="store_id">
-                            <SelectValue placeholder="Tất cả cửa hàng" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Tất cả cửa hàng</SelectItem>
-                            {stores.map((store) => (
-                                <SelectItem key={store.id} value={store.id.toString()}>
-                                    {store.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </BaseFilterRow>
+                {showStoreFilter && (
+                    <>
+                        <BaseFilterRow label="Cửa hàng">
+                            <Select value={filters.store_id} onValueChange={(value) => handleSelectChange('store_id', value)} disabled={filters.unassigned}>
+                                <SelectTrigger id="store_id">
+                                    <SelectValue placeholder="Tất cả cửa hàng" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Tất cả cửa hàng</SelectItem>
+                                    {stores.map((store) => (
+                                        <SelectItem key={store.id} value={store.id.toString()}>
+                                            {store.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </BaseFilterRow>
 
-                <BaseFilterRow label="">
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="unassigned" checked={filters.unassigned} onCheckedChange={handleCheckboxChange} />
-                        <Label htmlFor="unassigned">Chỉ hiện nhân viên chưa phân công</Label>
-                    </div>
-                </BaseFilterRow>
+                        <BaseFilterRow label="">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="unassigned" checked={filters.unassigned} onCheckedChange={handleCheckboxChange} />
+                                <Label htmlFor="unassigned">Chỉ hiện nhân viên chưa phân công</Label>
+                            </div>
+                        </BaseFilterRow>
+                    </>
+                )}
             </BaseFilterForm>
         </BaseFilterDialog>
     );

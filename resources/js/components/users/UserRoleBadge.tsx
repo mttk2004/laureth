@@ -1,14 +1,22 @@
 import { Badge } from '@/components/ui/badge';
-import { roleLabels } from '@/types/user';
+import { UserRole, roleLabels } from '@/types/user';
 
 interface UserRoleBadgeProps {
-    role: 'DM' | 'SM' | 'SL' | 'SA';
+    role?: UserRole;
+    position?: UserRole;
     className?: string;
 }
 
-export default function UserRoleBadge({ role, className = '' }: UserRoleBadgeProps) {
+export default function UserRoleBadge({ role, position, className = '' }: UserRoleBadgeProps) {
+    // Lấy giá trị role từ prop position nếu role không được cung cấp
+    const userRole = role || position;
+
+    if (!userRole) {
+        return null;
+    }
+
     const getBadgeVariant = () => {
-        switch (role) {
+        switch (userRole) {
             case 'DM':
                 return 'bg-purple-100 text-purple-800 border-purple-200';
             case 'SM':
@@ -24,7 +32,7 @@ export default function UserRoleBadge({ role, className = '' }: UserRoleBadgePro
 
     return (
         <Badge variant="outline" className={`${getBadgeVariant()} ${className}`}>
-            {roleLabels[role]}
+            {roleLabels[userRole]}
         </Badge>
     );
 }

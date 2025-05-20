@@ -36,6 +36,13 @@ export function isStaff(role: UserRole): boolean {
 }
 
 /**
+ * Kiểm tra xem người dùng có phải là SM không
+ */
+export function isSm(role: UserRole): boolean {
+    return role === 'SM';
+}
+
+/**
  * Format thời gian đăng nhập cuối
  */
 export function formatLastLogin(lastLogin: string | undefined): string {

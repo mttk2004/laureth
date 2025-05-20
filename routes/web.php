@@ -97,6 +97,10 @@ Route::middleware(['web', 'auth', 'verified', 'sm'])->group(function () {
   Route::get('/api/shifts-management/month-shifts', [ShiftManagerController::class, 'getMonthShifts']);
   Route::post('/api/shifts-management/bulk', [ShiftManagerController::class, 'storeBulk'])->name('shifts-management.store-bulk');
 
+  // Routes cho quản lý nhân viên của SM
+  Route::get('/staff', [App\Http\Controllers\Staff\StaffController::class, 'index'])->name('staff.index');
+  Route::get('/staff/{staff}', [App\Http\Controllers\Staff\StaffController::class, 'show'])->name('staff.show');
+
   Route::get('/store-reports', function () {
     return Inertia::render('Others/FeatureOnDeveloping', [
       'user' => Auth::user(),
