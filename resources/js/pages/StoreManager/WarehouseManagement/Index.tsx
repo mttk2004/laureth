@@ -86,8 +86,6 @@ interface TransferDetailDialogProps {
     selectedTransfer: TransferDetailResponse | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onStatusUpdated: () => void;
-    currentUserStoreId: number;
 }
 
 // Khai báo lại component TransferDetailDialog với props mới
@@ -98,7 +96,6 @@ export default function WarehouseManagementIndex({
     storeWarehouses,
     allWarehouses,
     user,
-    store,
     filters = {},
     sort = 'created_at_desc'
 }: Props) {
@@ -351,7 +348,6 @@ export default function WarehouseManagementIndex({
                     selectedTransfer={selectedTransfer}
                     open={detailDialogOpen}
                     onOpenChange={setDetailDialogOpen}
-                    onStatusUpdated={handleTransferUpdated}
                 />
             </div>
         </AppLayout>

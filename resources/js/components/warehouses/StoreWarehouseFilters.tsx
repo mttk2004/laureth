@@ -62,8 +62,8 @@ export default function StoreWarehouseFilters({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="flex gap-2 items-center">
-                    <FilterIcon className="h-4 w-4" /> Lọc
+                <Button variant="outline" size="default" className="flex gap-2 items-center">
+                    <FilterIcon className="h-5 w-5" /> Lọc yêu cầu
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

@@ -137,8 +137,8 @@ export default function CreateTransferDialog({
             setOpen(newOpen);
         }}>
             <DialogTrigger asChild>
-                <Button size="sm" className="flex gap-2 items-center">
-                    <PlusIcon className="h-4 w-4" /> Tạo yêu cầu
+                <Button size="default" className="flex gap-2 items-center">
+                    <PlusIcon className="h-5 w-5" /> Tạo yêu cầu mới
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
