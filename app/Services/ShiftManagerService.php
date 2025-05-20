@@ -39,6 +39,9 @@ class ShiftManagerService extends BaseService
     $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth()->format('Y-m-d');
     $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth()->format('Y-m-d');
 
+    // Tự động cập nhật trạng thái các ca làm việc trong quá khứ mà chưa được chấm công
+    $this->updatePastShiftsStatus($storeId, $startDate, $endDate);
+
     // Lấy danh sách ca làm việc trong tháng
     $shifts = Shift::where('store_id', $storeId)
       ->whereBetween('date', [$startDate, $endDate])
@@ -97,6 +100,93 @@ class ShiftManagerService extends BaseService
       'month' => $month,
       'year' => $year,
     ];
+  }
+
+  /**
+   * Tự động cập nhật trạng thái các ca làm việc trong quá khứ
+   * Nếu ca làm việc đã qua mà vẫn ở trạng thái "planned" và không có bản ghi chấm công
+   * thì cập nhật thành "absent" (vắng mặt)
+   *
+   * @param  string  $storeId  ID của cửa hàng
+   * @param  string  $startDate  Ngày bắt đầu
+   * @param  string  $endDate  Ngày kết thúc
+   */
+  private function updatePastShiftsStatus(string $storeId, string $startDate, string $endDate): void
+  {
+    $now = Carbon::now();
+    $today = $now->format('Y-m-d');
+
+    // Log thông tin debug
+    Log::info("ShiftManager: Updating past shifts status", [
+      'store_id' => $storeId,
+      'start_date' => $startDate,
+      'end_date' => $endDate,
+      'current_time' => $now->toDateTimeString(),
+      'timezone' => $now->timezone->getName(),
+    ]);
+
+    // Tìm các ca làm việc trong quá khứ mà vẫn ở trạng thái "planned"
+    $pastShifts = Shift::where('store_id', $storeId)
+      ->whereBetween('date', [$startDate, $endDate])
+      ->where('status', 'planned')
+      ->get();
+
+    // Log số lượng ca làm việc cần kiểm tra
+    Log::info("ShiftManager: Found shifts to check", [
+      'count' => $pastShifts->count(),
+      'shift_ids' => $pastShifts->pluck('id')->toArray(),
+    ]);
+
+    foreach ($pastShifts as $shift) {
+      $shiftDate = Carbon::parse($shift->date);
+      $isToday = $shiftDate->format('Y-m-d') === $today;
+
+      // Xác định giờ kết thúc ca làm việc
+      $endHour = $shift->shift_type === 'A' ? 16 : 22; // Ca A: 8-16h, Ca B: 14:30-22:30
+      $endMinute = $shift->shift_type === 'A' ? 0 : 30;
+
+      // Tạo thời điểm kết thúc ca làm việc
+      $shiftEndTime = Carbon::parse($shift->date)->setHour($endHour)->setMinute($endMinute)->setSecond(0);
+
+      // Kiểm tra xem ca làm việc đã kết thúc chưa
+      $shiftHasEnded = $now->greaterThan($shiftEndTime);
+
+      // Log thông tin chi tiết về ca làm việc
+      Log::info("ShiftManager: Checking shift", [
+        'shift_id' => $shift->id,
+        'date' => $shift->date,
+        'shift_type' => $shift->shift_type,
+        'shift_end_time' => $shiftEndTime->toDateTimeString(),
+        'is_today' => $isToday,
+        'shift_has_ended' => $shiftHasEnded,
+        'is_past_day' => $shiftDate->lessThan($now->startOfDay()),
+      ]);
+
+      // Nếu ca làm việc đã kết thúc (ngày trong quá khứ hoặc hôm nay nhưng đã qua giờ kết thúc)
+      if ($shiftDate->lessThan($now->startOfDay()) || ($isToday && $shiftHasEnded)) {
+        // Kiểm tra xem có bản ghi chấm công không
+        $hasAttendance = DB::table('attendance_records')
+          ->where('shift_id', $shift->id)
+          ->exists();
+
+        Log::info("ShiftManager: Shift has ended check", [
+          'shift_id' => $shift->id,
+          'has_attendance' => $hasAttendance,
+        ]);
+
+        // Nếu không có bản ghi chấm công, cập nhật thành "absent"
+        if (! $hasAttendance) {
+          $shift->status = 'absent';
+          $result = $shift->save();
+
+          // Log kết quả cập nhật
+          Log::info("ShiftManager: Updated shift to absent", [
+            'shift_id' => $shift->id,
+            'success' => $result,
+          ]);
+        }
+      }
+    }
   }
 
   /**
