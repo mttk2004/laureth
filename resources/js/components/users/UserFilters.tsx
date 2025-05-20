@@ -115,7 +115,11 @@ export default function UserFilters({ stores = [], initialFilters, onApplyFilter
                 {showStoreFilter && (
                     <>
                         <BaseFilterRow label="Cửa hàng">
-                            <Select value={filters.store_id} onValueChange={(value) => handleSelectChange('store_id', value)} disabled={filters.unassigned}>
+                            <Select
+                                value={filters.store_id}
+                                onValueChange={(value) => handleSelectChange('store_id', value)}
+                                disabled={filters.unassigned}
+                            >
                                 <SelectTrigger id="store_id">
                                     <SelectValue placeholder="Tất cả cửa hàng" />
                                 </SelectTrigger>

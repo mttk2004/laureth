@@ -1,9 +1,9 @@
-import AppLayout from "@/layouts/app-layout";
-import { Head } from "@inertiajs/react";
-import { User } from "@/types/user";
-import { formatCurrency, formatLastLogin, formatPhoneNumber } from "@/lib";
-import UserRoleBadge from "@/components/users/UserRoleBadge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import UserRoleBadge from '@/components/users/UserRoleBadge';
+import AppLayout from '@/layouts/app-layout';
+import { formatCurrency, formatLastLogin, formatPhoneNumber } from '@/lib';
+import { User } from '@/types/user';
+import { Head } from '@inertiajs/react';
 
 interface PageProps {
     user: User;
@@ -31,7 +31,7 @@ export default function Profile({ user }: PageProps) {
                         <CardContent>
                             <div className="flex flex-col space-y-4">
                                 <div className="flex items-center space-x-4">
-                                    <div className="bg-blue-100 flex h-16 w-16 items-center justify-center rounded-full">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
                                         <span className="text-xl font-medium text-blue-700">{user.full_name.charAt(0)}</span>
                                     </div>
                                     <div>
@@ -94,8 +94,8 @@ export default function Profile({ user }: PageProps) {
                             <div className="mt-6 rounded-lg bg-blue-50 p-4">
                                 <h3 className="font-medium text-blue-800">Thông tin lương</h3>
                                 <p className="mt-2 text-sm text-blue-700">
-                                    Lương của bạn được tính dựa trên vai trò và hiệu suất làm việc.
-                                    Xem chi tiết lương và hoa hồng của bạn trong mục báo cáo lương.
+                                    Lương của bạn được tính dựa trên vai trò và hiệu suất làm việc. Xem chi tiết lương và hoa hồng của bạn trong mục
+                                    báo cáo lương.
                                 </p>
                             </div>
                         </CardContent>

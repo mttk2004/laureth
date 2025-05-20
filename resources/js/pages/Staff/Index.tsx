@@ -77,32 +77,32 @@ export default function StaffIndex({ staff, user, store, filters = {}, sort = Us
 
     // Định nghĩa các cột cho bảng
     const columns = [
-      {
-          key: 'name',
-          label: 'Nhân viên',
-          render: (user: User) => (
-              <div className="flex items-center">
-                  <div className="bg-muted mr-4 flex h-10 w-10 items-center justify-center rounded-full">
-                      <span className="font-medium">{user.full_name.charAt(0)}</span>
-                  </div>
-                  <div>
-                      <div className="text-sm font-medium">{user.full_name}</div>
-                      <div className="text-muted-foreground text-xs">{user.email}</div>
-                  </div>
-              </div>
-          ),
-      },
-      {
-          key: 'position',
-          label: 'Vai trò',
-          render: (user: User) => <UserRoleBadge role={user.position} />,
-      },
-      {
-          key: 'phone',
-          label: 'Điện thoại',
-          render: (user: User) => <div className="text-sm">{formatPhoneNumber(user.phone)}</div>,
-      },
-  ];
+        {
+            key: 'name',
+            label: 'Nhân viên',
+            render: (user: User) => (
+                <div className="flex items-center">
+                    <div className="bg-muted mr-4 flex h-10 w-10 items-center justify-center rounded-full">
+                        <span className="font-medium">{user.full_name.charAt(0)}</span>
+                    </div>
+                    <div>
+                        <div className="text-sm font-medium">{user.full_name}</div>
+                        <div className="text-muted-foreground text-xs">{user.email}</div>
+                    </div>
+                </div>
+            ),
+        },
+        {
+            key: 'position',
+            label: 'Vai trò',
+            render: (user: User) => <UserRoleBadge role={user.position} />,
+        },
+        {
+            key: 'phone',
+            label: 'Điện thoại',
+            render: (user: User) => <div className="text-sm">{formatPhoneNumber(user.phone)}</div>,
+        },
+    ];
 
     return (
         <AppLayout user={user}>
@@ -139,12 +139,7 @@ export default function StaffIndex({ staff, user, store, filters = {}, sort = Us
                     }}
                 />
 
-                <UserDetailDialog
-                    user={selectedStaff}
-                    open={detailDialogOpen}
-                    onOpenChange={setDetailDialogOpen}
-                    currentUserRole={user.position}
-                />
+                <UserDetailDialog user={selectedStaff} open={detailDialogOpen} onOpenChange={setDetailDialogOpen} currentUserRole={user.position} />
             </div>
         </AppLayout>
     );

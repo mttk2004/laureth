@@ -14,15 +14,7 @@ interface ShiftManagerCalendarProps {
     onDeleteShift: (shiftId: number) => void;
 }
 
-export function ShiftManagerCalendar({
-    calendar,
-    month,
-    year,
-    staff,
-    onPrevMonth,
-    onNextMonth,
-    onDeleteShift,
-}: ShiftManagerCalendarProps) {
+export function ShiftManagerCalendar({ calendar, month, year, staff, onPrevMonth, onNextMonth, onDeleteShift }: ShiftManagerCalendarProps) {
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
@@ -116,7 +108,7 @@ export function ShiftManagerCalendar({
                                         <div
                                             key={shift.id}
                                             className={`flex items-center justify-between rounded-md p-1 text-xs ${getShiftStatusColor(
-                                                shift.status
+                                                shift.status,
                                             )}`}
                                         >
                                             <div className="flex flex-col">
@@ -124,12 +116,7 @@ export function ShiftManagerCalendar({
                                                 <span>{shift.shift_type === ShiftType.A ? 'Ca sáng' : 'Ca chiều'}</span>
                                             </div>
                                             {shift.status === ShiftStatus.PLANNED && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-6 w-6 p-0"
-                                                    onClick={() => onDeleteShift(shift.id)}
-                                                >
+                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onDeleteShift(shift.id)}>
                                                     <TrashIcon className="h-3 w-3 text-red-500" />
                                                     <span className="sr-only">Xóa</span>
                                                 </Button>
@@ -143,12 +130,7 @@ export function ShiftManagerCalendar({
                 ))}
             </div>
 
-            <ShiftManagerCreateDialog
-                open={createDialogOpen}
-                onOpenChange={setCreateDialogOpen}
-                date={selectedDate}
-                staff={staff}
-            />
+            <ShiftManagerCreateDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} date={selectedDate} staff={staff} />
         </Card>
     );
 }

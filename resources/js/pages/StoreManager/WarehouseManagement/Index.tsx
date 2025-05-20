@@ -1,18 +1,13 @@
+import { BaseSortSelect } from '@/components/common/BaseSortSelect';
 import { Button, DataTable } from '@/components/ui';
-import {
-    CreateTransferDialog,
-    StoreWarehouseFilters,
-    TransferDetailDialog,
-    TransferStatusBadge
-} from '@/components/warehouses';
+import { CreateTransferDialog, StoreWarehouseFilters, TransferDetailDialog, TransferStatusBadge } from '@/components/warehouses';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/utils';
 import { InventoryTransfer, InventoryTransferStatus, Store, User, Warehouse, WarehouseWithStore } from '@/types';
+import { Head, router } from '@inertiajs/react';
+import axios from 'axios';
 import { EyeIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Head, router } from '@inertiajs/react';
-import { BaseSortSelect } from '@/components/common/BaseSortSelect';
-import { formatDate } from '@/lib/utils';
-import axios from 'axios';
 
 // Interface cho dữ liệu chi tiết từ API
 interface TransferDetailResponse {
@@ -89,16 +84,9 @@ interface TransferDetailDialogProps {
 }
 
 // Khai báo lại component TransferDetailDialog với props mới
-const EnhancedTransferDetailDialog = (TransferDetailDialog as unknown) as React.FC<TransferDetailDialogProps>;
+const EnhancedTransferDetailDialog = TransferDetailDialog as unknown as React.FC<TransferDetailDialogProps>;
 
-export default function WarehouseManagementIndex({
-    transfers,
-    storeWarehouses,
-    allWarehouses,
-    user,
-    filters = {},
-    sort = 'created_at_desc'
-}: Props) {
+export default function WarehouseManagementIndex({ transfers, storeWarehouses, allWarehouses, user, filters = {}, sort = 'created_at_desc' }: Props) {
     const [selectedTransfer, setSelectedTransfer] = useState<TransferDetailResponse | null>(null);
     const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [transferList, setTransferList] = useState<TransferDetailResponse[]>([]);
@@ -115,11 +103,11 @@ export default function WarehouseManagementIndex({
                 firstItem: transfers.data[0] || 'No items',
                 hasSourceWarehouse: transfers.data[0]?.sourceWarehouse !== undefined,
                 hasDestinationWarehouse: transfers.data[0]?.destinationWarehouse !== undefined,
-                fullDataSample: JSON.stringify(transfers.data[0])
+                fullDataSample: JSON.stringify(transfers.data[0]),
             });
 
             // Map từ InventoryTransfer sang TransferDetailResponse
-            const mappedTransfers = transfers.data.map(transfer => {
+            const mappedTransfers = transfers.data.map((transfer) => {
                 // Log chi tiết từng transfer
                 console.log(`Processing transfer #${transfer.id} raw data:`, transfer);
 
@@ -133,7 +121,7 @@ export default function WarehouseManagementIndex({
                     sourceWarehouseData: transfer.sourceWarehouse,
                     destinationWarehouseData: transfer.destinationWarehouse,
                     sourceStoreName: transfer.sourceWarehouse?.store?.name,
-                    destinationStoreName: transfer.destinationWarehouse?.store?.name
+                    destinationStoreName: transfer.destinationWarehouse?.store?.name,
                 });
 
                 // Có thể dữ liệu đã được chuyển đổi sang snake_case bởi server
@@ -156,7 +144,7 @@ export default function WarehouseManagementIndex({
                     quantity: transfer.quantity,
                     status: transfer.status,
                     created_at: transfer.created_at,
-                    updated_at: transfer.updated_at
+                    updated_at: transfer.updated_at,
                 } as TransferDetailResponse;
             });
 
@@ -237,27 +225,17 @@ export default function WarehouseManagementIndex({
         {
             key: 'id',
             label: 'Mã YC',
-            render: (transfer: TransferDetailResponse) => (
-                <div className="text-sm font-medium">#{transfer.id}</div>
-            ),
+            render: (transfer: TransferDetailResponse) => <div className="text-sm font-medium">#{transfer.id}</div>,
         },
         {
             key: 'source_warehouse',
             label: 'Kho nguồn',
-            render: (transfer: TransferDetailResponse) => (
-                <div className="text-sm">
-                    {getWarehouseName(transfer.source_warehouse)}
-                </div>
-            ),
+            render: (transfer: TransferDetailResponse) => <div className="text-sm">{getWarehouseName(transfer.source_warehouse)}</div>,
         },
         {
             key: 'destination_warehouse',
             label: 'Kho đích',
-            render: (transfer: TransferDetailResponse) => (
-                <div className="text-sm">
-                    {getWarehouseName(transfer.destination_warehouse)}
-                </div>
-            ),
+            render: (transfer: TransferDetailResponse) => <div className="text-sm">{getWarehouseName(transfer.destination_warehouse)}</div>,
         },
         {
             key: 'product',
@@ -316,10 +294,7 @@ export default function WarehouseManagementIndex({
                             initialFilters={filters}
                             onApplyFilters={handleApplyFilters}
                         />
-                        <CreateTransferDialog
-                            allWarehouses={allWarehouses}
-                            onTransferCreated={handleTransferUpdated}
-                        />
+                        <CreateTransferDialog allWarehouses={allWarehouses} onTransferCreated={handleTransferUpdated} />
                     </div>
                 </div>
 

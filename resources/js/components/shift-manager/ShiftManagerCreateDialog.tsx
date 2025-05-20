@@ -2,7 +2,7 @@ import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogH
 import { useToast } from '@/hooks/use-toast';
 import { ShiftFormData, ShiftType, User } from '@/types';
 import { router } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ShiftManagerCreateDialogProps {
     open: boolean;
@@ -38,29 +38,33 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
         setIsSubmitting(true);
         setErrors({});
 
-        router.post('/shifts-management', {
-            user_id: formData.user_id,
-            date: formData.date,
-            shift_type: formData.shift_type
-        }, {
-            onSuccess: () => {
-                addToast('Ca làm việc đã được tạo thành công', 'success');
-                onOpenChange(false);
-                setIsSubmitting(false);
-                // Reset form
-                setFormData({
-                    user_id: '',
-                    date: date || '',
-                    shift_type: ShiftType.A,
-                });
+        router.post(
+            '/shifts-management',
+            {
+                user_id: formData.user_id,
+                date: formData.date,
+                shift_type: formData.shift_type,
             },
-            onError: (errors) => {
-                addToast('Có lỗi xảy ra khi tạo ca làm việc', 'error');
-                setErrors(errors);
-                setIsSubmitting(false);
+            {
+                onSuccess: () => {
+                    addToast('Ca làm việc đã được tạo thành công', 'success');
+                    onOpenChange(false);
+                    setIsSubmitting(false);
+                    // Reset form
+                    setFormData({
+                        user_id: '',
+                        date: date || '',
+                        shift_type: ShiftType.A,
+                    });
+                },
+                onError: (errors) => {
+                    addToast('Có lỗi xảy ra khi tạo ca làm việc', 'error');
+                    setErrors(errors);
+                    setIsSubmitting(false);
+                },
+                preserveScroll: true,
             },
-            preserveScroll: true,
-        });
+        );
     };
 
     return (
@@ -82,7 +86,7 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
                             <select
                                 id="user_id"
                                 name="user_id"
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                 value={formData.user_id}
                                 onChange={handleChange}
                                 required
@@ -104,7 +108,7 @@ export function ShiftManagerCreateDialog({ open, onOpenChange, date, staff }: Sh
                             <select
                                 id="shift_type"
                                 name="shift_type"
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                 value={formData.shift_type}
                                 onChange={handleChange}
                                 required

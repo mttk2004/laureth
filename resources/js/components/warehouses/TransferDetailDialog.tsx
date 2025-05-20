@@ -1,18 +1,11 @@
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import {  InventoryTransferStatus } from '@/types/inventory_transfer';
-import { formatDate } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import { useEffect, useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { formatDate } from '@/lib/utils';
+import { InventoryTransferStatus } from '@/types/inventory_transfer';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 import TransferStatusBadge from './TransferStatusBadge';
 
 // Interface cho dữ liệu chi tiết từ API
@@ -64,12 +57,7 @@ interface TransferDetailDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
-export default function TransferDetailDialog({
-    transfer,
-    selectedTransfer,
-    open,
-    onOpenChange,
-}: TransferDetailDialogProps) {
+export default function TransferDetailDialog({ transfer, selectedTransfer, open, onOpenChange }: TransferDetailDialogProps) {
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [transferDetail, setTransferDetail] = useState<TransferDetailResponse | null>(null);
@@ -129,13 +117,9 @@ export default function TransferDetailDialog({
     const destWarehouseName = transferData.destination_warehouse?.name || 'Không xác định';
     const destStoreName = transferData.destination_warehouse?.store?.name || '';
 
-    const requestedByName = transferData.requested_by?.full_name ||
-                         transferData.requested_by?.name ||
-                         'Không xác định';
+    const requestedByName = transferData.requested_by?.full_name || transferData.requested_by?.name || 'Không xác định';
 
-    const approvedByName = transferData.approved_by?.full_name ||
-                        transferData.approved_by?.name ||
-                        'Chưa có người duyệt';
+    const approvedByName = transferData.approved_by?.full_name || transferData.approved_by?.name || 'Chưa có người duyệt';
 
     const productName = transferData.product?.name || 'Không xác định';
 
@@ -146,7 +130,7 @@ export default function TransferDetailDialog({
         destStoreName,
         requestedByName,
         approvedByName,
-        productName
+        productName,
     });
 
     return (
@@ -161,7 +145,7 @@ export default function TransferDetailDialog({
                 <div className="grid gap-4 py-4">
                     {loading ? (
                         <div className="flex items-center justify-center py-4">
-                            <div className="animate-spin h-6 w-6 border-2 border-blue-500 rounded-full border-t-transparent"></div>
+                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
                             <span className="ml-2">Đang tải dữ liệu...</span>
                         </div>
                     ) : (
@@ -182,9 +166,7 @@ export default function TransferDetailDialog({
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Sản phẩm:</Label>
-                                <div className="col-span-2">
-                                    {productName}
-                                </div>
+                                <div className="col-span-2">{productName}</div>
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Số lượng:</Label>

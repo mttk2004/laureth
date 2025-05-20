@@ -88,32 +88,24 @@ export default function ShiftManagerIndex({ user, shifts, staff, filters }: Shif
                 </div>
 
                 <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-4">
-                    <div className="rounded-lg border bg-card p-4 shadow-sm">
-                        <div className="text-sm font-medium text-muted-foreground">Tổng số nhân viên</div>
+                    <div className="bg-card rounded-lg border p-4 shadow-sm">
+                        <div className="text-muted-foreground text-sm font-medium">Tổng số nhân viên</div>
                         <div className="mt-2 text-2xl font-bold">{staff.length}</div>
                     </div>
-                    <div className="rounded-lg border bg-card p-4 shadow-sm">
-                        <div className="text-sm font-medium text-muted-foreground">Số ca làm việc trong tháng</div>
+                    <div className="bg-card rounded-lg border p-4 shadow-sm">
+                        <div className="text-muted-foreground text-sm font-medium">Số ca làm việc trong tháng</div>
+                        <div className="mt-2 text-2xl font-bold">{shifts.calendar.reduce((total, day) => total + day.shifts.length, 0)}</div>
+                    </div>
+                    <div className="bg-card rounded-lg border p-4 shadow-sm">
+                        <div className="text-muted-foreground text-sm font-medium">Ca sáng</div>
                         <div className="mt-2 text-2xl font-bold">
-                            {shifts.calendar.reduce((total, day) => total + day.shifts.length, 0)}
+                            {shifts.calendar.reduce((total, day) => total + day.shifts.filter((shift) => shift.shift_type === 'A').length, 0)}
                         </div>
                     </div>
-                    <div className="rounded-lg border bg-card p-4 shadow-sm">
-                        <div className="text-sm font-medium text-muted-foreground">Ca sáng</div>
+                    <div className="bg-card rounded-lg border p-4 shadow-sm">
+                        <div className="text-muted-foreground text-sm font-medium">Ca chiều</div>
                         <div className="mt-2 text-2xl font-bold">
-                            {shifts.calendar.reduce(
-                                (total, day) => total + day.shifts.filter((shift) => shift.shift_type === 'A').length,
-                                0
-                            )}
-                        </div>
-                    </div>
-                    <div className="rounded-lg border bg-card p-4 shadow-sm">
-                        <div className="text-sm font-medium text-muted-foreground">Ca chiều</div>
-                        <div className="mt-2 text-2xl font-bold">
-                            {shifts.calendar.reduce(
-                                (total, day) => total + day.shifts.filter((shift) => shift.shift_type === 'B').length,
-                                0
-                            )}
+                            {shifts.calendar.reduce((total, day) => total + day.shifts.filter((shift) => shift.shift_type === 'B').length, 0)}
                         </div>
                     </div>
                 </div>

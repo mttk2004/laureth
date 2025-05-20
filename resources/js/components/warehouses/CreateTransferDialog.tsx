@@ -1,23 +1,15 @@
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 import { InventoryItem } from '@/types/inventory_item';
 import { Product } from '@/types/product';
 import { WarehouseWithStore } from '@/types/warehouse';
-import { useToast } from '@/hooks/use-toast';
-import { useState, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import axios from 'axios';
 import { PlusIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 // Mở rộng loại InventoryItem với product
 interface InventoryItemWithProduct extends InventoryItem {
@@ -29,10 +21,7 @@ interface CreateTransferDialogProps {
     onTransferCreated: () => void;
 }
 
-export default function CreateTransferDialog({
-    allWarehouses,
-    onTransferCreated,
-}: CreateTransferDialogProps) {
+export default function CreateTransferDialog({ allWarehouses, onTransferCreated }: CreateTransferDialogProps) {
     const { addToast } = useToast();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -52,13 +41,13 @@ export default function CreateTransferDialog({
             setSelectedProduct('');
             setMaxQuantity(0);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedSourceWarehouse]);
 
     // Cập nhật max quantity khi chọn sản phẩm
     useEffect(() => {
         if (selectedProduct) {
-            const product = inventory.find(item => item.product_id.toString() === selectedProduct);
+            const product = inventory.find((item) => item.product_id.toString() === selectedProduct);
             if (product) {
                 setMaxQuantity(product.quantity);
                 setQuantity(1);
@@ -115,7 +104,7 @@ export default function CreateTransferDialog({
                 source_warehouse_id: selectedSourceWarehouse,
                 destination_warehouse_id: selectedDestinationWarehouse,
                 product_id: selectedProduct,
-                quantity: quantity
+                quantity: quantity,
             });
 
             addToast('Đã tạo yêu cầu chuyển kho thành công', 'success');
@@ -131,14 +120,17 @@ export default function CreateTransferDialog({
     };
 
     return (
-        <Dialog open={open} onOpenChange={(newOpen) => {
-            if (!newOpen) {
-                resetForm();
-            }
-            setOpen(newOpen);
-        }}>
+        <Dialog
+            open={open}
+            onOpenChange={(newOpen) => {
+                if (!newOpen) {
+                    resetForm();
+                }
+                setOpen(newOpen);
+            }}
+        >
             <DialogTrigger asChild>
-                <Button size="default" className="flex gap-2 items-center">
+                <Button size="default" className="flex items-center gap-2">
                     <PlusIcon className="h-5 w-5" /> Tạo yêu cầu mới
                 </Button>
             </DialogTrigger>
@@ -152,11 +144,7 @@ export default function CreateTransferDialog({
                         <Label htmlFor="source_warehouse" className="text-right">
                             Kho nguồn
                         </Label>
-                        <Select
-                            value={selectedSourceWarehouse}
-                            onValueChange={setSelectedSourceWarehouse}
-                            disabled={loading}
-                        >
+                        <Select value={selectedSourceWarehouse} onValueChange={setSelectedSourceWarehouse} disabled={loading}>
                             <SelectTrigger id="source_warehouse" className="col-span-3">
                                 <SelectValue placeholder="Chọn kho nguồn" />
                             </SelectTrigger>
@@ -177,11 +165,7 @@ export default function CreateTransferDialog({
                         <Label htmlFor="destination_warehouse" className="text-right">
                             Kho đích
                         </Label>
-                        <Select
-                            value={selectedDestinationWarehouse}
-                            onValueChange={setSelectedDestinationWarehouse}
-                            disabled={loading}
-                        >
+                        <Select value={selectedDestinationWarehouse} onValueChange={setSelectedDestinationWarehouse} disabled={loading}>
                             <SelectTrigger id="destination_warehouse" className="col-span-3">
                                 <SelectValue placeholder="Chọn kho đích" />
                             </SelectTrigger>
@@ -202,25 +186,19 @@ export default function CreateTransferDialog({
                         <Label htmlFor="product" className="text-right">
                             Sản phẩm
                         </Label>
-                        <Select
-                            value={selectedProduct}
-                            onValueChange={setSelectedProduct}
-                            disabled={!selectedSourceWarehouse || loading}
-                        >
+                        <Select value={selectedProduct} onValueChange={setSelectedProduct} disabled={!selectedSourceWarehouse || loading}>
                             <SelectTrigger id="product" className="col-span-3">
                                 <SelectValue placeholder="Chọn sản phẩm" />
                             </SelectTrigger>
                             <SelectContent>
-                                {inventory.filter(item => item.quantity > 0).map((item) => (
-                                    <SelectItem key={item.product_id} value={item.product_id.toString()}>
-                                        {item.product?.name} - Tồn kho: {item.quantity}
-                                    </SelectItem>
-                                ))}
-                                {inventory.length === 0 && (
-                                    <div className="p-2 text-sm text-muted-foreground">
-                                        Không có sản phẩm nào trong kho
-                                    </div>
-                                )}
+                                {inventory
+                                    .filter((item) => item.quantity > 0)
+                                    .map((item) => (
+                                        <SelectItem key={item.product_id} value={item.product_id.toString()}>
+                                            {item.product?.name} - Tồn kho: {item.quantity}
+                                        </SelectItem>
+                                    ))}
+                                {inventory.length === 0 && <div className="text-muted-foreground p-2 text-sm">Không có sản phẩm nào trong kho</div>}
                             </SelectContent>
                         </Select>
                     </div>
@@ -238,11 +216,7 @@ export default function CreateTransferDialog({
                                 onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
                                 disabled={!selectedProduct || loading}
                             />
-                            {selectedProduct && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    Tối đa: {maxQuantity}
-                                </p>
-                            )}
+                            {selectedProduct && <p className="text-muted-foreground mt-1 text-xs">Tối đa: {maxQuantity}</p>}
                         </div>
                     </div>
                 </div>
@@ -250,7 +224,17 @@ export default function CreateTransferDialog({
                     <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
                         Hủy
                     </Button>
-                    <Button onClick={handleCreateTransfer} disabled={loading || !selectedSourceWarehouse || !selectedDestinationWarehouse || !selectedProduct || quantity <= 0 || quantity > maxQuantity}>
+                    <Button
+                        onClick={handleCreateTransfer}
+                        disabled={
+                            loading ||
+                            !selectedSourceWarehouse ||
+                            !selectedDestinationWarehouse ||
+                            !selectedProduct ||
+                            quantity <= 0 ||
+                            quantity > maxQuantity
+                        }
+                    >
                         {loading ? 'Đang xử lý...' : 'Tạo yêu cầu'}
                     </Button>
                 </DialogFooter>

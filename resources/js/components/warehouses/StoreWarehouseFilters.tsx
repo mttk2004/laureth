@@ -1,19 +1,11 @@
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InventoryTransferStatus } from '@/types/inventory_transfer';
 import { Warehouse, WarehouseWithStore } from '@/types/warehouse';
 import { FilterIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface StoreWarehouseFiltersProps {
     storeWarehouses: Warehouse[];
@@ -26,12 +18,7 @@ interface StoreWarehouseFiltersProps {
     onApplyFilters: (filters: Record<string, string>) => void;
 }
 
-export default function StoreWarehouseFilters({
-    storeWarehouses,
-    allWarehouses,
-    initialFilters,
-    onApplyFilters,
-}: StoreWarehouseFiltersProps) {
+export default function StoreWarehouseFilters({ storeWarehouses, allWarehouses, initialFilters, onApplyFilters }: StoreWarehouseFiltersProps) {
     const [open, setOpen] = useState(false);
     const [filters, setFilters] = useState({
         status: initialFilters.status || 'all',
@@ -62,7 +49,7 @@ export default function StoreWarehouseFilters({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="default" className="flex gap-2 items-center">
+                <Button variant="outline" size="default" className="flex items-center gap-2">
                     <FilterIcon className="h-5 w-5" /> Lọc yêu cầu
                 </Button>
             </DialogTrigger>
@@ -76,10 +63,7 @@ export default function StoreWarehouseFilters({
                         <Label htmlFor="status" className="text-right">
                             Trạng thái
                         </Label>
-                        <Select
-                            value={filters.status}
-                            onValueChange={(value) => handleFilterChange('status', value)}
-                        >
+                        <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
                             <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Chọn trạng thái" />
                             </SelectTrigger>
@@ -96,10 +80,7 @@ export default function StoreWarehouseFilters({
                         <Label htmlFor="source_warehouse_id" className="text-right">
                             Kho nguồn
                         </Label>
-                        <Select
-                            value={filters.source_warehouse_id}
-                            onValueChange={(value) => handleFilterChange('source_warehouse_id', value)}
-                        >
+                        <Select value={filters.source_warehouse_id} onValueChange={(value) => handleFilterChange('source_warehouse_id', value)}>
                             <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Chọn kho nguồn" />
                             </SelectTrigger>

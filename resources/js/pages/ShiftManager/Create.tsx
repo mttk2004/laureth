@@ -62,10 +62,7 @@ export default function ShiftManagerCreate({ user, staff }: CreateShiftManagerPr
             onSuccess: (response) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const data = response.props as any;
-                addToast(
-                    `Đã tạo ${data.created} ca làm việc thành công, bỏ qua ${data.skipped} ca trùng lặp hoặc không hợp lệ`,
-                    'success'
-                );
+                addToast(`Đã tạo ${data.created} ca làm việc thành công, bỏ qua ${data.skipped} ca trùng lặp hoặc không hợp lệ`, 'success');
                 setIsSubmitting(false);
                 router.visit('/shifts-management');
             },
@@ -107,8 +104,8 @@ export default function ShiftManagerCreate({ user, staff }: CreateShiftManagerPr
 
                         {shifts.length === 0 ? (
                             <div className="mb-4 flex flex-col items-center justify-center rounded-md border border-dashed p-8">
-                                <CalendarIcon className="mb-2 h-10 w-10 text-muted-foreground" />
-                                <p className="text-center text-muted-foreground">Chưa có ca làm việc nào được thêm</p>
+                                <CalendarIcon className="text-muted-foreground mb-2 h-10 w-10" />
+                                <p className="text-muted-foreground text-center">Chưa có ca làm việc nào được thêm</p>
                                 <Button className="mt-4" onClick={addShift}>
                                     <PlusIcon className="mr-2 h-4 w-4" />
                                     Thêm ca làm việc
@@ -124,7 +121,7 @@ export default function ShiftManagerCreate({ user, staff }: CreateShiftManagerPr
                                             </label>
                                             <select
                                                 id={`user_id_${index}`}
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                                 value={shift.user_id}
                                                 onChange={(e) => updateShift(index, 'user_id', e.target.value)}
                                                 required
@@ -144,7 +141,7 @@ export default function ShiftManagerCreate({ user, staff }: CreateShiftManagerPr
                                             <input
                                                 id={`date_${index}`}
                                                 type="date"
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                                 value={shift.date}
                                                 onChange={(e) => updateShift(index, 'date', e.target.value)}
                                                 required
@@ -156,7 +153,7 @@ export default function ShiftManagerCreate({ user, staff }: CreateShiftManagerPr
                                             </label>
                                             <select
                                                 id={`shift_type_${index}`}
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                                 value={shift.shift_type}
                                                 onChange={(e) => updateShift(index, 'shift_type', e.target.value as ShiftType)}
                                                 required
