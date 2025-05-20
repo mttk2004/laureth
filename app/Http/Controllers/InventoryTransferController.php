@@ -269,25 +269,55 @@ class InventoryTransferController extends Controller
       }
     ])->findOrFail($inventoryTransfer->id);
 
+    // Chuyển đổi các quan hệ thành định dạng đồng nhất cho frontend
+    $responseData = [
+      'id' => $transfer->id,
+      'source_warehouse_id' => $transfer->source_warehouse_id,
+      'destination_warehouse_id' => $transfer->destination_warehouse_id,
+      'source_warehouse' => $transfer->sourceWarehouse ? [
+        'id' => $transfer->sourceWarehouse->id,
+        'name' => $transfer->sourceWarehouse->name,
+        'store' => $transfer->sourceWarehouse->store ? [
+          'id' => $transfer->sourceWarehouse->store->id,
+          'name' => $transfer->sourceWarehouse->store->name
+        ] : null
+      ] : null,
+      'destination_warehouse' => $transfer->destinationWarehouse ? [
+        'id' => $transfer->destinationWarehouse->id,
+        'name' => $transfer->destinationWarehouse->name,
+        'store' => $transfer->destinationWarehouse->store ? [
+          'id' => $transfer->destinationWarehouse->store->id,
+          'name' => $transfer->destinationWarehouse->store->name
+        ] : null
+      ] : null,
+      'requested_by' => $transfer->requestedBy ? [
+        'id' => $transfer->requestedBy->id,
+        'name' => $transfer->requestedBy->name,
+        'full_name' => $transfer->requestedBy->full_name ?? $transfer->requestedBy->name
+      ] : null,
+      'approved_by' => $transfer->approvedBy ? [
+        'id' => $transfer->approvedBy->id,
+        'name' => $transfer->approvedBy->name,
+        'full_name' => $transfer->approvedBy->full_name ?? $transfer->approvedBy->name
+      ] : null,
+      'product' => $transfer->product ? [
+        'id' => $transfer->product->id,
+        'name' => $transfer->product->name
+      ] : null,
+      'product_id' => $transfer->product_id,
+      'quantity' => $transfer->quantity,
+      'status' => $transfer->status,
+      'created_at' => $transfer->created_at,
+      'updated_at' => $transfer->updated_at
+    ];
+
     Log::info('Inventory transfer detail loaded', [
       'transfer_id' => $transfer->id,
-      'has_source_warehouse' => isset($transfer->sourceWarehouse),
-      'has_destination_warehouse' => isset($transfer->destinationWarehouse),
-      'has_product' => isset($transfer->product),
-      'has_requested_by' => isset($transfer->requestedBy),
-      'has_approved_by' => isset($transfer->approvedBy)
     ]);
 
-    // Chuyển đổi thành JSON để ghi log cụ thể hơn
-    $transferData = json_decode(json_encode($transfer), true);
-    Log::debug('Detailed transfer data for debugging', [
-      'source_warehouse' => $transferData['source_warehouse'] ?? null,
-      'destination_warehouse' => $transferData['destination_warehouse'] ?? null,
-      'product' => isset($transferData['product']) ? ['id' => $transferData['product']['id'], 'name' => $transferData['product']['name']] : null,
-      'requestedBy' => isset($transferData['requested_by']) ? ['id' => $transferData['requested_by']['id'], 'name' => $transferData['requested_by']['full_name']] : null,
-      'approvedBy' => isset($transferData['approved_by']) ? ['id' => $transferData['approved_by']['id'], 'name' => $transferData['approved_by']['full_name']] : null,
-    ]);
+    // Ghi log chi tiết dữ liệu trả về
+    Log::debug('Transfer detail data sent to frontend', $responseData);
 
-    return response()->json($transfer);
+    return response()->json($responseData);
   }
 }

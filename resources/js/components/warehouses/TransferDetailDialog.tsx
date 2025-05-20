@@ -16,6 +16,48 @@ import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import TransferStatusBadge from './TransferStatusBadge';
 
+// Interface cho dữ liệu chi tiết từ API
+interface TransferDetailResponse {
+    id: number;
+    source_warehouse_id: number;
+    destination_warehouse_id: number;
+    source_warehouse?: {
+        id: number;
+        name: string;
+        store?: {
+            id: number;
+            name: string;
+        };
+    };
+    destination_warehouse?: {
+        id: number;
+        name: string;
+        store?: {
+            id: number;
+            name: string;
+        };
+    };
+    requested_by?: {
+        id: string;
+        name: string;
+        full_name: string;
+    };
+    approved_by?: {
+        id: string;
+        name: string;
+        full_name: string;
+    };
+    product?: {
+        id: string;
+        name: string;
+    };
+    product_id: string;
+    quantity: number;
+    status: InventoryTransferStatus;
+    created_at: string;
+    updated_at: string;
+}
+
 interface TransferDetailDialogProps {
     transfer: InventoryTransfer | null;
     selectedTransfer: InventoryTransfer | null;
@@ -36,7 +78,7 @@ export default function TransferDetailDialog({
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<string>('');
-    const [transferDetail, setTransferDetail] = useState<InventoryTransfer | null>(null);
+    const [transferDetail, setTransferDetail] = useState<TransferDetailResponse | null>(null);
 
     // Xử lý khi mở/đóng dialog
     const handleOpenChange = (open: boolean) => {
@@ -67,50 +109,51 @@ export default function TransferDetailDialog({
         }
     };
 
-    // Log dữ liệu mỗi khi transferDetail thay đổi
+    // Log dữ liệu khi chuyển đổi
     useEffect(() => {
         if (transferDetail) {
             console.log('Current transfer detail state:', {
-                source: transferDetail.sourceWarehouse,
-                destination: transferDetail.destinationWarehouse,
-                requestedBy: transferDetail.requestedBy,
-                approvedBy: transferDetail.approvedBy
+                id: transferDetail.id,
+                source: transferDetail.source_warehouse,
+                destination: transferDetail.destination_warehouse,
+                requestedBy: transferDetail.requested_by,
+                approvedBy: transferDetail.approved_by,
+                storeId: transferDetail.source_warehouse?.store?.id,
+                destStoreId: transferDetail.destination_warehouse?.store?.id,
             });
         }
     }, [transferDetail]);
 
-    // Lấy dữ liệu với thứ tự ưu tiên: transferDetail > selectedTransfer > transfer
-    const transferToDisplay = transferDetail || selectedTransfer || transfer;
+    // Lấy dữ liệu ưu tiên từ API
+    const transferData = transferDetail || (selectedTransfer as unknown as TransferDetailResponse) || (transfer as unknown as TransferDetailResponse);
 
     // Check if the current user can update this transfer
     const canUpdateStatus = () => {
-        const transferToUse = transferToDisplay;
-        if (!transferToUse) return false;
+        if (!transferData) return false;
 
         // Nếu chuyển kho đã hoàn thành hoặc từ chối thì không thể cập nhật
         if (
-            transferToUse.status === InventoryTransferStatus.COMPLETED ||
-            transferToUse.status === InventoryTransferStatus.REJECTED
+            transferData.status === InventoryTransferStatus.COMPLETED ||
+            transferData.status === InventoryTransferStatus.REJECTED
         ) {
             return false;
         }
 
-        // Kiểm tra kho đích thuộc về store của user hiện tại
-        if (transferToUse.destinationWarehouse?.store?.id) {
+        // Kiểm tra quyền cập nhật dựa trên cửa hàng của kho đích
+        if (transferData.destination_warehouse?.store?.id) {
             console.log('Checking permission:', {
-                destStoreId: transferToUse.destinationWarehouse.store.id,
+                destStoreId: transferData.destination_warehouse.store.id,
                 currentUserStoreId
             });
-            return Number(transferToUse.destinationWarehouse.store.id) === Number(currentUserStoreId);
+            return Number(transferData.destination_warehouse.store.id) === Number(currentUserStoreId);
         }
 
-        // Nếu không có thông tin store, so sánh warehouse_id
-        return Number(transferToUse.destination_warehouse_id) === Number(currentUserStoreId);
+        return false;
     };
 
     // Update transfer status
     const handleUpdateStatus = async () => {
-        if (!transferToDisplay || !selectedStatus) {
+        if (!transferData || !selectedStatus) {
             addToast('Vui lòng chọn trạng thái', 'error');
             return;
         }
@@ -118,7 +161,7 @@ export default function TransferDetailDialog({
         try {
             setLoading(true);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const response = await axios.put(`/api/inventory-transfers/${transferToDisplay.id}/status`, {
+            const response = await axios.put(`/api/inventory-transfers/${transferData.id}/status`, {
                 status: selectedStatus,
             });
 
@@ -133,23 +176,24 @@ export default function TransferDetailDialog({
         }
     };
 
-    if (!transferToDisplay) return null;
+    if (!transferData) return null;
 
-    // Lấy tên kho nguồn và kho đích từ dữ liệu
-    const sourceWarehouseName = transferToDisplay.sourceWarehouse?.name || 'Kho trung tâm';
-    const sourceStoreName = transferToDisplay.sourceWarehouse?.store?.name || '';
+    // Lấy thông tin từ cấu trúc API mới
+    const sourceWarehouseName = transferData.source_warehouse?.name || 'Không xác định';
+    const sourceStoreName = transferData.source_warehouse?.store?.name || '';
 
-    const destWarehouseName = transferToDisplay.destinationWarehouse?.name || 'Kho trung tâm';
-    const destStoreName = transferToDisplay.destinationWarehouse?.store?.name || '';
+    const destWarehouseName = transferData.destination_warehouse?.name || 'Không xác định';
+    const destStoreName = transferData.destination_warehouse?.store?.name || '';
 
-    // Lấy tên người yêu cầu và người duyệt
-    const requestedByName = transferToDisplay.requestedBy?.full_name ||
-                           transferToDisplay.requestedBy?.name ||
-                           'Không xác định';
+    const requestedByName = transferData.requested_by?.full_name ||
+                         transferData.requested_by?.name ||
+                         'Không xác định';
 
-    const approvedByName = transferToDisplay.approvedBy?.full_name ||
-                          transferToDisplay.approvedBy?.name ||
-                          'Chưa có người duyệt';
+    const approvedByName = transferData.approved_by?.full_name ||
+                        transferData.approved_by?.name ||
+                        'Chưa có người duyệt';
+
+    const productName = transferData.product?.name || 'Không xác định';
 
     console.log('Rendering transfer detail dialog with data:', {
         sourceWarehouseName,
@@ -157,7 +201,8 @@ export default function TransferDetailDialog({
         destWarehouseName,
         destStoreName,
         requestedByName,
-        approvedByName
+        approvedByName,
+        productName
     });
 
     return (
@@ -166,7 +211,7 @@ export default function TransferDetailDialog({
                 <DialogHeader>
                     <DialogTitle>Chi tiết yêu cầu chuyển kho</DialogTitle>
                     <DialogDescription>
-                        Mã yêu cầu: #{transferToDisplay.id} - <TransferStatusBadge status={transferToDisplay.status} />
+                        Mã yêu cầu: #{transferData.id} - <TransferStatusBadge status={transferData.status} />
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -194,18 +239,18 @@ export default function TransferDetailDialog({
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Sản phẩm:</Label>
                                 <div className="col-span-2">
-                                    {transferToDisplay.product?.name || 'Không có thông tin'}
+                                    {productName}
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Số lượng:</Label>
-                                <div className="col-span-2">{transferToDisplay.quantity}</div>
+                                <div className="col-span-2">{transferData.quantity}</div>
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Người yêu cầu:</Label>
                                 <div className="col-span-2">{requestedByName}</div>
                             </div>
-                            {transferToDisplay.approved_by && (
+                            {transferData.approved_by && (
                                 <div className="grid grid-cols-3 items-center gap-4">
                                     <Label className="text-right font-medium">Người duyệt:</Label>
                                     <div className="col-span-2">{approvedByName}</div>
@@ -213,12 +258,12 @@ export default function TransferDetailDialog({
                             )}
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Ngày tạo:</Label>
-                                <div className="col-span-2">{formatDate(transferToDisplay.created_at)}</div>
+                                <div className="col-span-2">{formatDate(transferData.created_at)}</div>
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="text-right font-medium">Trạng thái:</Label>
                                 <div className="col-span-2">
-                                    <TransferStatusBadge status={transferToDisplay.status} />
+                                    <TransferStatusBadge status={transferData.status} />
                                 </div>
                             </div>
 
@@ -237,13 +282,13 @@ export default function TransferDetailDialog({
                                                 <SelectValue placeholder="Chọn trạng thái mới" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {transferToDisplay.status === InventoryTransferStatus.PENDING && (
+                                                {transferData.status === InventoryTransferStatus.PENDING && (
                                                     <>
                                                         <SelectItem value={InventoryTransferStatus.APPROVED}>Duyệt yêu cầu</SelectItem>
                                                         <SelectItem value={InventoryTransferStatus.REJECTED}>Từ chối yêu cầu</SelectItem>
                                                     </>
                                                 )}
-                                                {transferToDisplay.status === InventoryTransferStatus.APPROVED && (
+                                                {transferData.status === InventoryTransferStatus.APPROVED && (
                                                     <SelectItem value={InventoryTransferStatus.COMPLETED}>Hoàn thành</SelectItem>
                                                 )}
                                             </SelectContent>
