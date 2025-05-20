@@ -15,8 +15,11 @@ class ProfileController extends Controller
    */
   public function show()
   {
+    // Load user với quan hệ store để đảm bảo thông tin cửa hàng được hiển thị đầy đủ
+    $user = Auth::user()->load('store');
+
     return Inertia::render('Profile/Index', [
-      'user' => Auth::user(),
+      'user' => $user,
     ]);
   }
 }
