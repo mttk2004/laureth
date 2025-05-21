@@ -54,10 +54,18 @@ export default function OrderFilters({ initialFilters, onApplyFilters, currentUs
         if (currentUser.store_id) {
             axios.get(`/api/stores/${currentUser.store_id}/staff`)
                 .then(response => {
-                    setStoreStaff(response.data);
+                    console.log('API response data:', response.data);
+                    // Đảm bảo dữ liệu trả về là một mảng
+                    if (Array.isArray(response.data)) {
+                        setStoreStaff(response.data);
+                    } else {
+                        console.error('Dữ liệu nhân viên không phải là mảng:', response.data);
+                        setStoreStaff([]);
+                    }
                 })
                 .catch(error => {
                     console.error('Không thể tải danh sách nhân viên:', error);
+                    setStoreStaff([]);
                 });
         }
     }, [currentUser.store_id]);
@@ -173,13 +181,14 @@ export default function OrderFilters({ initialFilters, onApplyFilters, currentUs
                         <SelectContent>
                             <SelectItem value="all">Tất cả nhân viên</SelectItem>
                             <SelectItem value={currentUser.id}>Chỉ của tôi</SelectItem>
-                            {storeStaff.map((staff) => (
-                                staff.id !== currentUser.id && (
+                            {Array.isArray(storeStaff) && storeStaff
+                                .filter(staff => staff.id !== currentUser.id)
+                                .map(staff => (
                                     <SelectItem key={staff.id} value={staff.id}>
                                         {staff.full_name}
                                     </SelectItem>
-                                )
-                            ))}
+                                ))
+                            }
                         </SelectContent>
                     </Select>
                 </BaseFilterRow>
