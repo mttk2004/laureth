@@ -131,15 +131,15 @@ Route::middleware(['web', 'auth', 'verified', 'staff'])->group(function () {
   // Routes cho chức năng POS
   // TODO: Thêm middleware check-active-shift
   // Tạm thời tắt middleware check-active-shift để test
-  Route::middleware(['check-active-shift'])->group(function () {
-    Route::get('/pos', [OrderController::class, 'index'])->name('pos.index');
-    Route::get('/pos/create', [OrderController::class, 'create'])->name('pos.create');
-    Route::post('/pos', [OrderController::class, 'store'])->name('pos.store');
-    Route::get('/api/orders/{order}/items', [OrderController::class, 'getItems']);
-    Route::get('/api/orders/{order}/details', [OrderController::class, 'getDetails']);
-    Route::patch('/api/orders/{order}/update-status', [OrderController::class, 'updateStatus']);
-    Route::get('/orders/{order}/download', [OrderPdfController::class, 'download'])->name('orders.download');
-  });
+  // Route::middleware(['check-active-shift'])->group(function () {
+  Route::get('/pos', [OrderController::class, 'index'])->name('pos.index');
+  Route::get('/pos/create', [OrderController::class, 'create'])->name('pos.create');
+  Route::post('/pos', [OrderController::class, 'store'])->name('pos.store');
+  Route::get('/api/orders/{order}/items', [OrderController::class, 'getItems']);
+  Route::get('/api/orders/{order}/details', [OrderController::class, 'getDetails']);
+  Route::patch('/api/orders/{order}/update-status', [OrderController::class, 'updateStatus']);
+  Route::get('/orders/{order}/download', [OrderPdfController::class, 'download'])->name('orders.download');
+  // });
 
   Route::get('/shift-reports', function () {
     return Inertia::render('Others/FeatureOnDeveloping', [

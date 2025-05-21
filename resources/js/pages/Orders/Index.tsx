@@ -158,6 +158,7 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
                     open={detailDialogOpen}
                     onOpenChange={setDetailDialogOpen}
                     onStatusUpdate={handleOrderStatusUpdate}
+                    currentUser={user}
                 />
             </div>
         </AppLayout>

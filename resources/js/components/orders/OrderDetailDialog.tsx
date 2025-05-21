@@ -7,8 +7,9 @@ import { formatCurrency, formatDate } from '@/lib/formatters';
 import { Order, OrderItem, OrderStatus } from '@/types/order';
 import { User } from '@/types/user';
 import axios from 'axios';
-import { Loader2Icon, PrinterIcon } from 'lucide-react';
+import { AlertCircle, Loader2Icon, PrinterIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface OrderWithDetails extends Order {
     user?: User;
@@ -31,19 +32,25 @@ interface OrderDetailDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onStatusUpdate?: () => void;
+    currentUser: User;
 }
 
-export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatusUpdate }: OrderDetailDialogProps) {
+export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatusUpdate, currentUser }: OrderDetailDialogProps) {
     const [order, setOrder] = useState<OrderWithDetails | null>(null);
     const [loading, setLoading] = useState(false);
     const [orderItems, setOrderItems] = useState<OrderItemWithProduct[]>([]);
     const [updatingStatus, setUpdatingStatus] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<OrderStatus | null>(null);
     const { addToast } = useToast();
+    const [error, setError] = useState<string | null>(null);
+
+    // Kiểm tra xem người dùng hiện tại có phải là người tạo đơn hàng không
+    const isOrderCreator = order?.user_id === currentUser.id;
 
     useEffect(() => {
         if (open && orderId) {
             setLoading(true);
+            setError(null);
             axios
                 .get(`/api/orders/${orderId}/details`)
                 .then((response) => {
@@ -77,6 +84,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
             setOrder(null);
             setOrderItems([]);
             setSelectedStatus(null);
+            setError(null);
         }
     }, [open, orderId, addToast]);
 
@@ -84,6 +92,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
         if (!order || !selectedStatus || selectedStatus === order.status) return;
 
         setUpdatingStatus(true);
+        setError(null);
         axios
             .patch(`/api/orders/${order.id}/update-status`, { status: selectedStatus })
             .then(() => {
@@ -93,7 +102,11 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
             })
             .catch((error) => {
                 console.error('Không thể cập nhật trạng thái đơn hàng:', error);
-                addToast('Không thể cập nhật trạng thái đơn hàng', 'error');
+                if (error.response && error.response.status === 403) {
+                    setError(error.response.data.message || 'Bạn không có quyền cập nhật đơn hàng này');
+                } else {
+                    addToast('Không thể cập nhật trạng thái đơn hàng', 'error');
+                }
             })
             .finally(() => {
                 setUpdatingStatus(false);
@@ -180,7 +193,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                             </div>
                         </div>
 
-                        {order.status === 'pending' && (
+                        {order.status === 'pending' && isOrderCreator && (
                             <div>
                                 <h3 className="text-muted-foreground mb-2 text-sm font-medium">Cập nhật trạng thái</h3>
                                 <div className="flex items-center space-x-2">
@@ -200,6 +213,22 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                                     </Button>
                                 </div>
                             </div>
+                        )}
+
+                        {order.status === 'pending' && !isOrderCreator && (
+                            <Alert className="bg-amber-50 text-amber-800 border-amber-200">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertDescription>
+                                    Chỉ nhân viên tạo đơn ({order.user?.full_name}) mới có thể cập nhật trạng thái đơn hàng này.
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {error && (
+                            <Alert variant="destructive" className="mt-4">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertDescription>{error}</AlertDescription>
+                            </Alert>
                         )}
                     </div>
 
