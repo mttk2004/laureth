@@ -7,7 +7,6 @@ import AppLayout from '@/layouts/app-layout';
 import { User } from '@/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -58,14 +57,13 @@ export default function CreatePayroll({ user, currentMonth, currentYear }: PageP
             <Head title="Tạo bảng lương" />
 
             <div className="container py-6">
-                <h1 className="text-2xl font-bold mb-6">Tạo bảng lương mới</h1>
+                <h1 className="mb-6 text-2xl font-bold">Tạo bảng lương mới</h1>
 
-                <Card className="max-w-md mx-auto">
+                <Card className="mx-auto max-w-md">
                     <CardHeader>
                         <CardTitle>Tạo bảng lương tháng</CardTitle>
                         <CardDescription>
-                            Hệ thống sẽ tạo bảng lương cho tất cả nhân viên trong tháng được chọn.
-                            Bảng lương sẽ được tạo ở trạng thái chờ duyệt.
+                            Hệ thống sẽ tạo bảng lương cho tất cả nhân viên trong tháng được chọn. Bảng lương sẽ được tạo ở trạng thái chờ duyệt.
                         </CardDescription>
                     </CardHeader>
                     <Form {...form}>
@@ -77,10 +75,7 @@ export default function CreatePayroll({ user, currentMonth, currentYear }: PageP
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Tháng</FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                defaultValue={field.value}
-                                            >
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Chọn tháng" />
@@ -105,10 +100,7 @@ export default function CreatePayroll({ user, currentMonth, currentYear }: PageP
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Năm</FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                defaultValue={field.value}
-                                            >
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Chọn năm" />
