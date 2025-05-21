@@ -198,7 +198,7 @@ export default function Index({ payrolls, summary, stores, user, filters, sort, 
             <div className="container py-6">
                 <div className="flex flex-col gap-6">
                     {/* Header */}
-                    <div className="flex justify-between items-center">
+                    {/* <div className="flex justify-between items-center">
                         <h1 className="text-2xl font-bold">Quản lý lương</h1>
                         {user.position === 'DM' && (
                             <Link href={route('payrolls.create')} className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">
@@ -208,7 +208,7 @@ export default function Index({ payrolls, summary, stores, user, filters, sort, 
                                 Tạo bảng lương mới
                             </Link>
                         )}
-                    </div>
+                    </div> */}
 
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -234,6 +234,13 @@ export default function Index({ payrolls, summary, stores, user, filters, sort, 
                             setIsFilterOpen={setIsFilterOpen}
                             periodYears={periodYears}
                         />
+
+                        <Link href={route('payrolls.create')} className="inline-flex items-center px-4 py-2 bg-primary text-sm text-white rounded-md hover:bg-primary/90">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                              Tạo bảng lương mới
+                          </Link>
                     </div>
 
                     {/* Dashboard Cards */}
