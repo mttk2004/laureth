@@ -16,8 +16,8 @@ export default function FeatureOnDeveloping({ user }: PageProps) {
                         <div className="rounded-full bg-blue-100 p-4">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                width="64"
-                                height="64"
+                                width="48"
+                                height="48"
                                 viewBox="0 0 24 24"
                                 strokeWidth="1.5"
                                 stroke="#0066ff"
@@ -32,7 +32,7 @@ export default function FeatureOnDeveloping({ user }: PageProps) {
                         </div>
                     </div>
 
-                    <h1 className="mb-4 text-4xl font-bold text-blue-700">Tính năng đang được phát triển</h1>
+                    <h1 className="mb-4 text-2xl font-bold text-blue-700">Tính năng đang được phát triển</h1>
 
                     <p className="mb-8 text-lg text-gray-600">
                         Chúng tôi đang nỗ lực hoàn thiện tính năng này để mang đến trải nghiệm tốt nhất cho bạn.
