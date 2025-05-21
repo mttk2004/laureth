@@ -3,8 +3,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OrderStatus, PaymentMethod } from '@/types/order';
 import { User } from '@/types/user';
-import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 interface OrderFiltersProps {
     initialFilters: {
@@ -14,13 +14,7 @@ interface OrderFiltersProps {
         date_to?: string;
         user_id?: string;
     };
-    onApplyFilters: (filters: {
-        status?: string;
-        payment_method?: string;
-        date_from?: string;
-        date_to?: string;
-        user_id?: string;
-    }) => void;
+    onApplyFilters: (filters: { status?: string; payment_method?: string; date_from?: string; date_to?: string; user_id?: string }) => void;
     currentUser: User;
 }
 
@@ -52,8 +46,9 @@ export default function OrderFilters({ initialFilters, onApplyFilters, currentUs
     // Lấy danh sách nhân viên trong cửa hàng
     useEffect(() => {
         if (currentUser.store_id) {
-            axios.get(`/api/stores/${currentUser.store_id}/staff`)
-                .then(response => {
+            axios
+                .get(`/api/stores/${currentUser.store_id}/staff`)
+                .then((response) => {
                     console.log('API response data:', response.data);
                     // Đảm bảo dữ liệu trả về là một mảng
                     if (Array.isArray(response.data)) {
@@ -63,7 +58,7 @@ export default function OrderFilters({ initialFilters, onApplyFilters, currentUs
                         setStoreStaff([]);
                     }
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Không thể tải danh sách nhân viên:', error);
                     setStoreStaff([]);
                 });
@@ -124,11 +119,7 @@ export default function OrderFilters({ initialFilters, onApplyFilters, currentUs
 
     // Kiểm tra xem đã áp dụng filter nào chưa
     const hasActiveFilters = Boolean(
-        initialFilters.status ||
-        initialFilters.payment_method ||
-        initialFilters.date_from ||
-        initialFilters.date_to ||
-        initialFilters.user_id
+        initialFilters.status || initialFilters.payment_method || initialFilters.date_from || initialFilters.date_to || initialFilters.user_id,
     );
 
     return (
@@ -181,14 +172,14 @@ export default function OrderFilters({ initialFilters, onApplyFilters, currentUs
                         <SelectContent>
                             <SelectItem value="all">Tất cả nhân viên</SelectItem>
                             <SelectItem value={currentUser.id}>Chỉ của tôi</SelectItem>
-                            {Array.isArray(storeStaff) && storeStaff
-                                .filter(staff => staff.id !== currentUser.id)
-                                .map(staff => (
-                                    <SelectItem key={staff.id} value={staff.id}>
-                                        {staff.full_name}
-                                    </SelectItem>
-                                ))
-                            }
+                            {Array.isArray(storeStaff) &&
+                                storeStaff
+                                    .filter((staff) => staff.id !== currentUser.id)
+                                    .map((staff) => (
+                                        <SelectItem key={staff.id} value={staff.id}>
+                                            {staff.full_name}
+                                        </SelectItem>
+                                    ))}
                         </SelectContent>
                     </Select>
                 </BaseFilterRow>

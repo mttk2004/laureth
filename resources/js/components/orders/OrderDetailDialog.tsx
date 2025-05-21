@@ -1,4 +1,5 @@
 import { OrderStatusBadge, PaymentMethodBadge } from '@/components/orders';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,7 +10,6 @@ import { User } from '@/types/user';
 import axios from 'axios';
 import { AlertCircle, Loader2Icon, PrinterIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface OrderWithDetails extends Order {
     user?: User;
@@ -216,7 +216,7 @@ export default function OrderDetailDialog({ orderId, open, onOpenChange, onStatu
                         )}
 
                         {order.status === 'pending' && !isOrderCreator && (
-                            <Alert className="bg-amber-50 text-amber-800 border-amber-200">
+                            <Alert className="border-amber-200 bg-amber-50 text-amber-800">
                                 <AlertCircle className="h-4 w-4" />
                                 <AlertDescription>
                                     Chỉ nhân viên tạo đơn ({order.user?.full_name}) mới có thể cập nhật trạng thái đơn hàng này.

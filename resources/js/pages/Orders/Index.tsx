@@ -68,13 +68,7 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
     };
 
     // Xử lý áp dụng bộ lọc
-    const handleApplyFilters = (newFilters: {
-        status?: string;
-        payment_method?: string;
-        date_from?: string;
-        date_to?: string;
-        user_id?: string;
-    }) => {
+    const handleApplyFilters = (newFilters: { status?: string; payment_method?: string; date_from?: string; date_to?: string; user_id?: string }) => {
         router.get(
             '/pos',
             { ...newFilters, sort },

@@ -1,10 +1,10 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import UserRoleBadge from '@/components/users/UserRoleBadge';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency, formatLastLogin, formatPhoneNumber } from '@/lib';
 import { User } from '@/types/user';
 import { Head } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 
 interface PageProps {
@@ -105,10 +105,7 @@ export default function Profile({ user }: PageProps) {
                                     báo cáo lương.
                                 </p>
                                 <div className="mt-4">
-                                    <Button
-                                        onClick={downloadPayrollPdf}
-                                        className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
-                                    >
+                                    <Button onClick={downloadPayrollPdf} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700">
                                         <FileText className="h-4 w-4" />
                                         <span>In bảng lương mới nhất</span>
                                     </Button>
