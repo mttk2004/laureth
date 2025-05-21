@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Payroll, PayrollSummary } from '@/types/payroll';
 import { Store } from '@/types/store';
 import { User } from '@/types/user';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import React, { useState } from 'react';
 
 interface PageProps {
@@ -201,12 +201,12 @@ export default function Index({ payrolls, summary, stores, user, filters, sort, 
                     <div className="flex justify-between items-center">
                         <h1 className="text-2xl font-bold">Quản lý lương</h1>
                         {user.position === 'DM' && (
-                            <a href={route('payrolls.create')} className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">
+                            <Link href={route('payrolls.create')} className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clipRule="evenodd" />
                                 </svg>
                                 Tạo bảng lương mới
-                            </a>
+                            </Link>
                         )}
                     </div>
 

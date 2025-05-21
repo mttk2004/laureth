@@ -20,6 +20,16 @@ export default defineConfig({
     resolve: {
         alias: {
             'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
+            '@': resolve(__dirname, 'resources/js'),
         },
+    },
+    server: {
+        cors: true,
+        hmr: {
+            host: 'localhost',
+        },
+    },
+    optimizeDeps: {
+        include: ['react-hook-form', '@hookform/resolvers/zod', 'zod'],
     },
 });
