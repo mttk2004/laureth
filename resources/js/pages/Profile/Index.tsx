@@ -109,12 +109,16 @@ export default function Profile({ user }: PageProps) {
                                     Lương của bạn được tính dựa trên vai trò và hiệu suất làm việc. Xem chi tiết lương và hoa hồng của bạn trong mục
                                     báo cáo lương.
                                 </p>
-                                <div className="mt-4 flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
+                                <div className="mt-4 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                                     <Button onClick={downloadPayrollPdf} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700">
                                         <FileText className="h-4 w-4" />
                                         <span>In bảng lương mới nhất</span>
                                     </Button>
-                                    <Button onClick={viewPayrollHistory} variant="outline" className="flex items-center space-x-2 border-blue-600 text-blue-600 hover:bg-blue-50">
+                                    <Button
+                                        onClick={viewPayrollHistory}
+                                        variant="outline"
+                                        className="flex items-center space-x-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+                                    >
                                         <History className="h-4 w-4" />
                                         <span>Xem lịch sử lương</span>
                                     </Button>

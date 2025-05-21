@@ -65,9 +65,7 @@ export default function PayrollHistory({ user }: PageProps) {
         {
             key: 'final_amount',
             label: 'Tổng cộng',
-            render: (item: Payroll) => (
-                <span className="font-semibold">{formatCurrency(item.final_amount)}</span>
-            ),
+            render: (item: Payroll) => <span className="font-semibold">{formatCurrency(item.final_amount)}</span>,
         },
         {
             key: 'status',
@@ -75,9 +73,7 @@ export default function PayrollHistory({ user }: PageProps) {
             render: (item: Payroll) => (
                 <span
                     className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                        item.status === PayrollStatus.PAID
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-amber-100 text-amber-800'
+                        item.status === PayrollStatus.PAID ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
                     }`}
                 >
                     {item.status === PayrollStatus.PAID ? 'Đã thanh toán' : 'Chờ thanh toán'}
@@ -88,12 +84,7 @@ export default function PayrollHistory({ user }: PageProps) {
 
     // Định nghĩa thao tác cho từng dòng
     const renderActions = (item: Payroll) => (
-        <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => downloadPayrollPdf(item.id)}
-            className="flex items-center space-x-1"
-        >
+        <Button variant="ghost" size="sm" onClick={() => downloadPayrollPdf(item.id)} className="flex items-center space-x-1">
             <FileText className="h-4 w-4" />
             <span>In PDF</span>
         </Button>
@@ -119,13 +110,9 @@ export default function PayrollHistory({ user }: PageProps) {
                                 <span>Đang tải dữ liệu...</span>
                             </div>
                         ) : error ? (
-                            <div className="rounded-md bg-red-50 p-4 text-center text-red-800">
-                                {error}
-                            </div>
+                            <div className="rounded-md bg-red-50 p-4 text-center text-red-800">{error}</div>
                         ) : payrolls.length === 0 ? (
-                            <div className="rounded-md bg-blue-50 p-4 text-center text-blue-800">
-                                Chưa có dữ liệu lương nào được ghi nhận.
-                            </div>
+                            <div className="rounded-md bg-blue-50 p-4 text-center text-blue-800">Chưa có dữ liệu lương nào được ghi nhận.</div>
                         ) : (
                             <DataTable columns={columns} data={payrolls} actions={renderActions} />
                         )}

@@ -34,9 +34,7 @@ export default function FeatureOnDeveloping({ user }: PageProps) {
 
                     <h1 className="mb-4 text-2xl font-bold text-blue-700">Tính năng đang được phát triển</h1>
 
-                    <p className="mb-8 text-gray-600">
-                        Chúng tôi đang nỗ lực hoàn thiện tính năng này để mang đến trải nghiệm tốt nhất cho bạn.
-                    </p>
+                    <p className="mb-8 text-gray-600">Chúng tôi đang nỗ lực hoàn thiện tính năng này để mang đến trải nghiệm tốt nhất cho bạn.</p>
 
                     <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div className="flex items-center rounded-lg bg-white p-4">

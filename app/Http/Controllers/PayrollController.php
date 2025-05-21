@@ -14,133 +14,133 @@ use Inertia\Inertia;
 
 class PayrollController extends Controller
 {
-  private $payrollService;
+    private $payrollService;
 
-  public function __construct(PayrollService $payrollService)
-  {
-    $this->payrollService = $payrollService;
-  }
-
-  /**
-   * Hiển thị trang quản lý lương
-   *
-   * @return \Inertia\Response
-   */
-  public function index(Request $request)
-  {
-    // Lấy danh sách bảng lương đã lọc, sắp xếp và phân trang
-    $payrolls = $this->payrollService->getPayrolls(
-      $request->all(),
-      12,
-      $request->input('sort', 'created_at_desc')
-    );
-
-    // Lấy thông tin tổng quan về bảng lương
-    $summary = $this->payrollService->getPayrollSummary();
-
-    // Lấy danh sách cửa hàng để hiển thị trong filter
-    $stores = Store::all();
-
-    // Lấy tab đang được chọn từ request
-    $activeTab = $request->input('activeTab', 'byStore');
-
-    return Inertia::render('Payrolls/Index', [
-      'payrolls' => $payrolls,
-      'summary' => $summary,
-      'stores' => $stores,
-      'user' => Auth::user(),
-      'filters' => $request->only(['month', 'year', 'status', 'store_id', 'position', 'name']),
-      'sort' => $request->input('sort', 'created_at_desc'),
-      'activeTab' => $activeTab,
-    ]);
-  }
-
-  /**
-   * Hiển thị form tạo bảng lương
-   *
-   * @return \Inertia\Response
-   */
-  public function create()
-  {
-    // Chỉ DM mới có quyền tạo bảng lương
-    if (Auth::user()->position !== 'DM') {
-      abort(403, 'Bạn không có quyền thực hiện hành động này.');
+    public function __construct(PayrollService $payrollService)
+    {
+        $this->payrollService = $payrollService;
     }
 
-    $currentDate = Carbon::now();
+    /**
+     * Hiển thị trang quản lý lương
+     *
+     * @return \Inertia\Response
+     */
+    public function index(Request $request)
+    {
+        // Lấy danh sách bảng lương đã lọc, sắp xếp và phân trang
+        $payrolls = $this->payrollService->getPayrolls(
+            $request->all(),
+            12,
+            $request->input('sort', 'created_at_desc')
+        );
 
-    return Inertia::render('Payrolls/Create', [
-      'user' => Auth::user(),
-      'currentMonth' => $currentDate->month,
-      'currentYear' => $currentDate->year,
-    ]);
-  }
+        // Lấy thông tin tổng quan về bảng lương
+        $summary = $this->payrollService->getPayrollSummary();
 
-  /**
-   * Tạo bảng lương cho tháng/năm chỉ định
-   *
-   * @return \Illuminate\Http\RedirectResponse
-   */
-  public function generate(GeneratePayrollRequest $request)
-  {
-    // Chỉ DM mới có quyền tạo bảng lương
-    if (Auth::user()->position !== 'DM') {
-      abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        // Lấy danh sách cửa hàng để hiển thị trong filter
+        $stores = Store::all();
+
+        // Lấy tab đang được chọn từ request
+        $activeTab = $request->input('activeTab', 'byStore');
+
+        return Inertia::render('Payrolls/Index', [
+            'payrolls' => $payrolls,
+            'summary' => $summary,
+            'stores' => $stores,
+            'user' => Auth::user(),
+            'filters' => $request->only(['month', 'year', 'status', 'store_id', 'position', 'name']),
+            'sort' => $request->input('sort', 'created_at_desc'),
+            'activeTab' => $activeTab,
+        ]);
     }
 
-    $validatedData = $request->validated();
-    $month = (int) $validatedData['month'];
-    $year = (int) $validatedData['year'];
+    /**
+     * Hiển thị form tạo bảng lương
+     *
+     * @return \Inertia\Response
+     */
+    public function create()
+    {
+        // Chỉ DM mới có quyền tạo bảng lương
+        if (Auth::user()->position !== 'DM') {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
 
-    $count = $this->payrollService->generatePayrollsForMonth($month, $year);
+        $currentDate = Carbon::now();
 
-    return redirect()->route('payrolls.index')
-      ->with('success', "Đã tạo {$count} bảng lương mới cho tháng {$month}/{$year}");
-  }
-
-  /**
-   * Duyệt bảng lương
-   *
-   * @return \Illuminate\Http\RedirectResponse
-   */
-  public function approve(ApprovePayrollRequest $request, Payroll $payroll)
-  {
-    // Chỉ DM mới có quyền duyệt lương
-    if (Auth::user()->position !== 'DM') {
-      abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        return Inertia::render('Payrolls/Create', [
+            'user' => Auth::user(),
+            'currentMonth' => $currentDate->month,
+            'currentYear' => $currentDate->year,
+        ]);
     }
 
-    $this->payrollService->approvePayroll($payroll);
+    /**
+     * Tạo bảng lương cho tháng/năm chỉ định
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function generate(GeneratePayrollRequest $request)
+    {
+        // Chỉ DM mới có quyền tạo bảng lương
+        if (Auth::user()->position !== 'DM') {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
 
-    // Chuyển hướng về trang danh sách
-    return redirect()->route('payrolls.index')
-      ->with('success', 'Đã duyệt thanh toán lương thành công.');
-  }
+        $validatedData = $request->validated();
+        $month = (int) $validatedData['month'];
+        $year = (int) $validatedData['year'];
 
-  /**
-   * Hiển thị trang lịch sử lương của người dùng hiện tại
-   */
-  public function history()
-  {
-    $user = Auth::user();
+        $count = $this->payrollService->generatePayrollsForMonth($month, $year);
 
-    return Inertia::render('Payroll/History', [
-      'user' => $user,
-    ]);
-  }
+        return redirect()->route('payrolls.index')
+            ->with('success', "Đã tạo {$count} bảng lương mới cho tháng {$month}/{$year}");
+    }
 
-  /**
-   * API để lấy lịch sử lương của người dùng hiện tại
-   */
-  public function getUserPayrollHistory()
-  {
-    $user = Auth::user();
+    /**
+     * Duyệt bảng lương
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function approve(ApprovePayrollRequest $request, Payroll $payroll)
+    {
+        // Chỉ DM mới có quyền duyệt lương
+        if (Auth::user()->position !== 'DM') {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
 
-    $payrolls = Payroll::where('user_id', $user->id)
-      ->orderBy('year', 'desc')
-      ->orderBy('month', 'desc')
-      ->get();
+        $this->payrollService->approvePayroll($payroll);
 
-    return response()->json($payrolls);
-  }
+        // Chuyển hướng về trang danh sách
+        return redirect()->route('payrolls.index')
+            ->with('success', 'Đã duyệt thanh toán lương thành công.');
+    }
+
+    /**
+     * Hiển thị trang lịch sử lương của người dùng hiện tại
+     */
+    public function history()
+    {
+        $user = Auth::user();
+
+        return Inertia::render('Payroll/History', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * API để lấy lịch sử lương của người dùng hiện tại
+     */
+    public function getUserPayrollHistory()
+    {
+        $user = Auth::user();
+
+        $payrolls = Payroll::where('user_id', $user->id)
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get();
+
+        return response()->json($payrolls);
+    }
 }
