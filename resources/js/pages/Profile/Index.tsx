@@ -4,6 +4,8 @@ import AppLayout from '@/layouts/app-layout';
 import { formatCurrency, formatLastLogin, formatPhoneNumber } from '@/lib';
 import { User } from '@/types/user';
 import { Head } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { FileText } from 'lucide-react';
 
 interface PageProps {
     user: User;
@@ -12,6 +14,11 @@ interface PageProps {
 export default function Profile({ user }: PageProps) {
     // Chuyển đổi tỷ lệ hoa hồng từ thập phân sang phần trăm
     const formattedCommissionRate = user.commission_rate ? `${user.commission_rate * 100}%` : 'Không áp dụng';
+
+    // Hàm tải xuống bảng lương PDF
+    const downloadPayrollPdf = () => {
+        window.open('/payroll/pdf/latest', '_blank');
+    };
 
     return (
         <AppLayout user={user}>
@@ -97,6 +104,15 @@ export default function Profile({ user }: PageProps) {
                                     Lương của bạn được tính dựa trên vai trò và hiệu suất làm việc. Xem chi tiết lương và hoa hồng của bạn trong mục
                                     báo cáo lương.
                                 </p>
+                                <div className="mt-4">
+                                    <Button
+                                        onClick={downloadPayrollPdf}
+                                        className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
+                                    >
+                                        <FileText className="h-4 w-4" />
+                                        <span>In bảng lương mới nhất</span>
+                                    </Button>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
