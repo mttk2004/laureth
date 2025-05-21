@@ -50,7 +50,7 @@ class OrderController extends Controller
     return Inertia::render('Orders/Index', [
       'orders' => $orders,
       'user' => $user,
-      'filters' => $request->only(['store_id', 'status', 'payment_method', 'date_from', 'date_to']),
+      'filters' => $request->only(['store_id', 'status', 'payment_method', 'date_from', 'date_to', 'user_id']),
       'sort' => $request->input('sort', 'order_date_desc'),
     ]);
   }

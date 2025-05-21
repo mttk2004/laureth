@@ -2,7 +2,9 @@ import { BaseFilterDialog, BaseFilterForm, BaseFilterRow } from '@/components/co
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OrderStatus, PaymentMethod } from '@/types/order';
-import { useState } from 'react';
+import { User } from '@/types/user';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 interface OrderFiltersProps {
     initialFilters: {
@@ -10,8 +12,16 @@ interface OrderFiltersProps {
         payment_method?: string;
         date_from?: string;
         date_to?: string;
+        user_id?: string;
     };
-    onApplyFilters: (filters: { status?: string; payment_method?: string; date_from?: string; date_to?: string }) => void;
+    onApplyFilters: (filters: {
+        status?: string;
+        payment_method?: string;
+        date_from?: string;
+        date_to?: string;
+        user_id?: string;
+    }) => void;
+    currentUser: User;
 }
 
 // Định nghĩa các trạng thái đơn hàng
@@ -28,13 +38,29 @@ const paymentMethodLabels: Record<PaymentMethod, string> = {
     [PaymentMethod.TRANSFER]: 'Chuyển khoản',
 };
 
-export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFiltersProps) {
+export default function OrderFilters({ initialFilters, onApplyFilters, currentUser }: OrderFiltersProps) {
     const [filters, setFilters] = useState({
         status: initialFilters.status || 'all',
         payment_method: initialFilters.payment_method || 'all',
         date_from: initialFilters.date_from || '',
         date_to: initialFilters.date_to || '',
+        user_id: initialFilters.user_id || 'all',
     });
+
+    const [storeStaff, setStoreStaff] = useState<User[]>([]);
+
+    // Lấy danh sách nhân viên trong cửa hàng
+    useEffect(() => {
+        if (currentUser.store_id) {
+            axios.get(`/api/stores/${currentUser.store_id}/staff`)
+                .then(response => {
+                    setStoreStaff(response.data);
+                })
+                .catch(error => {
+                    console.error('Không thể tải danh sách nhân viên:', error);
+                });
+        }
+    }, [currentUser.store_id]);
 
     const handleSelectChange = (name: string, value: string) => {
         setFilters((prev) => ({ ...prev, [name]: value }));
@@ -51,6 +77,7 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
             payment_method: 'all',
             date_from: '',
             date_to: '',
+            user_id: 'all',
         });
         onApplyFilters({});
     };
@@ -61,6 +88,7 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
             payment_method?: string;
             date_from?: string;
             date_to?: string;
+            user_id?: string;
         } = {};
 
         if (filters.status && filters.status !== 'all') {
@@ -79,11 +107,21 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
             appliedFilters.date_to = filters.date_to;
         }
 
+        if (filters.user_id && filters.user_id !== 'all') {
+            appliedFilters.user_id = filters.user_id;
+        }
+
         onApplyFilters(appliedFilters);
     };
 
     // Kiểm tra xem đã áp dụng filter nào chưa
-    const hasActiveFilters = Boolean(initialFilters.status || initialFilters.payment_method || initialFilters.date_from || initialFilters.date_to);
+    const hasActiveFilters = Boolean(
+        initialFilters.status ||
+        initialFilters.payment_method ||
+        initialFilters.date_from ||
+        initialFilters.date_to ||
+        initialFilters.user_id
+    );
 
     return (
         <BaseFilterDialog
@@ -122,6 +160,25 @@ export default function OrderFilters({ initialFilters, onApplyFilters }: OrderFi
                                 <SelectItem key={value} value={value}>
                                     {label}
                                 </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </BaseFilterRow>
+
+                <BaseFilterRow label="Nhân viên">
+                    <Select value={filters.user_id} onValueChange={(value) => handleSelectChange('user_id', value)}>
+                        <SelectTrigger id="user_id">
+                            <SelectValue placeholder="Tất cả nhân viên" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả nhân viên</SelectItem>
+                            <SelectItem value={currentUser.id}>Chỉ của tôi</SelectItem>
+                            {storeStaff.map((staff) => (
+                                staff.id !== currentUser.id && (
+                                    <SelectItem key={staff.id} value={staff.id}>
+                                        {staff.full_name}
+                                    </SelectItem>
+                                )
                             ))}
                         </SelectContent>
                     </Select>

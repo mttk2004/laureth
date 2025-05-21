@@ -111,6 +111,9 @@ Route::middleware(['web', 'auth', 'verified', 'sm'])->group(function () {
   Route::put('/api/inventory-transfers/{inventoryTransfer}/status', [InventoryTransferController::class, 'updateStatus'])->name('inventory-transfers.update-status');
   Route::get('/api/inventory-transfers/{inventoryTransfer}', [InventoryTransferController::class, 'getTransferDetail'])->name('inventory-transfers.detail');
 
+  // API route để lấy danh sách nhân viên của cửa hàng
+  Route::get('/api/stores/{store}/staff', [App\Http\Controllers\StoreController::class, 'getStoreStaff']);
+
   Route::get('/store-reports', function () {
     return Inertia::render('Others/FeatureOnDeveloping', [
       'user' => Auth::user(),

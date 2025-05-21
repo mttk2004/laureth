@@ -9,9 +9,17 @@ import { Head, router } from '@inertiajs/react';
 import { EyeIcon, PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 
+interface OrderWithUser extends Order {
+    user?: {
+        id: string;
+        full_name: string;
+        email: string;
+    };
+}
+
 interface Props {
     orders: {
-        data: Order[];
+        data: OrderWithUser[];
         links: {
             url: string | null;
             label: string;
@@ -29,6 +37,7 @@ interface Props {
         payment_method?: string;
         date_from?: string;
         date_to?: string;
+        user_id?: string;
     };
     sort?: string;
 }
@@ -59,7 +68,13 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
     };
 
     // Xử lý áp dụng bộ lọc
-    const handleApplyFilters = (newFilters: { status?: string; payment_method?: string; date_from?: string; date_to?: string }) => {
+    const handleApplyFilters = (newFilters: {
+        status?: string;
+        payment_method?: string;
+        date_from?: string;
+        date_to?: string;
+        user_id?: string;
+    }) => {
         router.get(
             '/pos',
             { ...newFilters, sort },
@@ -90,32 +105,37 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
         {
             key: 'id',
             label: 'Mã đơn hàng',
-            render: (item: Order) => <span className="font-mono text-xs">{item.id.substring(0, 8)}...</span>,
+            render: (item: OrderWithUser) => <span className="font-mono text-xs">{item.id.substring(0, 8)}...</span>,
         },
         {
             key: 'order_date',
             label: 'Ngày đặt hàng',
-            render: (item: Order) => formatDate(item.order_date),
+            render: (item: OrderWithUser) => formatDate(item.order_date),
         },
         {
             key: 'status',
             label: 'Trạng thái',
-            render: (item: Order) => <OrderStatusBadge status={item.status} />,
+            render: (item: OrderWithUser) => <OrderStatusBadge status={item.status} />,
         },
         {
             key: 'payment_method',
             label: 'Phương thức thanh toán',
-            render: (item: Order) => <PaymentMethodBadge paymentMethod={item.payment_method} />,
+            render: (item: OrderWithUser) => <PaymentMethodBadge paymentMethod={item.payment_method} />,
+        },
+        {
+            key: 'user',
+            label: 'Nhân viên',
+            render: (item: OrderWithUser) => <span>{item.user?.full_name || 'N/A'}</span>,
         },
         {
             key: 'final_amount',
             label: 'Tổng tiền',
-            render: (item: Order) => formatCurrency(item.final_amount),
+            render: (item: OrderWithUser) => formatCurrency(item.final_amount),
         },
     ];
 
     // Định nghĩa thao tác cho từng dòng
-    const renderActions = (item: Order) => (
+    const renderActions = (item: OrderWithUser) => (
         <div className="flex space-x-2">
             <Button variant="ghost" size="sm" onClick={() => handleViewDetails(item.id)}>
                 <EyeIcon className="h-4 w-4" />
@@ -143,7 +163,7 @@ export default function OrdersIndex({ orders, user, filters = {}, sort = OrderSo
                     <h1 className="text-2xl font-bold">Đơn hàng</h1>
                     <div className="flex space-x-2">
                         <OrderSortSelect value={sort as OrderSortOption} onChange={handleSortChange} />
-                        <OrderFilters initialFilters={filters} onApplyFilters={handleApplyFilters} />
+                        <OrderFilters initialFilters={filters} onApplyFilters={handleApplyFilters} currentUser={user} />
                         <Button onClick={() => router.visit('/pos/create')}>
                             <PlusIcon className="mr-2 h-4 w-4" />
                             Tạo đơn hàng mới
