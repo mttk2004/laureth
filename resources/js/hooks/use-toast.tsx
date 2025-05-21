@@ -7,12 +7,15 @@ export interface Toast {
     message: string;
     type: ToastType;
     duration?: number;
+    title?: string;
+    description?: string;
 }
 
 interface ToastContextType {
     toasts: Toast[];
     addToast: (message: string, type: ToastType, duration?: number) => void;
     removeToast: (id: string) => void;
+    toast: (props: { title: string; description: string; type?: ToastType }) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -31,11 +34,23 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const toast = (props: { title: string; description: string; type?: ToastType }) => {
+        const id = Math.random().toString(36).substring(2, 9);
+        const { title, description, type = 'info' } = props;
+        const duration = 5000;
+
+        setToasts((prev) => [...prev, { id, message: description, title, description, type, duration }]);
+
+        setTimeout(() => {
+            setToasts((prev) => prev.filter((toast) => toast.id !== id));
+        }, duration);
+    };
+
     const removeToast = (id: string) => {
         setToasts((prev) => prev.filter((toast) => toast.id !== id));
     };
 
-    return <ToastContext.Provider value={{ toasts, addToast, removeToast }}>{children}</ToastContext.Provider>;
+    return <ToastContext.Provider value={{ toasts, addToast, removeToast, toast }}>{children}</ToastContext.Provider>;
 }
 
 export function useToast() {
