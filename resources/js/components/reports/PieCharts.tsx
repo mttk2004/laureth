@@ -46,11 +46,11 @@ export function PieCharts({ revenueByStore, revenueByPaymentMethod, revenueByCat
     ];
 
     const renderPieChart = (data: PieChartDataItem[], title: string) => {
-        console.log(`renderPieChart - ${title} data:`, data);
+        // console.log(`renderPieChart - ${title} data:`, data);
 
         // Kiểm tra nếu data là null, undefined hoặc mảng rỗng
         if (!data || !Array.isArray(data) || data.length === 0) {
-            console.log(`renderPieChart - ${title} dữ liệu không hợp lệ:`, data);
+            // console.log(`renderPieChart - ${title} dữ liệu không hợp lệ:`, data);
             return renderEmptyChart(title);
         }
 
@@ -68,15 +68,15 @@ export function PieCharts({ revenueByStore, revenueByPaymentMethod, revenueByCat
 
         // Thêm kiểm tra dữ liệu trống
         const hasData = chartData.some((item) => item.value > 0);
-        console.log(`renderPieChart - ${title} hasData:`, hasData);
+        // console.log(`renderPieChart - ${title} hasData:`, hasData);
 
         // Nếu không có dữ liệu, hiển thị thông báo
         if (!hasData) {
-            console.log(`renderPieChart - ${title} không có dữ liệu`);
+            // console.log(`renderPieChart - ${title} không có dữ liệu`);
             return renderEmptyChart(title);
         }
 
-        console.log(`renderPieChart - ${title} chartData final:`, chartData);
+        // console.log(`renderPieChart - ${title} chartData final:`, chartData);
 
         const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
             if (active && payload && payload.length) {

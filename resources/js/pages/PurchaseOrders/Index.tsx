@@ -51,7 +51,6 @@ export default function PurchaseOrdersIndex({
 }: Props) {
     const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [printDialogOpen, setPrintDialogOpen] = useState(false);
-    const [warehouseSelectDialogOpen, setWarehouseSelectDialogOpen] = useState(false);
     const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState<PurchaseOrderWithRelations | null>(null);
 
     const handleApplyFilters = (
@@ -99,6 +98,10 @@ export default function PurchaseOrdersIndex({
     const handlePrintPurchaseOrder = (purchaseOrder: PurchaseOrderWithRelations) => {
         setSelectedPurchaseOrder(purchaseOrder);
         setPrintDialogOpen(true);
+    };
+
+    const handleWarehouseSelect = (warehouseId: string) => {
+        router.get(`/warehouses/${warehouseId}/purchase`);
     };
 
     const formatDate = (dateString: string) => {
@@ -159,10 +162,18 @@ export default function PurchaseOrdersIndex({
                             initialFilters={filters}
                             onApplyFilters={handleApplyFilters}
                         />
-                        <Button onClick={() => setWarehouseSelectDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-                            <PlusIcon className="mr-2 h-4 w-4" />
-                            Nhập hàng
-                        </Button>
+                        <WarehouseSelectDialog
+                            warehouses={warehouses}
+                            triggerComponent={
+                                <Button className="bg-blue-600 hover:bg-blue-700">
+                                    <PlusIcon className="mr-2 h-4 w-4" />
+                                    Nhập hàng
+                                </Button>
+                            }
+                            onSelect={handleWarehouseSelect}
+                            title="Chọn kho nhập hàng"
+                            description="Chọn kho để tạo đơn nhập hàng mới"
+                        />
                     </div>
                 </div>
 
@@ -192,8 +203,6 @@ export default function PurchaseOrdersIndex({
                 <PurchaseOrderDetailDialog purchaseOrder={selectedPurchaseOrder} open={detailDialogOpen} onOpenChange={setDetailDialogOpen} />
 
                 <PurchaseOrderPrintPreview purchaseOrder={selectedPurchaseOrder} open={printDialogOpen} onOpenChange={setPrintDialogOpen} />
-
-                <WarehouseSelectDialog warehouses={warehouses} open={warehouseSelectDialogOpen} onOpenChange={setWarehouseSelectDialogOpen} />
             </div>
         </AppLayout>
     );
